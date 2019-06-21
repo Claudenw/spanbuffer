@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.xenei</groupId>
+    <artifactId>spanbuffer</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Span Buffer Library</name>
+	<properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+	</properties>
+	
+    <build>
+        <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                  <failOnError>false</failOnError>
+              </configuration>
+          </plugin>
+      </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    <dependencies>
+    	<dependency>
+            <groupId>org.xenei</groupId>
+            <artifactId>span</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+    	</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xenei</groupId>
+            <artifactId>junit-contracts</artifactId>
+            <version>0.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-api</artifactId>
+        	<version>1.7.26</version>
+        </dependency>
+    </dependencies>
+    <distributionManagement>
+    </distributionManagement>
+    <dependencyManagement>
+    </dependencyManagement>
+    <description>Library for creating SpanBuffers.</description>
+
+    <issueManagement>
+    </issueManagement>
+    <scm>
+    </scm>
+
+ 
+    <organization>
+        <name>Xenei.org - Simple Open Source Libraries</name>
+    </organization>
+
+    
+</project>
