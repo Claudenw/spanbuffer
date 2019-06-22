@@ -20,51 +20,20 @@ package org.xenei.spanbuffer.lazy.tree;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.SpanBuffer.Walker;
-import org.xenei.spanbuffer.lazy.tree.serde.Position;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
 public class TestDeserializer implements TreeDeserializer<TestPosition> {
 	
 	
 	private List<byte[]> buffers;
-	
-	private Function<SpanBuffer, List<TreeLazyLoader<TestPosition,TestDeserializer>>> func;	
+
 	
 	public TestDeserializer(List<byte[]> buffers)
 	{
 		this.buffers= buffers;
-		this.func = new Function<SpanBuffer, List<TreeLazyLoader<TestPosition,TestDeserializer>>>() {
-
-				@Override
-				public List<TreeLazyLoader<TestPosition,TestDeserializer>> apply(SpanBuffer buffer) {
-					List<TreeLazyLoader<TestPosition,TestDeserializer>> result = new ArrayList<TreeLazyLoader<TestPosition,TestDeserializer>>();
-					try (ObjectInputStream ois = new ObjectInputStream( buffer.getInputStream() )) {
-						while (true) {
-							try {
-								int idx = ois.readInt();
-								TreeLazyLoader<TestPosition,TestDeserializer> tll = new TreeLazyLoader<TestPosition,TestDeserializer>( new TestPosition( idx ), TestDeserializer.this);
-								result.add( tll );
-							} catch (EOFException e)
-							{
-								return result;
-							}
-						}
-					} catch (IOException e)
-					{
-						throw new RuntimeException( e );
-					}
-					
-				}};
-				
-
 	}
 	
 	@Override
@@ -72,6 +41,7 @@ public class TestDeserializer implements TreeDeserializer<TestPosition> {
 		return position.isNoData()? new byte[0] : buffers.get(position.idx);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TreeLazyLoader<TestPosition, TestDeserializer>> extractLoaders( SpanBuffer buffer ) {
 		List<TreeLazyLoader<TestPosition,TestDeserializer>> result = new ArrayList<TreeLazyLoader<TestPosition,TestDeserializer>>();
