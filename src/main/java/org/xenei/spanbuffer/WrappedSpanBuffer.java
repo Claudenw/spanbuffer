@@ -20,6 +20,8 @@ package org.xenei.spanbuffer;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.xenei.spanbuffer.streams.SpanBufferInputStream;
+
 /**
  * An abstract class that wraps another SpanBuffer.
  *
@@ -89,7 +91,7 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
     }
 
     @Override
-    public InputStream getInputStream() {
+    public SpanBufferInputStream getInputStream() {
         return sb.getInputStream();
     }
 

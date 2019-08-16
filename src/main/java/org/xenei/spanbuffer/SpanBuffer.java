@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.NoSuchElementException;
 
 import org.xenei.span.Span;
+import org.xenei.spanbuffer.streams.SpanBufferInputStream;
 
 /**
  * Interface that places a span on a buffer. Only bytes within the span will be visible.
@@ -258,7 +259,7 @@ public interface SpanBuffer extends Span {
      *
      * @return An input stream on the buffer.
      */
-    InputStream getInputStream();
+    SpanBufferInputStream getInputStream();
 
     /**
      * Get the absolute position of the needle in the SpanBuffer starting at specified absolute location.

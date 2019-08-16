@@ -38,6 +38,14 @@ public class SpanBufferInputStream extends InputStream {
     public SpanBufferInputStream(final SpanBuffer buf) {
         walker = buf.getWalker( buf.getOffset() );
     }
+    
+    /**
+     * get the number of bytes read.
+     * @return the number of bytes read.
+     */
+    public long getBytesRead() {
+    	return walker.getBuffer().makeRelative(walker.getPos());
+    }
 
     /**
      * Get the span buffer this input stream is reading from.

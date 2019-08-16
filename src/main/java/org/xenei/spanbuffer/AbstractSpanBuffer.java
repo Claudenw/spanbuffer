@@ -199,7 +199,7 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
     }
 
     @Override
-    public InputStream getInputStream() {
+    public SpanBufferInputStream getInputStream() {
         return new SpanBufferInputStream( this );
     }
 
