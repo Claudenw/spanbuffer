@@ -26,24 +26,24 @@ import org.xenei.spanbuffer.impl.SpanByteBuffer;
 
 public class SpanByteBufferTest {
 
-    @Test
-    public void constructorTest() throws IOException {
+	@Test
+	public void constructorTest() throws IOException {
 
-        final SpanByteBuffer sp1 = new SpanByteBuffer( ByteBuffer.wrap( "Hello World".getBytes() ) );
-        Assert.assertEquals( 0, sp1.getOffset() );
-        Assert.assertEquals( 10, sp1.getEnd() );
-        Assert.assertEquals( 11, sp1.getLength() );
+		final SpanByteBuffer sp1 = new SpanByteBuffer(ByteBuffer.wrap("Hello World".getBytes()));
+		Assert.assertEquals(0, sp1.getOffset());
+		Assert.assertEquals(10, sp1.getEnd());
+		Assert.assertEquals(11, sp1.getLength());
 
-    }
+	}
 
-    @Test
-    public void constructorWithOFfsetTest() throws IOException {
+	@Test
+	public void constructorWithOFfsetTest() throws IOException {
 
-        final SpanByteBuffer sp1 = new SpanByteBuffer( 5, ByteBuffer.wrap( "Hello World".getBytes() ) );
-        Assert.assertEquals( 5, sp1.getOffset() );
-        Assert.assertEquals( 15, sp1.getEnd() );
-        Assert.assertEquals( 11, sp1.getLength() );
+		final SpanByteBuffer sp1 = new SpanByteBuffer(5, ByteBuffer.wrap("Hello World".getBytes()));
+		Assert.assertEquals(5, sp1.getOffset());
+		Assert.assertEquals(15, sp1.getEnd());
+		Assert.assertEquals(11, sp1.getLength());
 
-    }
+	}
 
 }

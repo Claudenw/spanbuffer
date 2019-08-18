@@ -18,7 +18,8 @@
 package org.xenei.spanbuffer.lazy.tree;
 
 import java.io.IOException;
-import org.xenei.span.Span;
+
+import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
@@ -32,7 +33,6 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	private long bufferLength;
 	@SuppressWarnings("rawtypes")
 	protected final TreeLazyLoader lazyLoader;
-
 
 	/**
 	 * Constructor.
@@ -48,7 +48,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
 		super(offset);
 		this.inset = inset;
-		this.bufferLength = lazyLoader.hasNoData()? 0 : bufferLength;
+		this.bufferLength = lazyLoader.hasNoData() ? 0 : bufferLength;
 		this.lazyLoader = lazyLoader;
 	}
 
@@ -58,7 +58,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	 *
 	 * @return the delegating spanbuffer
 	 */
-	protected abstract SpanBuffer getDelegate();	
+	protected abstract SpanBuffer getDelegate();
 
 	@Override
 	public final byte read(final long position) throws IOException {
@@ -77,7 +77,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 
 	@Override
 	public final long getEnd() {
-		return Span.calcEnd(this);
+		return LongSpan.calcEnd(this);
 	}
 
 	@Override

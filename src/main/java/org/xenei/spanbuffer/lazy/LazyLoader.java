@@ -17,24 +17,23 @@
  */
 package org.xenei.spanbuffer.lazy;
 
-
 /**
- *  Load a single buffer segment if needed.
+ * Load a single buffer segment if needed.
  */
 public interface LazyLoader {
 
-    /**
-     * return the buffer if it has been loaded already, otherwise load and return.
-     *
-     * @return fully loaded buffer
-     */
-    byte[] getBuffer();
+	/**
+	 * return the buffer if it has been loaded already, otherwise load and return.
+	 *
+	 * @return fully loaded buffer
+	 */
+	byte[] getBuffer();
 
-    /**
-     * return the buffer length, load the buffer if unknown.
-     *
-     * @return length of buffer
-     */
-    long getLength();
+	/**
+	 * return the buffer length, load the buffer if unknown.
+	 *
+	 * @return length of buffer
+	 */
+	long getLength();
 
 }

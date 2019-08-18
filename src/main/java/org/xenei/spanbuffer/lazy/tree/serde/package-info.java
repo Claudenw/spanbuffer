@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 /**
- * The serializer, deserializer and position interfaces that must be implemented to correctly write and 
- * read data from the storage layer.
+ * The serializer, deserializer and position interfaces that must be implemented
+ * to correctly write and read data from the storage layer.
  * 
  */
 package org.xenei.spanbuffer.lazy.tree.serde;
-

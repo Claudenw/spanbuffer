@@ -26,30 +26,30 @@ import org.xenei.spanbuffer.impl.SpanBufferList;
 
 public class SpanBufferFactoryTests {
 
-    @Test
-    public void testMergeEmpty() throws IOException {
-        final SpanBuffer sb = Factory.wrap( "Hello" );
-        SpanBuffer sb2 = Factory.merge( Factory.EMPTY, sb );
-        Assert.assertEquals( "Hello", sb2.getText() );
-        Assert.assertEquals( 0, sb2.getOffset() );
-        Assert.assertEquals( 5, sb2.getLength() );
+	@Test
+	public void testMergeEmpty() throws IOException {
+		final SpanBuffer sb = Factory.wrap("Hello");
+		SpanBuffer sb2 = Factory.merge(Factory.EMPTY, sb);
+		Assert.assertEquals("Hello", sb2.getText());
+		Assert.assertEquals(0, sb2.getOffset());
+		Assert.assertEquals(5, sb2.getLength());
 
-        // Assert.assertTrue( sb2 instanceof SpanByteBuffer );
-        // Assert.assertEquals( sb, sb2 );
+		// Assert.assertTrue( sb2 instanceof SpanByteBuffer );
+		// Assert.assertEquals( sb, sb2 );
 
-        sb2 = Factory.merge( sb, Factory.EMPTY );
-        Assert.assertEquals( "Hello", sb2.getText() );
-        Assert.assertEquals( 0, sb2.getOffset() );
-        Assert.assertEquals( 5, sb2.getLength() );
+		sb2 = Factory.merge(sb, Factory.EMPTY);
+		Assert.assertEquals("Hello", sb2.getText());
+		Assert.assertEquals(0, sb2.getOffset());
+		Assert.assertEquals(5, sb2.getLength());
 
-        // Assert.assertTrue( sb2 instanceof SpanByteBuffer );
-        // Assert.assertEquals( sb, sb2 );
+		// Assert.assertTrue( sb2 instanceof SpanByteBuffer );
+		// Assert.assertEquals( sb, sb2 );
 
-        sb2 = Factory.merge( sb, sb );
-        Assert.assertTrue( sb2 instanceof SpanBufferList );
-        Assert.assertEquals( "HelloHello", sb2.getText() );
-        Assert.assertEquals( 0, sb2.getOffset() );
-        Assert.assertEquals( 10, sb2.getLength() );
+		sb2 = Factory.merge(sb, sb);
+		Assert.assertTrue(sb2 instanceof SpanBufferList);
+		Assert.assertEquals("HelloHello", sb2.getText());
+		Assert.assertEquals(0, sb2.getOffset());
+		Assert.assertEquals(10, sb2.getLength());
 
-    }
+	}
 }

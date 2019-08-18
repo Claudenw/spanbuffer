@@ -20,4 +20,3 @@
  * 
  */
 package org.xenei.spanbuffer.lazy.tree.node;
-

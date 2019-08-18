@@ -17,7 +17,6 @@
  */
 package org.xenei.spanbuffer.lazy.tree;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Factory;
@@ -30,9 +29,8 @@ import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
  */
 public class LeafBuffer extends AbstractNodeBuffer {
 
-    private static final Logger LOG = LoggerFactory.getLogger( LeafBuffer.class );
+	private static final Logger LOG = LoggerFactory.getLogger(LeafBuffer.class);
 	private SpanBuffer delegate;
-	
 
 	/**
 	 * Creates TreeNode with offset to 0.
@@ -40,12 +38,13 @@ public class LeafBuffer extends AbstractNodeBuffer {
 	 * @param lazyLoader the lazy loader for the data.
 	 */
 	public LeafBuffer(@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
-		this(0L, lazyLoader);		
+		this(0L, lazyLoader);
 	}
 
 	/**
 	 * Creates a tree node with specified offset.
-	 * @param offset the offset.
+	 * 
+	 * @param offset     the offset.
 	 * @param lazyLoader the lazy loader for the data.
 	 */
 	public LeafBuffer(final long offset, @SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
@@ -60,7 +59,8 @@ public class LeafBuffer extends AbstractNodeBuffer {
 	 *                   starts.
 	 * @param lazyLoader the lazy loader for the data
 	 */
-	private LeafBuffer(final long offset, final int inset, @SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+	private LeafBuffer(final long offset, final int inset,
+			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
 		this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
 	}
 
@@ -75,9 +75,9 @@ public class LeafBuffer extends AbstractNodeBuffer {
 	 * @param lazyLoader   the lazy loader for the data
 	 */
 	private LeafBuffer(final long offset, final int inset, final long bufferLength,
-			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {	
-		super(offset,inset, bufferLength, lazyLoader);
-		
+			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+		super(offset, inset, bufferLength, lazyLoader);
+
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class LeafBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			delegate = Factory.wrap( getOffset(), lazyLoader.getBuffer());
+			delegate = Factory.wrap(getOffset(), lazyLoader.getBuffer());
 		}
 
 		return delegate;
@@ -102,6 +102,5 @@ public class LeafBuffer extends AbstractNodeBuffer {
 	public SpanBuffer duplicate(final long newOffset) {
 		return new LeafBuffer(newOffset, inset, getLength(), lazyLoader);
 	}
-
 
 }

@@ -19,7 +19,6 @@ package org.xenei.spanbuffer.lazy.tree.serde;
 
 import java.util.List;
 
-
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.tree.TreeLazyLoader;
 
@@ -33,19 +32,21 @@ public interface TreeDeserializer<P extends Position> {
 	/**
 	 * Read from the Position and return the associated byte buffer.
 	 * 
-	 * The position parameter was returned from an earlier call to TreeSerializer.serialize().
+	 * The position parameter was returned from an earlier call to
+	 * TreeSerializer.serialize().
 	 * 
 	 * @param position the position to read the buffer from.
 	 * @return a byte buffer containing data that was serialized at the position.
 	 */
-	public byte[] deserialize( P position );
-	
+	public byte[] deserialize(P position);
+
 	/**
-	 * process a spanbuffer that contains one or more positions serialized by 
-	 * TreeSerializer.serialize(position) and return a list of TreeLazyLoader instances.
+	 * process a spanbuffer that contains one or more positions serialized by
+	 * TreeSerializer.serialize(position) and return a list of TreeLazyLoader
+	 * instances.
 	 * 
 	 * @param buffer the buffer to process.
 	 * @return A list of TreeLazyLoader instances.
 	 */
-	public <T extends TreeDeserializer<P>> List<TreeLazyLoader<P, T>> extractLoaders(SpanBuffer buffer );
+	public <T extends TreeDeserializer<P>> List<TreeLazyLoader<P, T>> extractLoaders(SpanBuffer buffer);
 }

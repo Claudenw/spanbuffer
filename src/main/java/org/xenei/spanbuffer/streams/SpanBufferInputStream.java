@@ -24,70 +24,68 @@ import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.SpanBuffer.Walker;
 
 /**
- * An InputStream implementation on top of a span buffer.  Multiple SpanBufferInputStreams may be 
- * active on a single SpanBuffer at one time.
+ * An InputStream implementation on top of a span buffer. Multiple
+ * SpanBufferInputStreams may be active on a single SpanBuffer at one time.
  */
 public class SpanBufferInputStream extends InputStream {
 
-    private final Walker walker;
+	private final Walker walker;
 
-    /**
-     * Constructor.
-     * @param buf the span buffer to read from.
-     */
-    public SpanBufferInputStream(final SpanBuffer buf) {
-        walker = buf.getWalker( buf.getOffset() );
-    }
-    
-    /**
-     * get the number of bytes read.
-     * @return the number of bytes read.
-     */
-    public long getBytesRead() {
-    	return walker.getBuffer().makeRelative(walker.getPos());
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param buf the span buffer to read from.
+	 */
+	public SpanBufferInputStream(final SpanBuffer buf) {
+		walker = buf.getWalker(buf.getOffset());
+	}
 
-    /**
-     * Get the span buffer this input stream is reading from.
-     * @return the enclosed span buffer.
-     */
-    public SpanBuffer getSpanBuffer() {
-    	return walker.getBuffer();
-    }
+	/**
+	 * get the number of bytes read.
+	 * 
+	 * @return the number of bytes read.
+	 */
+	public long getBytesRead() {
+		return walker.getBuffer().makeRelative(walker.getPos());
+	}
 
-    @Override
-    public int available() {
-        return (int) Math.min( walker.remaining(), Integer.MAX_VALUE );
-    }
+	/**
+	 * Get the span buffer this input stream is reading from.
+	 * 
+	 * @return the enclosed span buffer.
+	 */
+	public SpanBuffer getSpanBuffer() {
+		return walker.getBuffer();
+	}
 
-    @Override
-    public int read() throws IOException {
-        if (!walker.hasCurrent())
-        {
-            return -1;
-        }
-        try
-        {
-            return walker.getByte() & 0xFF;
-        } finally
-        {
-            walker.next();
-        }
-    }
+	@Override
+	public int available() {
+		return (int) Math.min(walker.remaining(), Integer.MAX_VALUE);
+	}
 
-    @Override
-    public int read(final byte[] bytes, final int off, int len) {
-        if (walker.remaining() <= 0)
-        {
-            return -1;
-        }
+	@Override
+	public int read() throws IOException {
+		if (!walker.hasCurrent()) {
+			return -1;
+		}
+		try {
+			return walker.getByte() & 0xFF;
+		} finally {
+			walker.next();
+		}
+	}
 
-        if (walker.remaining() <= Integer.MAX_VALUE)
-        {
-            len = Math.min( len, (int) walker.remaining() );
-        }
-        final int bytesRead = walker.getBuffer().read( walker.getPos(), bytes, off, len );
-        walker.increment( bytesRead );
-        return bytesRead;
-    }
+	@Override
+	public int read(final byte[] bytes, final int off, int len) {
+		if (walker.remaining() <= 0) {
+			return -1;
+		}
+
+		if (walker.remaining() <= Integer.MAX_VALUE) {
+			len = Math.min(len, (int) walker.remaining());
+		}
+		final int bytesRead = walker.getBuffer().read(walker.getPos(), bytes, off, len);
+		walker.increment(bytesRead);
+		return bytesRead;
+	}
 }

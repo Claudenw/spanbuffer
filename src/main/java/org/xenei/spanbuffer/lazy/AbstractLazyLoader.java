@@ -19,57 +19,55 @@ package org.xenei.spanbuffer.lazy;
 
 import java.lang.ref.SoftReference;
 
-
 /**
- * Abstract class for lazy loading.
- * Keeps a soft reference to the loaded bytes so the garbage collector can dispose of them when necessary.
+ * Abstract class for lazy loading. Keeps a soft reference to the loaded bytes
+ * so the garbage collector can dispose of them when necessary.
  */
 public abstract class AbstractLazyLoader implements LazyLoader {
 
-    private SoftReference<byte[]> loadedBufferReference = null;
-    private Long length = null;
+	private SoftReference<byte[]> loadedBufferReference = null;
+	private Long length = null;
 
-    /**
-     * Method to load the internal buffer.
-     * @return the bytes for the internal buffer.
-     */
-    protected abstract byte[] getBufferInternal();
+	/**
+	 * Method to load the internal buffer.
+	 * 
+	 * @return the bytes for the internal buffer.
+	 */
+	protected abstract byte[] getBufferInternal();
 
-    /**
-     * allows for creation where the length isn't known upfront.
-     */
-    public AbstractLazyLoader() {
-    }
+	/**
+	 * allows for creation where the length isn't known upfront.
+	 */
+	public AbstractLazyLoader() {
+	}
 
-    /**
-     * Allows length to be specified up-front when known - so that don't need to invoke get() method to get it.
-     *
-     * @param length
-     *            to be specified
-     */
-    public AbstractLazyLoader(final Long length) {
-        this();
-        this.length = length;
-    }
+	/**
+	 * Allows length to be specified up-front when known - so that don't need to
+	 * invoke get() method to get it.
+	 *
+	 * @param length to be specified
+	 */
+	public AbstractLazyLoader(final Long length) {
+		this();
+		this.length = length;
+	}
 
-    @Override
-    public synchronized byte[] getBuffer() {
+	@Override
+	public synchronized byte[] getBuffer() {
 
-        if ((loadedBufferReference == null) || (loadedBufferReference.get() == null))
-        {
-            loadedBufferReference = new SoftReference<>( getBufferInternal() );
-        }
-        return loadedBufferReference.get();
-    }
+		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
+			loadedBufferReference = new SoftReference<>(getBufferInternal());
+		}
+		return loadedBufferReference.get();
+	}
 
-    @Override
-    public long getLength() {
-        if (length == null)
-        {
-            final byte[] buffer = getBuffer();
-            length = (long) buffer.length;
-        }
-        return length;
-    }
+	@Override
+	public long getLength() {
+		if (length == null) {
+			final byte[] buffer = getBuffer();
+			length = (long) buffer.length;
+		}
+		return length;
+	}
 
 }

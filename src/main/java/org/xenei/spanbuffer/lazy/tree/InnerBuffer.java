@@ -34,7 +34,7 @@ import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
  */
 public class InnerBuffer extends AbstractNodeBuffer {
 
-    private static final Logger LOG = LoggerFactory.getLogger( InnerBuffer.class );
+	private static final Logger LOG = LoggerFactory.getLogger(InnerBuffer.class);
 	private SpanBuffer delegate;
 
 	/**

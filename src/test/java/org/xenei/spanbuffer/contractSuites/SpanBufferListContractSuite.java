@@ -32,27 +32,26 @@ import org.xenei.spanbuffer.impl.SpanBufferList;
 @ContractImpl(SpanBufferList.class)
 public class SpanBufferListContractSuite {
 
-    @Contract.Inject
-    public SpanBufferProducer<SpanBufferList> getProducer() {
-        return new SpanBufferProducer<SpanBufferList>() {
+	@Contract.Inject
+	public SpanBufferProducer<SpanBufferList> getProducer() {
+		return new SpanBufferProducer<SpanBufferList>() {
 
-            @Override
-            public SpanBufferList newInstance() {
+			@Override
+			public SpanBufferList newInstance() {
 
-                return new SpanBufferList( 0, Arrays.asList( new SpanBuffer[] {Factory.wrap( "Hello"
-                        .getBytes() ), Factory.wrap( " ".getBytes() ), Factory.wrap( "World"
-                                .getBytes() )} ) );
-            }
+				return new SpanBufferList(0, Arrays.asList(new SpanBuffer[] { Factory.wrap("Hello".getBytes()),
+						Factory.wrap(" ".getBytes()), Factory.wrap("World".getBytes()) }));
+			}
 
-            @Override
-            public void cleanUp() {
-                // do nothing
-            }
+			@Override
+			public void cleanUp() {
+				// do nothing
+			}
 
-            @Override
-            public byte[] getBufferContents() {
-                return "Hello World".getBytes();
-            }
-        };
-    }
+			@Override
+			public byte[] getBufferContents() {
+				return "Hello World".getBytes();
+			}
+		};
+	}
 }

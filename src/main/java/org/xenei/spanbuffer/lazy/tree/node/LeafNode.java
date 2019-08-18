@@ -20,44 +20,44 @@ package org.xenei.spanbuffer.lazy.tree.node;
 import java.util.Arrays;
 
 /**
- * A leaf node in a tree buffer structure.  This node contains raw byte data for the span buffer.
+ * A leaf node in a tree buffer structure. This node contains raw byte data for
+ * the span buffer.
  */
 public class LeafNode extends TreeNode {
 
-    /**
-     * Constructor.
-     *
-     * @param maxBufferSize
-     *            max buffer size
-     */
-    public LeafNode(final int maxBufferSize) {
-        super( maxBufferSize );
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param maxBufferSize max buffer size
+	 */
+	public LeafNode(final int maxBufferSize) {
+		super(maxBufferSize);
+	}
 
-    @Override
-    public boolean isDataEmpty() {
-        return offset == 0;
-    }
+	@Override
+	public boolean isDataEmpty() {
+		return offset == 0;
+	}
 
-    @Override
-    protected void adjustLength(final long expandedLength) throws IllegalStateException {
-        // Do nothing
-    }
+	@Override
+	protected void adjustLength(final long expandedLength) throws IllegalStateException {
+		// Do nothing
+	}
 
-    @Override
-    public long getExpandedLength() {
-        return offset;
-    }
+	@Override
+	public long getExpandedLength() {
+		return offset;
+	}
 
-    @Override
-    public void clearData() {
-        Arrays.fill( data, (byte) 0 );
-        offset = 0;
-    }
+	@Override
+	public void clearData() {
+		Arrays.fill(data, (byte) 0);
+		offset = 0;
+	}
 
-    @Override
-    public String toString() {
-        return "LeafNode of length: " + getExpandedLength();
-    }
+	@Override
+	public String toString() {
+		return "LeafNode of length: " + getExpandedLength();
+	}
 
 }

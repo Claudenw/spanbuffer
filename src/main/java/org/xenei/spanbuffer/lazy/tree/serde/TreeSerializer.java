@@ -19,7 +19,6 @@ package org.xenei.spanbuffer.lazy.tree.serde;
 
 import java.nio.ByteBuffer;
 
-
 /**
  * Serializer to write tree data to storage.
  * 
@@ -29,29 +28,32 @@ public interface TreeSerializer<P extends Position> {
 
 	/**
 	 * Get the maximum buffer that the serializer can handle in one buffer.
+	 * 
 	 * @return the maximum buffer size.
 	 */
 	public int getMaxBufferSize();
-	
+
 	/**
-	 * Write the buffer to the data storage and return a Position. 
-	 * @param buffer the buffer to write 
+	 * Write the buffer to the data storage and return a Position.
+	 * 
+	 * @param buffer the buffer to write
 	 * @return The Position the buffer was written to.
 	 */
-	public P serialize( byte[] buffer );
-	
+	public P serialize(byte[] buffer);
+
 	/**
 	 * Write the Position information to a byte buffer.
+	 * 
 	 * @param position the position to write to the buffer.
 	 * @return a byte buffer containing the position information.
 	 */
-	public ByteBuffer serialize( P position );
-	
+	public ByteBuffer serialize(P position);
+
 	/**
 	 * Return a position that means no data has been written.
+	 * 
 	 * @return the no data position for this serializer.
 	 */
 	public P getNoDataPosition();
-
 
 }

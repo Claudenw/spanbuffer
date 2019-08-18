@@ -26,41 +26,36 @@ import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
 public class TestDeserializer implements TreeDeserializer<TestPosition> {
-	
-	
+
 	private List<byte[]> buffers;
 
-	
-	public TestDeserializer(List<byte[]> buffers)
-	{
-		this.buffers= buffers;
+	public TestDeserializer(List<byte[]> buffers) {
+		this.buffers = buffers;
 	}
-	
+
 	@Override
 	public byte[] deserialize(TestPosition position) {
-		return position.isNoData()? new byte[0] : buffers.get(position.idx);
+		return position.isNoData() ? new byte[0] : buffers.get(position.idx);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TreeLazyLoader<TestPosition, TestDeserializer>> extractLoaders( SpanBuffer buffer ) {
-		List<TreeLazyLoader<TestPosition,TestDeserializer>> result = new ArrayList<TreeLazyLoader<TestPosition,TestDeserializer>>();
-		try (DataInputStream ois = new DataInputStream( buffer.getInputStream() )) {
+	public List<TreeLazyLoader<TestPosition, TestDeserializer>> extractLoaders(SpanBuffer buffer) {
+		List<TreeLazyLoader<TestPosition, TestDeserializer>> result = new ArrayList<TreeLazyLoader<TestPosition, TestDeserializer>>();
+		try (DataInputStream ois = new DataInputStream(buffer.getInputStream())) {
 			while (true) {
 				try {
 					int idx = ois.readInt();
-					TreeLazyLoader<TestPosition,TestDeserializer> tll = new TreeLazyLoader<TestPosition,TestDeserializer>( new TestPosition( idx ), TestDeserializer.this);
-					result.add( tll );
-				} catch (EOFException e)
-				{
+					TreeLazyLoader<TestPosition, TestDeserializer> tll = new TreeLazyLoader<TestPosition, TestDeserializer>(
+							new TestPosition(idx), TestDeserializer.this);
+					result.add(tll);
+				} catch (EOFException e) {
 					return result;
 				}
 			}
-		} catch (IOException e)
-		{
-			throw new RuntimeException( e );
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	
 }

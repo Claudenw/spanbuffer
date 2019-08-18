@@ -20,13 +20,12 @@ package org.xenei.spanbuffer.lazy.tree;
 import org.xenei.spanbuffer.lazy.tree.serde.Position;
 
 public class TestPosition implements Position {
-	
-	public static final TestPosition NO_DATA = new TestPosition( -1 );
-	
+
+	public static final TestPosition NO_DATA = new TestPosition(-1);
+
 	int idx;
-	
-	TestPosition( int idx )
-	{
+
+	TestPosition(int idx) {
 		this.idx = idx;
 	}
 
@@ -34,6 +33,5 @@ public class TestPosition implements Position {
 	public boolean isNoData() {
 		return idx < 0;
 	}
-	
-	
+
 }

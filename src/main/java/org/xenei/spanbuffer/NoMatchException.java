@@ -22,20 +22,19 @@ package org.xenei.spanbuffer;
  */
 public class NoMatchException extends Exception {
 
-    private static final long serialVersionUID = 7477988479078488840L;
+	private static final long serialVersionUID = 7477988479078488840L;
 
-    public NoMatchException() {
-        super();
-    }
+	public NoMatchException() {
+		super();
+	}
 
-    /**
-     * Generate NoMatchException with a specified reason.
-     *
-     * @param reason
-     *            specify the reason for the exception
-     */
-    public NoMatchException(final String reason) {
-        super( reason );
-    }
+	/**
+	 * Generate NoMatchException with a specified reason.
+	 *
+	 * @param reason specify the reason for the exception
+	 */
+	public NoMatchException(final String reason) {
+		super(reason);
+	}
 
 }

@@ -25,56 +25,61 @@ import org.xenei.spanbuffer.lazy.tree.serde.Position;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
 /**
- * Class that manages the loading of tree data. 
+ * Class that manages the loading of tree data.
  * 
  * @param <P> the Position implementation.
- * @param <T> The TreeDeserializer<P> implementation.
+ * @param <T> The TreeDeserializer
+ *            <P>
+ *            implementation.
  */
 public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> extends AbstractLazyLoader {
-	
+
 	private T deserializer;
 	private P position;
 
-    /**
-     * Constructor.
-     * @param position The position in the deserializer to read the data from.
-     * @param deserializer the deserializer to read from.
-     */
-    public TreeLazyLoader(P position, T deserializer) {
-    	this.deserializer = deserializer;
-    	this.position = position;
-    }
-    
-    /**
-     * Return this lazy loader as a span buffer.
-     * @return this lazy loader as a span buffer.
-     */
+	/**
+	 * Constructor.
+	 * 
+	 * @param position     The position in the deserializer to read the data from.
+	 * @param deserializer the deserializer to read from.
+	 */
+	public TreeLazyLoader(P position, T deserializer) {
+		this.deserializer = deserializer;
+		this.position = position;
+	}
+
+	/**
+	 * Return this lazy loader as a span buffer.
+	 * 
+	 * @return this lazy loader as a span buffer.
+	 */
 	public SpanBuffer asSpanBuffer() {
-		if (position.isNoData())
-		{
+		if (position.isNoData()) {
 			return Factory.EMPTY;
 		}
 		return new InnerBuffer(this);
 	}
-	
+
 	/**
 	 * Apply the deserializer map to the buffer to create a list of TreeLazyLoaders.
+	 * 
 	 * @return a list of TreeLazyLoader<P,T> from the buffer.
 	 */
-	public final List<TreeLazyLoader<P,T>> applyMap( SpanBuffer buffer ) {
-		return deserializer.extractLoaders( buffer );
+	public final List<TreeLazyLoader<P, T>> applyMap(SpanBuffer buffer) {
+		return deserializer.extractLoaders(buffer);
 	}
 
 	/**
 	 * Return true if the buffer has no data.
+	 * 
 	 * @return true if the buffer has no data.
 	 */
 	public final boolean hasNoData() {
 		return position.isNoData();
 	}
-	
+
 	@Override
-	protected byte[] getBufferInternal() {	
-		return position.isNoData()? new byte[0] : deserializer.deserialize(position);
+	protected byte[] getBufferInternal() {
+		return position.isNoData() ? new byte[0] : deserializer.deserialize(position);
 	}
 }

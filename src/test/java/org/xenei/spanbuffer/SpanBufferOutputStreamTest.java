@@ -29,47 +29,43 @@ import org.xenei.spanbuffer.streams.SpanBufferOutputStream;
 
 public class SpanBufferOutputStreamTest {
 
-    @Test
-    public void minimalTest() throws IOException {
-        final SpanBufferOutputStream sbos = new SpanBufferOutputStream();
-        sbos.write( "Hello World".getBytes() );
-        SpanBuffer sb = sbos.getSpanBuffer();
-        Assert.assertEquals( "Hello World", sb.getText() );
+	@Test
+	public void minimalTest() throws IOException {
+		final SpanBufferOutputStream sbos = new SpanBufferOutputStream();
+		sbos.write("Hello World".getBytes());
+		SpanBuffer sb = sbos.getSpanBuffer();
+		Assert.assertEquals("Hello World", sb.getText());
 
-        sbos.write( "Hello World Again".getBytes() );
-        sb = sbos.getSpanBuffer();
-        Assert.assertEquals( "Hello WorldHello World Again", sb.getText() );
+		sbos.write("Hello World Again".getBytes());
+		sb = sbos.getSpanBuffer();
+		Assert.assertEquals("Hello WorldHello World Again", sb.getText());
 
-        sbos.close();
-        try
-        {
-            sbos.getSpanBuffer();
-            Assert.fail( "Should have thrown an already closed exception" );
-        } catch (final IOException expected)
-        {
-            // do nothing expected result.
-        }
-    }
+		sbos.close();
+		try {
+			sbos.getSpanBuffer();
+			Assert.fail("Should have thrown an already closed exception");
+		} catch (final IOException expected) {
+			// do nothing expected result.
+		}
+	}
 
-    @Test
-    public void testLargeWrite() throws IOException {
-        final String s = RandomStringUtils.randomAlphabetic( (int) FileUtils.ONE_MB );
-        final SpanBufferOutputStream sbos = new SpanBufferOutputStream();
-        for (int i = 0; i < 35; i++)
-        {
-            sbos.write( s.getBytes() );
-        }
-        final long size = s.getBytes().length * 35;
-        final SpanBuffer sb = sbos.getSpanBuffer();
-        Assert.assertEquals( size, sb.getLength() );
-        final InputStream is = sb.getInputStream();
-        final byte[] buffer = new byte[s.getBytes().length];
+	@Test
+	public void testLargeWrite() throws IOException {
+		final String s = RandomStringUtils.randomAlphabetic((int) FileUtils.ONE_MB);
+		final SpanBufferOutputStream sbos = new SpanBufferOutputStream();
+		for (int i = 0; i < 35; i++) {
+			sbos.write(s.getBytes());
+		}
+		final long size = s.getBytes().length * 35;
+		final SpanBuffer sb = sbos.getSpanBuffer();
+		Assert.assertEquals(size, sb.getLength());
+		final InputStream is = sb.getInputStream();
+		final byte[] buffer = new byte[s.getBytes().length];
 
-        while (is.read( buffer ) != -1)
-        {
-            Assert.assertEquals( s, new String( buffer ) );
-        }
-        sbos.close();
-    }
+		while (is.read(buffer) != -1) {
+			Assert.assertEquals(s, new String(buffer));
+		}
+		sbos.close();
+	}
 
 }
