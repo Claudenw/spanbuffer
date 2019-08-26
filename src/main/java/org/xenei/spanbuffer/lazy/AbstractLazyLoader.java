@@ -17,23 +17,27 @@
  */
 package org.xenei.spanbuffer.lazy;
 
+import java.io.IOException;
 import java.lang.ref.SoftReference;
+
+import org.xenei.spanbuffer.SpanBuffer;
 
 /**
  * Abstract class for lazy loading. Keeps a soft reference to the loaded bytes
  * so the garbage collector can dispose of them when necessary.
  */
 public abstract class AbstractLazyLoader implements LazyLoader {
-
-	private SoftReference<byte[]> loadedBufferReference = null;
-	private Long length = null;
+	
+	private SoftReference<SpanBuffer> loadedBufferReference = null;
+	private Long length = null;	
 
 	/**
 	 * Method to load the internal buffer.
 	 * 
 	 * @return the bytes for the internal buffer.
+	 * @throws IOException on error
 	 */
-	protected abstract byte[] getBufferInternal();
+	protected abstract SpanBuffer getBufferInternal() throws IOException;
 
 	/**
 	 * allows for creation where the length isn't known upfront.
@@ -53,7 +57,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	}
 
 	@Override
-	public synchronized byte[] getBuffer() {
+	public synchronized SpanBuffer getBuffer() throws IOException {
 
 		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
 			loadedBufferReference = new SoftReference<>(getBufferInternal());
@@ -64,8 +68,13 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	@Override
 	public long getLength() {
 		if (length == null) {
-			final byte[] buffer = getBuffer();
-			length = (long) buffer.length;
+			SpanBuffer buffer;
+			try {
+				buffer = getBuffer();
+			} catch (IOException e) {
+				throw new IllegalStateException( e );
+			}
+			length = buffer.getLength();
 		}
 		return length;
 	}

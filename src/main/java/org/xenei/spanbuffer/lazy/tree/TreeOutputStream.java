@@ -153,7 +153,7 @@ public class TreeOutputStream extends OutputStream {
 	}
 
 	private SpanBuffer startWritingToLeaf(final SpanBuffer node, final byte[] bytes)
-			throws ExecutionException, InterruptedException {
+			throws ExecutionException, InterruptedException, IOException {
 
 		node.readRelative(0, bytes);
 

@@ -17,6 +17,8 @@
  */
 package org.xenei.spanbuffer.lazy.tree;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Factory;
@@ -81,7 +83,7 @@ public class LeafBuffer extends AbstractNodeBuffer {
 	}
 
 	@Override
-	protected SpanBuffer getDelegate() {
+	protected SpanBuffer getDelegate() throws IOException {
 
 		// Check if we need to create the delegate
 		if (delegate != null) {
@@ -91,7 +93,7 @@ public class LeafBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			delegate = Factory.wrap(getOffset(), lazyLoader.getBuffer());
+			delegate = lazyLoader.getBuffer().duplicate( getOffset() );
 		}
 
 		return delegate;

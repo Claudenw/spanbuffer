@@ -17,12 +17,14 @@
  */
 package org.xenei.spanbuffer.lazy.tree;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
+import org.xenei.spanbuffer.Walker;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
 
@@ -91,9 +93,10 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 * information we need for the SpanBuffer.
 	 *
 	 * @return the delegating spanbuffer
+	 * @throws IOException 
 	 */
 	@Override
-	protected SpanBuffer getDelegate() {
+	protected SpanBuffer getDelegate() throws IOException {
 
 		// Check if we need to create the delegate
 		if (delegate != null) {
@@ -104,17 +107,17 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			final byte[] buffer = lazyLoader.getBuffer();
-			if (buffer.length == 0) {
+			SpanBuffer buffer = lazyLoader.getBuffer();
+			if (buffer.getLength() == 0) {
 				throw new IllegalStateException("Buffer must contain atleast 1 byte");
 			}
-
+			
 			/* Figure out what type of data we have */
-			final boolean innerNodePtrs = (buffer[org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE]
+			final boolean innerNodePtrs = (buffer.read(org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE)
 					& InnerNode.INNER_NODE_FLAG) != 0;
 
 			// cut the flag_byte from the front
-			final SpanBuffer spanBuffer = Factory.wrap(buffer).cut(1);
+			final SpanBuffer spanBuffer = buffer.cut(1);
 
 			if (InnerBuffer.LOG.isDebugEnabled()) {
 				InnerBuffer.LOG.debug("Generating Delegate, inner Nodes:[" + innerNodePtrs + "] ");
@@ -124,7 +127,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 				delegate = extract(spanBuffer);
 			} else {
 
-				final boolean outerNodeType = (buffer[org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE]
+				final boolean outerNodeType = (buffer.read(org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE)
 						& InnerNode.OUTER_NODE_FLAG) != 0;
 
 				if (!outerNodeType) {

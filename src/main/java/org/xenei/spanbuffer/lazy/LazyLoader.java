@@ -17,17 +17,25 @@
  */
 package org.xenei.spanbuffer.lazy;
 
+import java.io.Closeable;
+import java.io.IOException;
+
+import org.xenei.spanbuffer.SpanBuffer;
+
 /**
  * Load a single buffer segment if needed.
  */
 public interface LazyLoader {
+	
+	public static final ClosableCleaningTracker tracker = new ClosableCleaningTracker();
 
 	/**
 	 * return the buffer if it has been loaded already, otherwise load and return.
 	 *
 	 * @return fully loaded buffer
+	 * @throws IOException on error
 	 */
-	byte[] getBuffer();
+	SpanBuffer getBuffer() throws IOException;
 
 	/**
 	 * return the buffer length, load the buffer if unknown.
@@ -35,5 +43,23 @@ public interface LazyLoader {
 	 * @return length of buffer
 	 */
 	long getLength();
+	
+	/**
+	 * A marker to determine when a closable object can be closed.
+	 * 
+	 * @param <T>
+	 */
+	public class Marker<T extends Closeable> {
+		private T closable;
+		
+		public Marker( T closable ) {
+			this.closable = closable;
+		}
+		
+		public T get() {
+			return closable;
+		}
+		
+	}
 
 }

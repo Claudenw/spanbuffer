@@ -22,10 +22,12 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.xenei.span.NumberUtils;
+import org.apache.commons.io.FileUtils;
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
+import org.xenei.spanbuffer.Walker;
 
 /**
  * SpanBuffer implementation that wraps a LazyLoader.
@@ -63,6 +65,11 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 	 * the length of a buffer with the length is undefined or unknown.
 	 */
 	public static final int UNDEF_LEN = -1;
+	
+	/**
+	 * The default length for the internal buffer of a lazy loaded buffer.
+	 */
+	public static final long DEFAULT_INTERNAL_BUFFER_SIZE = 4 * FileUtils.ONE_MB;
 
 	/**
 	 * Create a SpanLazyLoadBuffer with default offset.
@@ -147,23 +154,15 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 	@Override
 	public byte read(final long position) throws IOException {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
-		return lazyLoader.getBuffer()[intLimit + inset];
+		return lazyLoader.getBuffer().read(intLimit + inset);
 	}
 
 	@Override
-	public int read(final long position, final byte[] buff, final int pos, final int len) {
+	public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
-		final ByteBuffer buffer = ByteBuffer.wrap(lazyLoader.getBuffer());
-
-		buffer.position(inset + intLimit);
-		try {
-			buffer.get(buff, pos, len);
-			return len;
-		} catch (final BufferUnderflowException ex) {
-			final int bytesRead = buffer.remaining();
-			buffer.get(buff, pos, bytesRead);
-			return bytesRead;
-		}
+		Walker walker = lazyLoader.getBuffer().getWalker(inset + intLimit);
+		return walker.read( buff, pos, len );
+		
 	}
 
 	@Override

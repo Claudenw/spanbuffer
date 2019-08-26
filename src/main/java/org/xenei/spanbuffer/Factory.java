@@ -34,11 +34,11 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.xenei.span.NumberUtils;
 import org.xenei.spanbuffer.impl.SpanBufferList;
 import org.xenei.spanbuffer.impl.SpanByteBuffer;
-import org.xenei.spanbuffer.lazy.AbstractLazyLoader;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
+import org.xenei.spanbuffer.lazy.linear.FileChannelLazyLoader;
+import org.xenei.spanbuffer.lazy.linear.FileLazyLoader;
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
 import org.xenei.spanbuffer.streams.SpanBufferOutputStream;
 
@@ -57,7 +57,7 @@ public final class Factory {
 	 * Sets the maximum memory buffer size used when creating buffers from files or
 	 * input streams. If the total size is greater than max mem buffer a memory
 	 * mapped file buffer is used otherwise the data is read into a standard memory
-	 * buffer. Initial default value is 500MB.
+	 * buffer. Initial default value is 32MB.
 	 *
 	 * @param newLimit The new memory limit
 	 * @return the old memory limit
@@ -111,25 +111,74 @@ public final class Factory {
 	}
 
 	/**
-	 * Create a span buffer from a file.
+	 * Create a span buffer from a random access file.
+	 * Uses default internal buffer size
+	 * 
+	 * @see LazyLoadedBuffer#DEFAULT_INTERNAL_BUFFER_SIZE
 	 *
-	 * @param file The file to read
+	 * @param randomAccessFile The random access file to read
 	 * @return A SpanBuffer with an offset (start) of 0.
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(final FileChannel fileChannel) throws FileNotFoundException, IOException {
+	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile) throws FileNotFoundException, IOException {
+		if (randomAccessFile == null) {
+			throw new IllegalArgumentException("randomAccessFile must not be a null");
+		}
+		return wrap( randomAccessFile.getChannel() );
+
+	}
+	
+	/**
+	 * Create a span buffer from a random access file.
+	 *
+	 * @param randomAccessFile The random access file to read
+	 * @param bufferSize the size of the internal buffer.
+	 * @return A SpanBuffer with an offset (start) of 0.
+	 * @throws IOException           on IO error
+	 * @throws FileNotFoundException on file not found.
+	 */
+	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile, long bufferSize) throws FileNotFoundException, IOException {
+		if (randomAccessFile == null) {
+			throw new IllegalArgumentException("randomAccessFile must not be a null");
+		}
+		return wrap( randomAccessFile.getChannel(), bufferSize );
+
+	}
+	
+
+		/**
+		 * Create a span buffer from a FileChannel.
+	 * Uses default internal buffer size
+	 * 
+	 * @see LazyLoadedBuffer#DEFAULT_INTERNAL_BUFFER_SIZE
+	 * 
+		 * @param fileChannel The file channel to read
+		 * @return A SpanBuffer with an offset (start) of 0.
+		 * @throws IOException           on IO error
+		 * @throws FileNotFoundException on file not found.
+		 */
+		public static SpanBuffer wrap(final FileChannel fileChannel) throws FileNotFoundException, IOException {
+			if (fileChannel == null) {
+				throw new IllegalArgumentException("FileChannel must not be a null");
+			}
+			return FileChannelLazyLoader.load( fileChannel );
+		}
+
+	/**
+	 * Create a span buffer from a FileChannel.
+	 *
+	 * @param fileChannel The file channel to read
+	 * @param bufferSize the size of the internal buffer.
+	 * @return A SpanBuffer with an offset (start) of 0.
+	 * @throws IOException           on IO error
+	 * @throws FileNotFoundException on file not found.
+	 */
+	public static SpanBuffer wrap(final FileChannel fileChannel, long bufferSize) throws FileNotFoundException, IOException {
 		if (fileChannel == null) {
 			throw new IllegalArgumentException("FileChannel must not be a null");
 		}
-
-		final MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
-
-		buffer.load();
-		// set position to zero and set the limit
-		buffer.clear();
-		return Factory.wrap(buffer);
-
+		return FileChannelLazyLoader.load( fileChannel, bufferSize );
 	}
 
 	/**
@@ -166,9 +215,7 @@ public final class Factory {
 	 * @throws FileNotFoundException on file not found.
 	 */
 	public static SpanBuffer wrap(File file, long bufferSize) throws IOException {
-		List<SpanBuffer> lazyLoader = getLoaders(new RandomAccessFile(file, "r"), bufferSize);
-		return new SpanBufferList(0, lazyLoader);
-
+		return FileLazyLoader.load(new RandomAccessFile(file, "r"), bufferSize);
 	}
 
 	/**
@@ -181,39 +228,20 @@ public final class Factory {
 	 * @throws FileNotFoundException on file not found.
 	 */
 	public static SpanBuffer wrapFile(String fileName, long bufferSize) throws IOException {
-		List<SpanBuffer> lazyLoader = getLoaders(new RandomAccessFile(fileName, "r"), bufferSize);
-		return new SpanBufferList(0, lazyLoader);
-	}
-
-	private static List<SpanBuffer> getLoaders(RandomAccessFile file, long bufferSize) throws IOException {
-		List<SpanBuffer> buffers = new ArrayList<SpanBuffer>();
-		long offset = 0;
-		long limit = file.length();
-		while (offset < limit) {
-			buffers.add(new LazyLoadedBuffer(offset, new FileLazyLoader(file, offset, bufferSize)));
-			offset += bufferSize;
-		}
-		return buffers;
+		return FileLazyLoader.load(new RandomAccessFile(fileName, "r"), bufferSize);
 	}
 
 	/**
 	 * Create a span buffer using a memory mapped file from a file.
 	 * 
 	 * @param file the file to read.
+	 * @param bufferSize the size of the internal buffer.
 	 * @return a SpanBuffer with an offset of 0.
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer asMemMap(File file) throws IOException {
-
-		// create a memory mapped file
-		RandomAccessFile aFile = null;
-		try {
-			aFile = new RandomAccessFile(file, "r");
-			return wrap(aFile.getChannel());
-		} finally {
-			IOUtils.closeQuietly(aFile);
-		}
+	public static SpanBuffer asMemMap(File file, long bufferSize) throws IOException {
+		return wrap(new RandomAccessFile(file, "r").getChannel(), bufferSize);
 	}
 
 	/**
@@ -404,43 +432,5 @@ public final class Factory {
 	 */
 	public static SpanBuffer merge(final long offset, final Stream<SpanBuffer> buffers) {
 		return Factory.merge(offset, buffers.iterator());
-	}
-
-	/**
-	 * Lazy loader for a random access file.
-	 */
-	public static class FileLazyLoader extends AbstractLazyLoader {
-
-		private final RandomAccessFile file;
-		private final long offset;
-
-		/**
-		 * Constructor
-		 * 
-		 * @param file       the random access file to read.
-		 * @param offset     the offset of the file to read.
-		 * @param bufferSize the default buffersize to use.
-		 * @throws IOException on read error.
-		 */
-		public FileLazyLoader(RandomAccessFile file, long offset, long bufferSize) throws IOException {
-			super((offset + bufferSize > file.length()) ? (file.length() - offset) : bufferSize);
-			this.file = file;
-			this.offset = offset;
-		}
-
-		@Override
-		protected byte[] getBufferInternal() {
-			byte[] buff = new byte[NumberUtils.checkIntLimit("buffer length", getLength())];
-			try {
-				synchronized (file) {
-					file.seek(offset);
-					file.read(buff);
-				}
-				return buff;
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
 	}
 }

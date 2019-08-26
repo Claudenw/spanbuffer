@@ -18,7 +18,6 @@
 package org.xenei.spanbuffer;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
@@ -431,9 +430,10 @@ public interface SpanBuffer extends LongSpan {
 	 * @param position the absolute position to start read from.
 	 * @param buff     the buffer to copy the bytes into.
 	 * @return the number of bytes read. May be less then length
+	 * @throws IOException on error
 	 * @see #readRelative(long, byte[])
 	 */
-	int read(long position, byte[] buff);
+	int read(long position, byte[] buff) throws IOException;
 
 	/**
 	 * Read the bytes from the specified absolute position into the provided buffer.
@@ -451,9 +451,10 @@ public interface SpanBuffer extends LongSpan {
 	 * @param pos      the position to copy the bytes into.
 	 * @param len      the number of bytes to copy.
 	 * @return the number of bytes read, may be less than len
+	 * @throws IOException on error
 	 * @see #readRelative(long, byte[], int, int)
 	 */
-	int read(long position, byte[] buff, int pos, int len);
+	int read(long position, byte[] buff, int pos, int len) throws IOException;
 
 	/**
 	 * Read the byte at the specified relative position.
@@ -488,9 +489,10 @@ public interface SpanBuffer extends LongSpan {
 	 * @param byteOffset the relative position to begin read from.
 	 * @param buff       the buffer to copy the bytes into.
 	 * @return the number of bytes read. May be less then length
+	 * @throws IOException on error
 	 * @see #read(long, byte[])
 	 */
-	int readRelative(long byteOffset, byte[] buff);
+	int readRelative(long byteOffset, byte[] buff) throws IOException;
 
 	/**
 	 * Read the bytes from the specified relative position into the provided buffer.
@@ -508,9 +510,10 @@ public interface SpanBuffer extends LongSpan {
 	 * @param pos        the position to copy the bytes into.
 	 * @param len        the number of bytes to copy.
 	 * @return the number of bytes read, may be less than len
+	 * @throws IOException on error
 	 * @see #read(long, byte[], int, int)
 	 */
-	int readRelative(long byteOffset, byte[] buff, int pos, int len);
+	int readRelative(long byteOffset, byte[] buff, int pos, int len) throws IOException;
 
 	/**
 	 * Get a buffer walker starting at an absolute position..
@@ -554,104 +557,6 @@ public interface SpanBuffer extends LongSpan {
 	 * @throws IOException on error
 	 */
 	boolean endsWith(SpanBuffer other) throws IOException;
-
-	/**
-	 * An object that walks up or down the spanned buffer.
-	 *
-	 * <p>
-	 * Could be used in a for loop like:
-	 * </p>
-	 * <p>
-	 * <code>
-	 * for (Walker w=spanBuffer.getWalker(0);walker.hasCurrent();walker.next())
-	 * </code>
-	 * </p>
-	 */
-	interface Walker {
-		/**
-		 * Move to the next absolute position.
-		 *
-		 * <p>
-		 * See discussion of Absolute and Relative methods above.
-		 * </p>
-		 *
-		 * @return the new absolute position;
-		 */
-		long next();
-
-		/**
-		 * Move to the previous position.
-		 *
-		 * <p>
-		 * See discussion of Absolute and Relative methods above.
-		 * </p>
-		 *
-		 * @return the new absolute position;
-		 */
-		long prev();
-
-		/**
-		 * Verify there is a current position.
-		 *
-		 * @return true if the current position is valid, false otherwise.
-		 */
-		boolean hasCurrent();
-
-		/**
-		 * get the current absolute position value.
-		 *
-		 * <p>
-		 * See discussion of Absolute and Relative methods above.
-		 * </p>
-		 *
-		 * @return the current absolute position in the buffer.
-		 */
-		long getPos();
-
-		/**
-		 * Get the byte at the current position.
-		 *
-		 * @return the byte at the current position.
-		 * @throws IOException on IO error
-		 */
-		byte getByte() throws IOException;
-
-		/**
-		 * Get the number of bytes remaining (after current position).
-		 *
-		 * @return the number of bytes remaining.
-		 */
-		long remaining();
-
-		/**
-		 * Get the span buffer this walker is walking.
-		 *
-		 * @return the span buffer this walker is walking.
-		 */
-		SpanBuffer getBuffer();
-
-		/**
-		 * Increment the position by number of bytes.
-		 *
-		 * @param numberOfBytes the number of bytes to move the position by.
-		 * @throws NoSuchElementException if the numberOfBytes moves past the end of the
-		 *                                buffer
-		 */
-		void increment(long numberOfBytes) throws NoSuchElementException;
-
-		/**
-		 * Set the absolute position of the walker on the buffer.
-		 *
-		 * <p>
-		 * See discussion of Absolute and Relative methods above.
-		 * </p>
-		 *
-		 * @param position the absolute position to set to.
-		 * @throws NoSuchElementException If the position is invalid.
-		 */
-		void setPosition(long position) throws NoSuchElementException;
-
-	}
 
 	/**
 	 * Class that contains reference implementations for various span buffer

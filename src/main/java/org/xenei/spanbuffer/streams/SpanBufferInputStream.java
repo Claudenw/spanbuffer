@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.SpanBuffer.Walker;
+import org.xenei.spanbuffer.Walker;
 
 /**
  * An InputStream implementation on top of a span buffer. Multiple
@@ -76,16 +76,7 @@ public class SpanBufferInputStream extends InputStream {
 	}
 
 	@Override
-	public int read(final byte[] bytes, final int off, int len) {
-		if (walker.remaining() <= 0) {
-			return -1;
-		}
-
-		if (walker.remaining() <= Integer.MAX_VALUE) {
-			len = Math.min(len, (int) walker.remaining());
-		}
-		final int bytesRead = walker.getBuffer().read(walker.getPos(), bytes, off, len);
-		walker.increment(bytesRead);
-		return bytesRead;
+	public int read(final byte[] bytes, final int off, int len) throws IOException {
+		return walker.read(bytes, off, len );
 	}
 }

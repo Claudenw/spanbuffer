@@ -79,7 +79,7 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	}
 
 	@Override
-	protected byte[] getBufferInternal() {
-		return position.isNoData() ? new byte[0] : deserializer.deserialize(position);
+	protected SpanBuffer getBufferInternal() {
+		return position.isNoData() ? Factory.EMPTY : deserializer.deserialize(position);
 	}
 }

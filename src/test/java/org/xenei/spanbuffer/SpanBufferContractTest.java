@@ -32,7 +32,6 @@ import org.xenei.junit.contract.ContractTest;
 import org.xenei.junit.contract.IProducer;
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.SpanBuffer.Walker;
 
 @Contract(SpanBuffer.class)
 public class SpanBufferContractTest<T extends SpanBuffer> {
@@ -83,7 +82,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testSliceAtPosition() {
+	public void testSliceAtPosition() throws IOException {
 
 		SpanBuffer span2 = spanBuffer.sliceAt(spanBuffer.getOffset());
 		Assert.assertEquals("Sliced start value is incorrect", spanBuffer.getOffset(), span2.getOffset());
@@ -460,7 +459,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArray() {
+	public void testReadByteArray()  throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) mid];
 		final int bytesRead = spanBuffer.read(0, buff);
@@ -471,7 +470,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayAtOffset() {
+	public void testReadByteArrayAtOffset()  throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) mid];
 		final int bytesRead = spanBuffer.read(1, buff);
@@ -482,7 +481,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithPos() {
+	public void testReadByteArrayWithPos() throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) spanBuffer.getLength()];
 		final int bytesRead = spanBuffer.read(0, buff, 1, (int) mid);
@@ -493,7 +492,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithOffsetAndPos() {
+	public void testReadByteArrayWithOffsetAndPos() throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) spanBuffer.getLength()];
 		final int bytesRead = spanBuffer.read(1, buff, 1, (int) mid);
@@ -504,7 +503,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testSliceAtPositionWithOffset() {
+	public void testSliceAtPositionWithOffset()  throws IOException {
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
 		testSliceAtPosition();
 	}
@@ -787,7 +786,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithOffset() {
+	public void testReadByteArrayWithOffset() throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) mid];
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
@@ -799,7 +798,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayAtOffsetWithOffset() {
+	public void testReadByteArrayAtOffsetWithOffset()  throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) mid];
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
@@ -811,7 +810,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithPosAndOffset() {
+	public void testReadByteArrayWithPosAndOffset() throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) spanBuffer.getLength()];
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
@@ -823,7 +822,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithOffsetAndPosAndOffset() {
+	public void testReadByteArrayWithOffsetAndPosAndOffset() throws IOException {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 		final byte[] buff = new byte[(int) spanBuffer.getLength()];
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
@@ -835,7 +834,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	}
 
 	@ContractTest
-	public void testReadByteArrayWithExcessLength() {
+	public void testReadByteArrayWithExcessLength()  throws IOException {
 		final byte[] buff = new byte[(int) spanBuffer.getLength() + 5];
 		final int bytesRead = spanBuffer.read(0, buff);
 		Assert.assertEquals("Should have read " + spanBuffer.getLength() + " bytes", spanBuffer.getLength(), bytesRead);

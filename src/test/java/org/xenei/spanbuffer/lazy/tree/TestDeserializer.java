@@ -22,6 +22,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
@@ -34,8 +36,8 @@ public class TestDeserializer implements TreeDeserializer<TestPosition> {
 	}
 
 	@Override
-	public byte[] deserialize(TestPosition position) {
-		return position.isNoData() ? new byte[0] : buffers.get(position.idx);
+	public SpanBuffer deserialize(TestPosition position) {
+		return position.isNoData() ? Factory.EMPTY: Factory.wrap(buffers.get(position.idx));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -17,14 +17,21 @@
  */
 package org.xenei.spanbuffer;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xenei.span.IntSpan;
+import org.xenei.span.LongSpan;
 import org.xenei.span.NumberUtils;
 import org.xenei.spanbuffer.impl.MatcherImpl;
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
@@ -278,17 +285,17 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
-	public final int readRelative(final long byteOffset, final byte[] buff) {
+	public final int readRelative(final long byteOffset, final byte[] buff) throws IOException {
 		return read(getOffset() + byteOffset, buff);
 	}
 
 	@Override
-	public final int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) {
+	public final int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) throws IOException {
 		return read(getOffset() + byteOffset, buff, pos, len);
 	}
 
 	@Override
-	public final int read(final long position, final byte[] buff) {
+	public final int read(final long position, final byte[] buff) throws IOException {
 		return read(position, buff, 0, buff.length);
 	}
 
@@ -378,7 +385,7 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 		return SpanBuffer.Utils.simpleText(this);
 	}
 
-	private static class WalkerImpl implements SpanBuffer.Walker {
+	private static class WalkerImpl implements Walker {
 
 		private final SpanBuffer sb;
 		// the absolute position in the buffer that the walker is at.
@@ -472,5 +479,169 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 			}
 			return String.format("Walker[ %s pos:%s char:%s", sb, pos, tmpBype);
 		}
+
+		@Override
+		public boolean readBoolean() throws IOException {
+			 return (readByte() != 0);
+		}
+
+		@Override
+		public byte readByte() throws IOException {
+			if (!hasCurrent())
+			{
+				 throw new EOFException();
+			}
+			try {
+				return getByte();
+			}
+			finally {
+				next();
+			}
+		}
+
+		@Override
+		public char readChar() throws IOException {	
+			      return (char) ((readByte() << 8)
+			              | (readByte() & 0xff));  
+		
+		}
+
+		@Override
+		public double readDouble() throws IOException {
+			return Double.longBitsToDouble (readLong ());
+		}
+
+		@Override
+		public float readFloat() throws IOException {
+			return Float.intBitsToFloat (readInt ());
+		}
+
+		@Override
+		public void readFully(byte[] buff) throws IOException {
+			readFully( buff, 0, buff.length );
+		}
+
+		@Override
+		public void readFully(byte[] buff, int offset, int len) throws IOException {
+			if (len > remaining())
+			{
+				throw new EOFException();
+			}
+			for (int i=0;i<len;i++)
+			{
+				buff[i] = readByte();
+			}
+		}
+
+		@Override
+		public int read(byte[] buff) throws IOException {
+			return read( buff, 0, buff.length );
+		}
+
+		@Override
+		public int read(byte[] buff, int offset, int len) throws IOException  {
+			if (remaining() <= 0) {
+				return -1;
+			}
+
+			if (remaining() <= Integer.MAX_VALUE) {
+				len = Math.min(len, (int) remaining());
+			}
+			final int bytesRead = getBuffer().read(getPos(), buff, offset, len);
+			increment(bytesRead);
+			return bytesRead;
+		}
+
+		@Override
+		public int readInt() throws IOException {
+			return (((readByte() & 0xff) << 24)
+					    | ((readByte() & 0xff) << 16)
+					          | ((readByte() & 0xff) << 8)
+					          | (readByte() & 0xff));  
+		}
+
+		@Override
+		public String readLine() throws IOException {
+			StringBuffer strb = new StringBuffer();
+
+			while (hasCurrent()) {
+				byte c = readByte();
+				if (c == '\r' && hasCurrent()) {
+					if (getByte() == '\n') {
+						pos++;
+					}
+					break;
+				}
+				if (c == '\n')
+					break;
+				strb.append((char) c);
+			}
+
+			return strb.length() > 0 ? strb.toString() : "";
+		}
+
+		@Override
+		public long readLong() throws IOException {
+			return (((long)(readByte() & 0xff) << 56) |
+					          ((long)(readByte() & 0xff) << 48) |
+					          ((long)(readByte() & 0xff) << 40) |
+					          ((long)(readByte() & 0xff) << 32) |
+					          ((long)(readByte() & 0xff) << 24) |
+					          ((long)(readByte() & 0xff) << 16) |
+					          ((long)(readByte() & 0xff) <<  8) |
+					          ((long)(readByte() & 0xff)));  
+		}
+
+		@Override
+		public short readShort() throws IOException {
+			return (short) ((readByte()<< 8)
+					              | (readByte() & 0xff));  
+		}
+
+		@Override
+		public String readUTF() throws IOException {
+			CharsetDecoder cd = StandardCharsets.UTF_8.newDecoder();
+			byte[] buff = new byte[readUnsignedShort()];
+			readFully(buff);
+			return cd.decode(ByteBuffer.wrap(buff)).toString();
+		}
+
+		@Override
+		public int readUnsignedByte() throws IOException {
+			return 0xFF & readByte();
+		}
+
+		@Override
+		public int readUnsignedShort() throws IOException {
+			return (((readByte() & 0xff) << 8)
+					    | (readByte() & 0xff));  
+		}
+
+		@Override
+		public int skipBytes(int n) throws IOException {
+			if (n < 0)
+			{
+				return 0;
+			}
+			if (pos+n <= sb.getEnd())
+			{
+				pos+= n;
+				return n;
+			}
+			try {
+				long l = LongSpan.fromEnd( pos, sb.getEnd()).getLength();
+				return NumberUtils.checkIntLimit("n", l);
+			}
+			catch (IllegalArgumentException e)
+			{
+				throw new IOException( e );
+			}
+			finally {
+				pos=sb.getEnd()+1;
+			}
+
+		}
+		
+		
 	}
 }

@@ -38,7 +38,7 @@ public interface TreeDeserializer<P extends Position> {
 	 * @param position the position to read the buffer from.
 	 * @return a byte buffer containing data that was serialized at the position.
 	 */
-	public byte[] deserialize(P position);
+	public SpanBuffer deserialize(P position);
 
 	/**
 	 * process a spanbuffer that contains one or more positions serialized by

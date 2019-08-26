@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Matcher;
 import org.xenei.spanbuffer.NoMatchException;
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.SpanBuffer.Walker;
+import org.xenei.spanbuffer.Walker;
 
 /**
  * The default matcher implementation.

@@ -57,8 +57,9 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	 * information we need for the SpanBuffer.
 	 *
 	 * @return the delegating spanbuffer
+	 * @throws IOException 
 	 */
-	protected abstract SpanBuffer getDelegate();
+	protected abstract SpanBuffer getDelegate() throws IOException;
 
 	@Override
 	public final byte read(final long position) throws IOException {
@@ -66,13 +67,17 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	}
 
 	@Override
-	public final int read(final long position, final byte[] buff, final int pos, final int len) {
+	public final int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		return getDelegate().read(position, buff, pos, len);
 	}
 
 	@Override
 	public final SpanBuffer sliceAt(final long position) {
-		return getDelegate().sliceAt(position);
+		try {
+			return getDelegate().sliceAt(position);
+		} catch (IOException e) {
+			throw new IllegalStateException( e );
+		}
 	}
 
 	@Override
@@ -83,14 +88,22 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	@Override
 	public final long getLength() {
 		if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
-			bufferLength = getDelegate().getLength();
+			try {
+				bufferLength = getDelegate().getLength();
+			} catch (IOException e) {
+				throw new IllegalStateException( e );
+			}
 		}
 		return bufferLength - inset;
 	}
 
 	@Override
 	public final SpanBuffer head(final long byteCount) {
-		return getDelegate().head(byteCount);
+		try {
+			return getDelegate().head(byteCount);
+		} catch (IOException e) {
+			throw new IllegalStateException( e );
+		}
 	}
 
 	@Override

@@ -160,7 +160,7 @@ public class SpanBufferList extends AbstractSpanBuffer {
 	}
 
 	@Override
-	public int read(final long position, final byte[] buff, final int pos, final int len) {
+	public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		final SpanBuffer sb = locateSpan(position);
 		if (sb == null) {
 			return 0;

@@ -147,12 +147,12 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
-	public int read(final long position, final byte[] buff) {
+	public int read(final long position, final byte[] buff) throws IOException {
 		return sb.read(position, buff);
 	}
 
 	@Override
-	public int read(final long position, final byte[] buff, final int pos, final int len) {
+	public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		return sb.read(position, buff, pos, len);
 	}
 
@@ -197,12 +197,12 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
-	public int readRelative(final long byteOffset, final byte[] buff) {
+	public int readRelative(final long byteOffset, final byte[] buff) throws IOException {
 		return sb.readRelative(byteOffset, buff);
 	}
 
 	@Override
-	public int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) {
+	public int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) throws IOException {
 		return sb.readRelative(byteOffset, buff, pos, len);
 	}
 
