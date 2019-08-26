@@ -161,7 +161,7 @@ public class ClosableCleaningTracker {
     private final class Reaper extends Thread {
         /** Construct a new Reaper */
         Reaper() {
-            super("File Reaper");
+            super("Closable Reaper");
             setPriority(Thread.MAX_PRIORITY);
             setDaemon(true);
         }
