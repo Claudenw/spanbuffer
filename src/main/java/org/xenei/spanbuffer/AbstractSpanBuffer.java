@@ -309,12 +309,9 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 	@Override
 	public String getText() throws IOException {
-
 		final InputStream is = new SpanBufferInputStream(this);
-
 		final char[] chars = IOUtils.toCharArray(is, "UTF-8");
 		return String.valueOf(chars);
-
 	}
 
 	@Override

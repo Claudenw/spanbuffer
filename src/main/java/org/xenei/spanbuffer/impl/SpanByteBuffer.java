@@ -22,6 +22,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.xenei.span.NumberUtils;
+import org.xenei.span.IntSpan;
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.Factory;
@@ -33,6 +34,12 @@ import org.xenei.spanbuffer.SpanBuffer;
  */
 public class SpanByteBuffer extends AbstractSpanBuffer {
 	private final ByteBuffer buffer;
+	/*
+	 * This Span contains the inset values for the buffer.
+	 * The offset is the position within the buffer that we start at
+	 * and the end is the last byte to be included in the output.
+	 */
+	private final IntSpan span;
 
 	/**
 	 * Constructor.
@@ -61,6 +68,7 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 	public SpanByteBuffer(final long offset, final ByteBuffer buffer) {
 		super(offset);
 		this.buffer = buffer;
+		this.span = IntSpan.fromEnd(buffer.position(), buffer.limit()-1);
 	}
 
 	@Override
@@ -74,13 +82,13 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 	@Override
 	public SpanByteBuffer head(final long byteCount) {
 		final int intLimit = NumberUtils.checkIntLimit("byteCount", byteCount);
-		final ByteBuffer newBuf = buffer.duplicate();
-		newBuf.position(0);
 		if ((intLimit < 0) || (intLimit > getLength())) {
 			throw new IllegalArgumentException(
 					String.format("byte count %s is not in the range [0,%s]", byteCount, getLength()));
 		}
-		newBuf.limit(intLimit);
+		final ByteBuffer newBuf = buffer.duplicate();
+		newBuf.position( span.getOffset() );
+		newBuf.limit(span.getOffset() + intLimit);
 		return new SpanByteBuffer(getOffset(), newBuf);
 	}
 
@@ -92,24 +100,23 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 		if (position == (getOffset() + getLength())) {
 			return Factory.EMPTY.duplicate(getOffset() + getLength());
 		}
-		final int checkInt = NumberUtils.checkIntLimit("position", localizePosition(position));
-		final int pos = buffer.position();
+		final int checkInt = NumberUtils.checkIntLimit("position", localizePosition(position)+span.getOffset());
 		buffer.position(checkInt);
 
 		final SpanBuffer retval = new SpanByteBuffer(position, buffer.slice());
-		buffer.position(pos);
+		buffer.position( span.getOffset() );
 		return retval;
 	}
 
 	@Override
 	public byte read(final long position) throws IOException {
-		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
+		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position)+span.getOffset());
 		return buffer.get(intLimit);
 	}
 
 	@Override
 	public int read(final long position, final byte[] buff, final int pos, final int len) {
-		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
+		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position)+span.getOffset());
 		buffer.position(intLimit);
 		try {
 			buffer.get(buff, pos, len);
@@ -117,12 +124,14 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 		} catch (final BufferUnderflowException ex) {
 			buffer.get(buff, pos, buffer.remaining());
 			return buffer.limit() - intLimit - buffer.remaining();
+		} finally {
+			buffer.position( span.getOffset() );
 		}
 	}
 
 	@Override
 	public long getLength() {
-		return buffer.limit();
+		return span.getLength();
 	}
 
 	@Override

@@ -225,11 +225,11 @@ public class FactoryTests {
 		{
 			buff[i] = (byte)i;
 		}
-		SpanBuffer sb = Factory.wrap(15, buff, 2, 2);
-		for (int i=0;i<5;i++)
+		SpanBuffer sb = Factory.wrap(15, buff, 1, 2);
+		for (int i=0;i<2;i++)
 		{
-			Assert.assertEquals( "wrong absolute byte value", i+2, sb.read( 15+i ));
-			Assert.assertEquals( "wrong relative byte value", i+2, sb.readRelative( i ));
+			Assert.assertEquals( "wrong absolute byte value", i+1, sb.read( 15+i ));
+			Assert.assertEquals( "wrong relative byte value", i+1, sb.readRelative( i ));
 		}
 	}
 	

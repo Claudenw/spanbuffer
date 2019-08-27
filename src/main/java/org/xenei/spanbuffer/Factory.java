@@ -622,7 +622,7 @@ public final class Factory {
 	 */
 	public static SpanBuffer wrap(final long offset, final byte[] bytes, final int off, final int length) {
 		return bytes.length == 0 ? (offset == 0 ? Factory.EMPTY : Factory.EMPTY.duplicate(offset))
-				: new SpanByteBuffer(ByteBuffer.wrap(bytes, off, length));
+				: new SpanByteBuffer(offset, ByteBuffer.wrap(bytes, off, length));
 	}
 
 	/**
