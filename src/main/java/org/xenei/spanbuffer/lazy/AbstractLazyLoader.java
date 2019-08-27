@@ -27,9 +27,9 @@ import org.xenei.spanbuffer.SpanBuffer;
  * so the garbage collector can dispose of them when necessary.
  */
 public abstract class AbstractLazyLoader implements LazyLoader {
-	
+
 	private SoftReference<SpanBuffer> loadedBufferReference = null;
-	private Long length = null;	
+	private Long length = null;
 
 	/**
 	 * Method to load the internal buffer.
@@ -72,7 +72,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 			try {
 				buffer = getBuffer();
 			} catch (IOException e) {
-				throw new IllegalStateException( e );
+				throw new IllegalStateException(e);
 			}
 			length = buffer.getLength();
 		}

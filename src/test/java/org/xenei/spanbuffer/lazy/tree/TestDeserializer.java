@@ -37,7 +37,7 @@ public class TestDeserializer implements TreeDeserializer<TestPosition> {
 
 	@Override
 	public SpanBuffer deserialize(TestPosition position) {
-		return position.isNoData() ? Factory.EMPTY: Factory.wrap(buffers.get(position.idx));
+		return position.isNoData() ? Factory.EMPTY : Factory.wrap(buffers.get(position.idx));
 	}
 
 	@SuppressWarnings("unchecked")

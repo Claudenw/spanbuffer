@@ -26,8 +26,6 @@ import org.xenei.spanbuffer.SpanBuffer;
  * Load a single buffer segment if needed.
  */
 public interface LazyLoader {
-	
-	public static final ClosableCleaningTracker tracker = new ClosableCleaningTracker();
 
 	/**
 	 * return the buffer if it has been loaded already, otherwise load and return.
@@ -43,23 +41,22 @@ public interface LazyLoader {
 	 * @return length of buffer
 	 */
 	long getLength();
-	
+
 	/**
 	 * A marker to determine when a closable object can be closed.
 	 * 
-	 * @param <T>
+	 * @param <T> A Closable type
 	 */
 	public class Marker<T extends Closeable> {
 		private T closable;
-		
-		public Marker( T closable ) {
+
+		public Marker(T closable) {
 			this.closable = closable;
 		}
-		
+
 		public T get() {
 			return closable;
 		}
-		
 	}
 
 }

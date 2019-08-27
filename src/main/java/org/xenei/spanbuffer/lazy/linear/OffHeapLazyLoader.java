@@ -1,6 +1,7 @@
 package org.xenei.spanbuffer.lazy.linear;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.ref.SoftReference;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,46 +16,64 @@ import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoader;
 
 /**
- * Lazy loader for a random access file.
+ * Lazy loader that utilizes off heap space.
  */
-public class FileChannelLazyLoader implements LazyLoader {
+public class OffHeapLazyLoader implements LazyLoader {
 
 	private final LazyLoader.Marker<FileChannel> marker;
 	private final LongSpan span;
 	private SoftReference<SpanBuffer> loadedBufferReference = null;
-	
 
 	/**
 	 * Create a span buffer from a random access file and a buffer size.
-	 * Uses default internal buffer size
 	 * 
-	 * @see LazyLoadedBuffer#DEFAULT_INTERNAL_BUFFER_SIZE
-	 * 
-	 * @param channel    the random access file to read.
+	 * @param channel       the random access file to read.
+	 * @param bufferSize    the buffer size.
+	 * @param closeAfterUse if true the channel will be closed when it is no longer
+	 *                      needed.
 	 * @return A lazy loaded span buffer.
 	 * @throws IOException on error.
 	 */
-	public static SpanBuffer load(FileChannel channel) throws IOException {
-		return load( channel, LazyLoadedBuffer.DEFAULT_INTERNAL_BUFFER_SIZE);
-	}
-	
-	/**
-	 * Create a span buffer from a random access file and a buffer size.
-	 * 
-	 * @param channel    the random access file to read.
-	 * @param bufferSize the buffer size.
-	 * @return A lazy loaded span buffer.
-	 * @throws IOException on error.
-	 */
-	public static SpanBuffer load(FileChannel channel, long bufferSize) throws IOException {
+	public static SpanBuffer load(FileChannel channel, long bufferSize, boolean closeAfterUse) throws IOException {
 		LazyLoader.Marker<FileChannel> marker = new LazyLoader.Marker<FileChannel>(channel);
-		LazyLoader.tracker.track(channel, marker);
+		if (closeAfterUse) {
+			Factory.closableTracker.track(channel, marker);
+		}
 		List<SpanBuffer> buffers = new ArrayList<SpanBuffer>();
 		long offset = 0;
 		long limit = channel.size();
 		while (offset < limit) {
 			long len = Long.min(limit - offset, bufferSize);
-			buffers.add(new LazyLoadedBuffer(offset, new FileChannelLazyLoader(marker, offset, len)));
+			buffers.add(new LazyLoadedBuffer(offset, new OffHeapLazyLoader(marker, offset, len)));
+			offset += bufferSize;
+		}
+		return Factory.merge(buffers.iterator());
+
+	}
+
+	/**
+	 * Create a span buffer from a random access file and a buffer size.
+	 * 
+	 * @param randomAccessFile the random access file to read.
+	 * @param bufferSize       the buffer size.
+	 * @param closeAfterUse    if true the channel will be closed when it is no
+	 *                         longer needed.
+	 * @return A lazy loaded span buffer.
+	 * @throws IOException on error.
+	 */
+	public static SpanBuffer load(RandomAccessFile randomAccessFile, long bufferSize, boolean closeAfterUse)
+			throws IOException {
+		LazyLoader.Marker<FileChannel> marker = new LazyLoader.Marker<FileChannel>(randomAccessFile.getChannel());
+		if (closeAfterUse) {
+			Factory.closableTracker.track(randomAccessFile, marker);
+		}
+
+		List<SpanBuffer> buffers = new ArrayList<SpanBuffer>();
+		long offset = 0;
+		long limit = randomAccessFile.length();
+		while (offset < limit) {
+			long len = Long.min(limit - offset, bufferSize);
+			buffers.add(new LazyLoadedBuffer(offset, new OffHeapLazyLoader(marker, offset, len)));
 			offset += bufferSize;
 		}
 		return Factory.merge(buffers.iterator());
@@ -69,7 +88,7 @@ public class FileChannelLazyLoader implements LazyLoader {
 	 * @param bufferSize the default buffersize to use.
 	 * @throws IOException on read error.
 	 */
-	public FileChannelLazyLoader(LazyLoader.Marker<FileChannel> marker, long offset, long length) throws IOException {
+	public OffHeapLazyLoader(LazyLoader.Marker<FileChannel> marker, long offset, long length) throws IOException {
 		this.marker = marker;
 		this.span = (offset + length > marker.get().size()) ? LongSpan.fromEnd(offset, marker.get().size())
 				: LongSpan.fromLength(offset, length);
@@ -86,7 +105,7 @@ public class FileChannelLazyLoader implements LazyLoader {
 
 	protected SpanBuffer getBufferInternal() throws IOException {
 		NumberUtils.checkIntLimit("buffer length", getLength());
-		MappedByteBuffer buff = this.marker.get().map(FileChannel.MapMode.READ_ONLY, span.getOffset(), getLength());
+		MappedByteBuffer buff = marker.get().map(FileChannel.MapMode.READ_ONLY, span.getOffset(), getLength());
 		return Factory.wrap(buff);
 	}
 

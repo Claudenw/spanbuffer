@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.Walker;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
 
@@ -93,7 +92,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 * information we need for the SpanBuffer.
 	 *
 	 * @return the delegating spanbuffer
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@Override
 	protected SpanBuffer getDelegate() throws IOException {
@@ -111,7 +110,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			if (buffer.getLength() == 0) {
 				throw new IllegalStateException("Buffer must contain atleast 1 byte");
 			}
-			
+
 			/* Figure out what type of data we have */
 			final boolean innerNodePtrs = (buffer.read(org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE)
 					& InnerNode.INNER_NODE_FLAG) != 0;

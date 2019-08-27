@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
 
@@ -93,7 +92,7 @@ public class LeafBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			delegate = lazyLoader.getBuffer().duplicate( getOffset() );
+			delegate = lazyLoader.getBuffer().duplicate(getOffset());
 		}
 
 		return delegate;

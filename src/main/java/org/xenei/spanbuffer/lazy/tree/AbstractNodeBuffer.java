@@ -57,7 +57,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	 * information we need for the SpanBuffer.
 	 *
 	 * @return the delegating spanbuffer
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected abstract SpanBuffer getDelegate() throws IOException;
 
@@ -76,7 +76,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 		try {
 			return getDelegate().sliceAt(position);
 		} catch (IOException e) {
-			throw new IllegalStateException( e );
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -91,7 +91,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 			try {
 				bufferLength = getDelegate().getLength();
 			} catch (IOException e) {
-				throw new IllegalStateException( e );
+				throw new IllegalStateException(e);
 			}
 		}
 		return bufferLength - inset;
@@ -102,7 +102,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 		try {
 			return getDelegate().head(byteCount);
 		} catch (IOException e) {
-			throw new IllegalStateException( e );
+			throw new IllegalStateException(e);
 		}
 	}
 

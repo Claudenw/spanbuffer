@@ -102,17 +102,19 @@ public interface Walker extends DataInput {
 
 	/**
 	 * Attempt to fill the buffer.
+	 * 
 	 * @param buff the buffer to fill.
 	 * @return the number of bytes read.
 	 * @throws IOException on error
 	 */
 	int read(byte[] buff) throws IOException;
-	
+
 	/**
 	 * Attempt to fill the buffer from offset and for length.
-	 * @param buff the buffer to fill.
+	 * 
+	 * @param buff   the buffer to fill.
 	 * @param offset the offset to start filling at.
-	 * @param len the number of bytes to read.
+	 * @param len    the number of bytes to read.
 	 * @return the number of bytes read.
 	 * @throws IOException on error
 	 */

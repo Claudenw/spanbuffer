@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
 import java.util.NoSuchElementException;
 
@@ -30,7 +29,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xenei.span.IntSpan;
 import org.xenei.span.LongSpan;
 import org.xenei.span.NumberUtils;
 import org.xenei.spanbuffer.impl.MatcherImpl;
@@ -290,7 +288,8 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
-	public final int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) throws IOException {
+	public final int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len)
+			throws IOException {
 		return read(getOffset() + byteOffset, buff, pos, len);
 	}
 
@@ -482,64 +481,59 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 		@Override
 		public boolean readBoolean() throws IOException {
-			 return (readByte() != 0);
+			return (readByte() != 0);
 		}
 
 		@Override
 		public byte readByte() throws IOException {
-			if (!hasCurrent())
-			{
-				 throw new EOFException();
+			if (!hasCurrent()) {
+				throw new EOFException();
 			}
 			try {
 				return getByte();
-			}
-			finally {
+			} finally {
 				next();
 			}
 		}
 
 		@Override
-		public char readChar() throws IOException {	
-			      return (char) ((readByte() << 8)
-			              | (readByte() & 0xff));  
-		
+		public char readChar() throws IOException {
+			return (char) ((readByte() << 8) | (readByte() & 0xff));
+
 		}
 
 		@Override
 		public double readDouble() throws IOException {
-			return Double.longBitsToDouble (readLong ());
+			return Double.longBitsToDouble(readLong());
 		}
 
 		@Override
 		public float readFloat() throws IOException {
-			return Float.intBitsToFloat (readInt ());
+			return Float.intBitsToFloat(readInt());
 		}
 
 		@Override
 		public void readFully(byte[] buff) throws IOException {
-			readFully( buff, 0, buff.length );
+			readFully(buff, 0, buff.length);
 		}
 
 		@Override
 		public void readFully(byte[] buff, int offset, int len) throws IOException {
-			if (len > remaining())
-			{
+			if (len > remaining()) {
 				throw new EOFException();
 			}
-			for (int i=0;i<len;i++)
-			{
+			for (int i = 0; i < len; i++) {
 				buff[i] = readByte();
 			}
 		}
 
 		@Override
 		public int read(byte[] buff) throws IOException {
-			return read( buff, 0, buff.length );
+			return read(buff, 0, buff.length);
 		}
 
 		@Override
-		public int read(byte[] buff, int offset, int len) throws IOException  {
+		public int read(byte[] buff, int offset, int len) throws IOException {
 			if (remaining() <= 0) {
 				return -1;
 			}
@@ -554,10 +548,8 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 		@Override
 		public int readInt() throws IOException {
-			return (((readByte() & 0xff) << 24)
-					    | ((readByte() & 0xff) << 16)
-					          | ((readByte() & 0xff) << 8)
-					          | (readByte() & 0xff));  
+			return (((readByte() & 0xff) << 24) | ((readByte() & 0xff) << 16) | ((readByte() & 0xff) << 8)
+					| (readByte() & 0xff));
 		}
 
 		@Override
@@ -582,20 +574,15 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 		@Override
 		public long readLong() throws IOException {
-			return (((long)(readByte() & 0xff) << 56) |
-					          ((long)(readByte() & 0xff) << 48) |
-					          ((long)(readByte() & 0xff) << 40) |
-					          ((long)(readByte() & 0xff) << 32) |
-					          ((long)(readByte() & 0xff) << 24) |
-					          ((long)(readByte() & 0xff) << 16) |
-					          ((long)(readByte() & 0xff) <<  8) |
-					          ((long)(readByte() & 0xff)));  
+			return (((long) (readByte() & 0xff) << 56) | ((long) (readByte() & 0xff) << 48)
+					| ((long) (readByte() & 0xff) << 40) | ((long) (readByte() & 0xff) << 32)
+					| ((long) (readByte() & 0xff) << 24) | ((long) (readByte() & 0xff) << 16)
+					| ((long) (readByte() & 0xff) << 8) | (readByte() & 0xff));
 		}
 
 		@Override
 		public short readShort() throws IOException {
-			return (short) ((readByte()<< 8)
-					              | (readByte() & 0xff));  
+			return (short) ((readByte() << 8) | (readByte() & 0xff));
 		}
 
 		@Override
@@ -613,35 +600,28 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 		@Override
 		public int readUnsignedShort() throws IOException {
-			return (((readByte() & 0xff) << 8)
-					    | (readByte() & 0xff));  
+			return (((readByte() & 0xff) << 8) | (readByte() & 0xff));
 		}
 
 		@Override
 		public int skipBytes(int n) throws IOException {
-			if (n < 0)
-			{
+			if (n < 0) {
 				return 0;
 			}
-			if (pos+n <= sb.getEnd())
-			{
-				pos+= n;
+			if (pos + n <= sb.getEnd()) {
+				pos += n;
 				return n;
 			}
 			try {
-				long l = LongSpan.fromEnd( pos, sb.getEnd()).getLength();
+				long l = LongSpan.fromEnd(pos, sb.getEnd()).getLength();
 				return NumberUtils.checkIntLimit("n", l);
-			}
-			catch (IllegalArgumentException e)
-			{
-				throw new IOException( e );
-			}
-			finally {
-				pos=sb.getEnd()+1;
+			} catch (IllegalArgumentException e) {
+				throw new IOException(e);
+			} finally {
+				pos = sb.getEnd() + 1;
 			}
 
 		}
-		
-		
+
 	}
 }

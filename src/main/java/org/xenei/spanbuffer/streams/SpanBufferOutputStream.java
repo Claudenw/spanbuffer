@@ -62,7 +62,7 @@ public class SpanBufferOutputStream extends OutputStream {
 			throw new IOException("SpanBuffer output stream closed");
 		}
 		baos.write(arg0);
-		if (baos.size() >= Factory.getMaxMemBuffer()) {
+		if (baos.size() >= Factory.getMaxHeap()) {
 			flush();
 		}
 	}
@@ -91,7 +91,7 @@ public class SpanBufferOutputStream extends OutputStream {
 		baos.flush();
 
 		if (baos.size() > 0) {
-			if ((fos == null) && (baos.size() >= Factory.getMaxMemBuffer())) {
+			if ((fos == null) && (baos.size() >= Factory.getMaxHeap())) {
 				file = File.createTempFile("sb-", ".tmp");
 				fos = new FileOutputStream(file);
 			}

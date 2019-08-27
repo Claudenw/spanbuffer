@@ -77,6 +77,6 @@ public class SpanBufferInputStream extends InputStream {
 
 	@Override
 	public int read(final byte[] bytes, final int off, int len) throws IOException {
-		return walker.read(bytes, off, len );
+		return walker.read(bytes, off, len);
 	}
 }
