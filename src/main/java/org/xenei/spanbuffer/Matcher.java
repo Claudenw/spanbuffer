@@ -24,7 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The default matcher implementation.
+ * Matcher implementation for SpanBuffers.  Provides some common
+ * matching functions.  Some of the code in this module is 
+ * based on Apache Commons Lang 3.5
+ * StringUtils.getLevenshteinDistance
  */
 public class Matcher  {
 	/**
@@ -65,39 +68,59 @@ public class Matcher  {
 		matchDistance = DEFAULT_MATCH_DISTANCE;
 	}
 
-	private int cb(final byte i) {
-		return (i & 0xFF);
+	/**
+	 * Convert a byte to an int.
+	 * @param b the byte to convert.
+	 * @return the integer value for the byte bit pattern.
+	 */
+	private int cb(final byte b) {
+		return (b & 0xFF);
 	}
 
 	/**
 	 * Set the threshold for a match. Default value is 0.5
 	 *
 	 * @param threshold the new threshold.
-	 * @return the old threshold.
+	 * @return this for chaining.
 	 */
-	public double setThreshold(final double threshold) {
-		final double old = matchThreshold;
+	public Matcher setThreshold(final double threshold) {
 		matchThreshold = threshold;
-		return old;
+		return this;
 	}
-
+	
 	/**
-	 * Set the distance for a match.
+	 * Get the threshold for this matcher.
+	 * @return the match threshold.
+	 */
+	public double getThreshold() {
+		return matchThreshold;
+	}
+	
+	/**
+	 * Set the distance for a match for bitap match.
 	 *
 	 * @param distance The new distance value
-	 * @return the old distance value
+	 * @return this for chaining.
 	 */
-	public int setDistance(final int distance) {
-		final int old = matchDistance;
+	public Matcher setDistance(final int distance) {
 		matchDistance = distance;
-		return old;
+		return this;
+	}
+	
+	/**
+	 * Get the current distance for for bitap match.
+	 * @return the match distance.
+	 */
+	public int getDistance()
+	{
+		return matchDistance;
 	}
 
 	/**
 	 * Match a pattern starting at the specified relative position.
 	 *
 	 * <p>
-	 * See discussion of Absolute and Relative methods above.
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
 	 *
 	 * @param pattern  The pattern to match.
@@ -143,7 +166,19 @@ public class Matcher  {
 	}
 
 	/**
-	 * Get a match result from an attempted match.
+	 * Get a match result from a previous match.
+	 *
+	 * @param pattern the pattern to match
+	 * @param prevResult  A previous result.
+	 * @return The match result.
+	 * @throws NoMatchException if a match could not be established
+	 * @throws IOException      on IO error.
+	 */
+	public Result match(final SpanBuffer pattern, final Result prevResult) throws NoMatchException, IOException {
+		return match( pattern, prevResult.getIndex()+1);
+	}
+	/**
+	 * Get a match result starting from a specific position.
 	 *
 	 * @param pattern the pattern to match
 	 * @param loc     the location to start the match from.
@@ -556,7 +591,7 @@ public class Matcher  {
 	 * The resulting position (in the Result object) is relative.
 	 * </p>
 	 * <p>
-	 * See discussion of Absolute and Relative methods above.
+ 	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
 	 *
 	 * @param pattern The pattern to match
@@ -576,7 +611,7 @@ public class Matcher  {
 	 *
 	 * </p>
 	 * <p>
-	 * See discussion of Absolute and Relative methods above.
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
 	 *
 	 * @param pattern The pattern to match
@@ -720,6 +755,9 @@ public class Matcher  {
 		return result;
 	}
 
+	/**
+	 * The result of a match call.
+	 */
 	public static class Result  {
 
 		/**

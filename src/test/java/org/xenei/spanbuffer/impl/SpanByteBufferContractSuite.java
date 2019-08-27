@@ -15,32 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.xenei.spanbuffer.contractSuites;
+package org.xenei.spanbuffer.impl;
 
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 import org.junit.runner.RunWith;
 import org.xenei.junit.contract.Contract;
 import org.xenei.junit.contract.ContractImpl;
 import org.xenei.junit.contract.ContractSuite;
-import org.xenei.spanbuffer.Factory;
-import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.SpanBufferContractTest.SpanBufferProducer;
-import org.xenei.spanbuffer.impl.SpanBufferList;
+import org.xenei.spanbuffer.impl.SpanByteBuffer;
 
 @RunWith(ContractSuite.class)
-@ContractImpl(SpanBufferList.class)
-public class SpanBufferListContractSuite {
+@ContractImpl(SpanByteBuffer.class)
+public class SpanByteBufferContractSuite {
 
 	@Contract.Inject
-	public SpanBufferProducer<SpanBufferList> getProducer() {
-		return new SpanBufferProducer<SpanBufferList>() {
+	public SpanBufferProducer<SpanByteBuffer> getProducer() {
+		return new SpanBufferProducer<SpanByteBuffer>() {
 
 			@Override
-			public SpanBufferList newInstance() {
-
-				return new SpanBufferList(0, Arrays.asList(new SpanBuffer[] { Factory.wrap("Hello".getBytes()),
-						Factory.wrap(" ".getBytes()), Factory.wrap("World".getBytes()) }));
+			public SpanByteBuffer newInstance() {
+				return new SpanByteBuffer(ByteBuffer.wrap("Hello World".getBytes()));
 			}
 
 			@Override
