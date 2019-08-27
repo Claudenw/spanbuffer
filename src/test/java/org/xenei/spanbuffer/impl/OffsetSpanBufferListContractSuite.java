@@ -24,7 +24,6 @@ import org.junit.runner.RunWith;
 import org.xenei.junit.contract.Contract;
 import org.xenei.junit.contract.ContractImpl;
 import org.xenei.junit.contract.ContractSuite;
-import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.SpanBufferContractTest.SpanBufferProducer;
 import org.xenei.spanbuffer.impl.SpanBufferList;
@@ -32,23 +31,23 @@ import org.xenei.spanbuffer.impl.SpanBufferList;
 @RunWith(ContractSuite.class)
 @ContractImpl(SpanBufferList.class)
 public class OffsetSpanBufferListContractSuite {
-	
+
 	private SpanBuffer hello;
 	private SpanBuffer space;
 	private SpanBuffer world;
-	
+
 	public OffsetSpanBufferListContractSuite() {
-		ByteBuffer bb = ByteBuffer.wrap( "xHellox".getBytes() );
-		bb.limit( 6 );
-		bb.position( 1 );
-		hello = new SpanByteBuffer( bb );
-		bb = ByteBuffer.wrap( "y ".getBytes() );
+		ByteBuffer bb = ByteBuffer.wrap("xHellox".getBytes());
+		bb.limit(6);
 		bb.position(1);
-		space= new SpanByteBuffer( bb );
-		bb = ByteBuffer.wrap( "zWorldz".getBytes() );
-		bb.limit( 6 );
-		bb.position( 1);
-		world = new SpanByteBuffer( bb );
+		hello = new SpanByteBuffer(bb);
+		bb = ByteBuffer.wrap("y ".getBytes());
+		bb.position(1);
+		space = new SpanByteBuffer(bb);
+		bb = ByteBuffer.wrap("zWorldz".getBytes());
+		bb.limit(6);
+		bb.position(1);
+		world = new SpanByteBuffer(bb);
 	}
 
 	@Contract.Inject
@@ -58,8 +57,7 @@ public class OffsetSpanBufferListContractSuite {
 			@Override
 			public SpanBufferList newInstance() {
 
-				return new SpanBufferList(0, Arrays.asList(
-						new SpanBuffer[] { hello, space, world  }));
+				return new SpanBufferList(0, Arrays.asList(new SpanBuffer[] { hello, space, world }));
 			}
 
 			@Override

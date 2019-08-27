@@ -8,16 +8,16 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class MatcherTest {
-	
-	@Test
-    public void testConstructorNull() {
-	 try {
-		 new Matcher( null );
-	 fail( "Should have thrown IllegalArgumentException");
-	 } catch (IllegalArgumentException expected) {}
-    }
 
-	
+	@Test
+	public void testConstructorNull() {
+		try {
+			new Matcher(null);
+			fail("Should have thrown IllegalArgumentException");
+		} catch (IllegalArgumentException expected) {
+		}
+	}
+
 	///////////////////// LEVENSHTEIN DISTANCE TESTS
 
 	@Test
@@ -167,57 +167,57 @@ public class MatcherTest {
 	}
 
 	///////////////// FUZZY TESTS
-	
-	 @Test
-	    public void testGetFuzzyScore() {
-		 assertEquals( 0, Factory.EMPTY.getMatcher().getFuzzyDistance( Factory.EMPTY));
-		 assertEquals( 0, Factory.wrap("Workshop").getMatcher().getFuzzyDistance( Factory.wrap("b")));
-		 assertEquals( 1, Factory.wrap("Room").getMatcher().getFuzzyDistance( Factory.wrap("o")));
-		 assertEquals( 1, Factory.wrap("Workshop").getMatcher().getFuzzyDistance( Factory.wrap("w")));
-		 assertEquals( 2, Factory.wrap("Workshop").getMatcher().getFuzzyDistance( Factory.wrap("ws")));
-		 assertEquals( 4, Factory.wrap("Workshop").getMatcher().getFuzzyDistance( Factory.wrap("wo")));
-		 assertEquals( 3, Factory.wrap("Apache Software Foundation").getMatcher().getFuzzyDistance( Factory.wrap("asf")));
-	    }
 
-	 @Test
-	    public void testGetFuzzyScore_StringNullLocale() {
-		 try {
-		 Factory.EMPTY.getMatcher().getFuzzyDistance( null );
-		 fail( "Should have thrown IllegalArgumentException");
-		 } catch (IllegalArgumentException expected) {}
-	    }
+	@Test
+	public void testGetFuzzyScore() {
+		assertEquals(0, Factory.EMPTY.getMatcher().getFuzzyDistance(Factory.EMPTY));
+		assertEquals(0, Factory.wrap("Workshop").getMatcher().getFuzzyDistance(Factory.wrap("b")));
+		assertEquals(1, Factory.wrap("Room").getMatcher().getFuzzyDistance(Factory.wrap("o")));
+		assertEquals(1, Factory.wrap("Workshop").getMatcher().getFuzzyDistance(Factory.wrap("w")));
+		assertEquals(2, Factory.wrap("Workshop").getMatcher().getFuzzyDistance(Factory.wrap("ws")));
+		assertEquals(4, Factory.wrap("Workshop").getMatcher().getFuzzyDistance(Factory.wrap("wo")));
+		assertEquals(3, Factory.wrap("Apache Software Foundation").getMatcher().getFuzzyDistance(Factory.wrap("asf")));
+	}
 
-
-	 /////////////// BITAP TESTS
-	 
-	 @Test
-		public void bygFindExactMatchInMiddle() throws NoMatchException, IOException {
-			SpanBuffer haystack = Factory.wrap("TGATGCATTCGTAGATGC");
-			SpanBuffer needle = Factory.wrap("ATTC");
-			Matcher.Result result = haystack.getMatcher().match( needle );
-			assertEquals( 6, result.getIndex() );
+	@Test
+	public void testGetFuzzyScore_StringNullLocale() {
+		try {
+			Factory.EMPTY.getMatcher().getFuzzyDistance(null);
+			fail("Should have thrown IllegalArgumentException");
+		} catch (IllegalArgumentException expected) {
 		}
-		
-		@Test
-		public void bygFindExactMatchAtStart() throws NoMatchException, IOException {
-			SpanBuffer haystack = Factory.wrap("ATTCGATGCATCAGTAGATGC");
-			SpanBuffer needle = Factory.wrap("ATTC");
-			Matcher.Result result = haystack.getMatcher().match( needle );
-			assertEquals( 0, result.getIndex() );
+	}
 
-		}
-		
-		@Test
-		public void bygFindExactMatchAtEnd() throws NoMatchException, IOException {
-			SpanBuffer haystack = Factory.wrap("GATGCATCAGTAGATGCATTC");
-			SpanBuffer needle = Factory.wrap("ATTC");
-			Matcher.Result result = haystack.getMatcher().match( needle );
-			assertEquals( 17, result.getIndex() );
+	/////////////// BITAP TESTS
 
-		}
-		
-		@Test
-		public void bygFindOverlappingExactMatches() throws NoMatchException, IOException {
+	@Test
+	public void bygFindExactMatchInMiddle() throws NoMatchException, IOException {
+		SpanBuffer haystack = Factory.wrap("TGATGCATTCGTAGATGC");
+		SpanBuffer needle = Factory.wrap("ATTC");
+		Matcher.Result result = haystack.getMatcher().match(needle);
+		assertEquals(6, result.getIndex());
+	}
+
+	@Test
+	public void bygFindExactMatchAtStart() throws NoMatchException, IOException {
+		SpanBuffer haystack = Factory.wrap("ATTCGATGCATCAGTAGATGC");
+		SpanBuffer needle = Factory.wrap("ATTC");
+		Matcher.Result result = haystack.getMatcher().match(needle);
+		assertEquals(0, result.getIndex());
+
+	}
+
+	@Test
+	public void bygFindExactMatchAtEnd() throws NoMatchException, IOException {
+		SpanBuffer haystack = Factory.wrap("GATGCATCAGTAGATGCATTC");
+		SpanBuffer needle = Factory.wrap("ATTC");
+		Matcher.Result result = haystack.getMatcher().match(needle);
+		assertEquals(17, result.getIndex());
+
+	}
+
+	@Test
+	public void bygFindOverlappingExactMatches() throws NoMatchException, IOException {
 //			String haystack = "TGATGCATTATTAGTAGATGC";
 //			String needle = "ATTA";
 //			Bitap bitap = new Bitap(needle, alphabet);
@@ -226,15 +226,15 @@ public class MatcherTest {
 //			test.add(6);
 //			test.add(9);
 //			assertEquals(test, pos);
-			SpanBuffer haystack = Factory.wrap("TGATGCATTATTAGTAGATGC");
-			SpanBuffer needle = Factory.wrap("ATTA");
-			Matcher matcher =  haystack.getMatcher();
-			Matcher.Result result = matcher.match( needle );
-			assertEquals( 6, result.getIndex() );
-			result = matcher.match( needle, result );
-			assertEquals( 9, result.getIndex() );
-		}
-		
+		SpanBuffer haystack = Factory.wrap("TGATGCATTATTAGTAGATGC");
+		SpanBuffer needle = Factory.wrap("ATTA");
+		Matcher matcher = haystack.getMatcher();
+		Matcher.Result result = matcher.match(needle);
+		assertEquals(6, result.getIndex());
+		result = matcher.match(needle, result);
+		assertEquals(9, result.getIndex());
+	}
+
 //		@Test
 //		public void wuFindExactMatchInMiddle() {
 //			String haystack = "TGATGCATTCGTAGATGC";
@@ -454,5 +454,5 @@ public class MatcherTest {
 //			test.add(57);
 //			assertEquals(test, pos);
 //		}
-	
+
 }

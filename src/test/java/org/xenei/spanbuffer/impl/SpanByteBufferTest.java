@@ -46,39 +46,40 @@ public class SpanByteBufferTest {
 		Assert.assertEquals(11, sp1.getLength());
 
 	}
-	
+
 	@Test
 	public void testPositionSet() throws IOException {
 		String text = "Hello World";
-		ByteBuffer bb = ByteBuffer.wrap( text.getBytes() );
-		bb.position( 6 );
-		SpanBuffer sb = new SpanByteBuffer( bb );
-		Assert.assertEquals( 5, sb.getLength() );
-		Assert.assertEquals(0,  sb.getOffset());
-		Assert.assertEquals( 4, sb.getEnd());
-		Assert.assertEquals( "World", sb.getText());
+		ByteBuffer bb = ByteBuffer.wrap(text.getBytes());
+		bb.position(6);
+		SpanBuffer sb = new SpanByteBuffer(bb);
+		Assert.assertEquals(5, sb.getLength());
+		Assert.assertEquals(0, sb.getOffset());
+		Assert.assertEquals(4, sb.getEnd());
+		Assert.assertEquals("World", sb.getText());
 	}
-	
+
 	@Test
 	public void testLimitSet() throws IOException {
 		String text = "Hello World  ";
-		ByteBuffer bb = ByteBuffer.wrap( text.getBytes() );
-		bb.limit( "Hello World".length() );
-		SpanBuffer sb = new SpanByteBuffer( bb );
-		Assert.assertEquals( "Hello World".length(), sb.getLength() );
-		Assert.assertEquals(0,  sb.getOffset());
-		Assert.assertEquals( "Hello World".length()-1, sb.getEnd());
-		Assert.assertEquals( "Hello World", sb.getText());
+		ByteBuffer bb = ByteBuffer.wrap(text.getBytes());
+		bb.limit("Hello World".length());
+		SpanBuffer sb = new SpanByteBuffer(bb);
+		Assert.assertEquals("Hello World".length(), sb.getLength());
+		Assert.assertEquals(0, sb.getOffset());
+		Assert.assertEquals("Hello World".length() - 1, sb.getEnd());
+		Assert.assertEquals("Hello World", sb.getText());
 	}
 
 	@Test
 	public void testCut() throws IOException {
 		String text = "Hello World";
-		ByteBuffer bb = ByteBuffer.wrap( text.getBytes() );
-		bb.position( 6 );
-		SpanBuffer sb = new SpanByteBuffer( bb );
+		ByteBuffer bb = ByteBuffer.wrap(text.getBytes());
+		bb.position(6);
+		SpanBuffer sb = new SpanByteBuffer(bb);
 		SpanBuffer sb2 = sb.cut(2);
-		Assert.assertEquals( 6, bb.position() );
+		Assert.assertEquals( "rld", sb2.getText());
+		Assert.assertEquals(6, bb.position());
 	}
 
 }

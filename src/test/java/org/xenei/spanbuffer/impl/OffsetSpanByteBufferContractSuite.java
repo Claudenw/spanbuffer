@@ -29,11 +29,12 @@ import org.xenei.spanbuffer.impl.SpanByteBuffer;
 @RunWith(ContractSuite.class)
 @ContractImpl(SpanByteBuffer.class)
 public class OffsetSpanByteBufferContractSuite {
-	
+
 	ByteBuffer bb;
+
 	public OffsetSpanByteBufferContractSuite() {
-		bb =  ByteBuffer.wrap("xxHello World".getBytes());
-		bb.position(2);			
+		bb = ByteBuffer.wrap("xxHello World".getBytes());
+		bb.position(2);
 	}
 
 	@Contract.Inject

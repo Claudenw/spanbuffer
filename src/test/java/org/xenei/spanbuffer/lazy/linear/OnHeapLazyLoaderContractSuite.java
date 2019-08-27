@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.xenei.junit.contract.Contract;
 import org.xenei.junit.contract.ContractImpl;
@@ -21,29 +19,25 @@ import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.SpanBufferContractTest.SpanBufferProducer;
-import org.xenei.spanbuffer.impl.SpanBufferList;
-import org.xenei.spanbuffer.impl.SpanByteBuffer;
 
 @RunWith(ContractSuite.class)
 @ContractImpl(OnHeapLazyLoaderContractSuite.TestingSpanBuffer.class)
 public class OnHeapLazyLoaderContractSuite {
-	
+
 	private File file;
 	private byte[] contents;
 	private List<RandomAccessFile> lst;
-	
+
 	public OnHeapLazyLoaderContractSuite() throws FileNotFoundException, IOException {
-		URL url = this.getClass().getClassLoader().getResource( "small.txt" );
-		file = new File( url.getFile() );
+		URL url = this.getClass().getClassLoader().getResource("small.txt");
+		file = new File(url.getFile());
 		lst = new ArrayList<RandomAccessFile>();
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				FileInputStream fis = new FileInputStream( file ))
-		{
-			IOUtils.copyLarge( fis, baos );
+				FileInputStream fis = new FileInputStream(file)) {
+			IOUtils.copyLarge(fis, baos);
 			contents = baos.toByteArray();
 		}
 	}
-
 
 	@Contract.Inject
 	public SpanBufferProducer<SpanBuffer> getProducer() {
@@ -52,18 +46,17 @@ public class OnHeapLazyLoaderContractSuite {
 			@Override
 			public SpanBuffer newInstance() {
 				try {
-					RandomAccessFile raf = new RandomAccessFile( file, "r" );
-					lst.add( raf );
+					RandomAccessFile raf = new RandomAccessFile(file, "r");
+					lst.add(raf);
 					return OnHeapLazyLoader.load(raf, Factory.DEFAULT_INTERNAL_BUFFER_SIZE, false);
 				} catch (IOException e) {
-					throw new IllegalStateException( e );
+					throw new IllegalStateException(e);
 				}
 			}
 
 			@Override
 			public void cleanUp() {
-				for (RandomAccessFile raf : lst)
-				{
+				for (RandomAccessFile raf : lst) {
 					try {
 						raf.close();
 					} catch (IOException e) {
@@ -78,7 +71,7 @@ public class OnHeapLazyLoaderContractSuite {
 			}
 		};
 	}
-	
+
 	private static class TestingSpanBuffer extends AbstractSpanBuffer {
 
 		protected TestingSpanBuffer(long offset) {
@@ -126,6 +119,6 @@ public class OnHeapLazyLoaderContractSuite {
 			// TODO Auto-generated method stub
 			return 0;
 		}
-		
+
 	}
 }
