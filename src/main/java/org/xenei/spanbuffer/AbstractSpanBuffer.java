@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.span.LongSpan;
 import org.xenei.span.NumberUtils;
-import org.xenei.spanbuffer.impl.MatcherImpl;
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
 
 /**
@@ -274,7 +273,7 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 	@Override
 	public final Matcher getMatcher() {
-		return new MatcherImpl(this);
+		return new Matcher(this);
 	}
 
 	@Override
