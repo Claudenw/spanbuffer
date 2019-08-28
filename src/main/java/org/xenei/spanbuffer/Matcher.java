@@ -152,7 +152,7 @@ public class Matcher  {
 		}
 
 		// Perfect match at the perfect spot! (Includes case of null pattern)
-		final SpanBuffer subTarget = target.cut(start);
+		final SpanBuffer subTarget = target.sliceAt(start);
 		Bitap.Result result = null;
 		if (subTarget.startsWith(pattern)) {
 			result = new Bitap.Result(config, start, target.makeRelative(start));
