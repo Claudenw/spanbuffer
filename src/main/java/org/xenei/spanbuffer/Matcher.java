@@ -33,45 +33,42 @@ public class Matcher  {
 	private static final Logger LOG = LoggerFactory.getLogger(Matcher.class);
 
 
-//	/**
-//	 * Match a pattern starting at the specified relative position.
-//	 *
-//	 * <p>
-//	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
-//	 * </p>
-//	 *
-//	 * @param pattern  The pattern to match.
-//	 * @param position The relative position to start matching at
-//	 * @return The relative match position.
-//	 * @throws NoMatchException if match not found
-//	 * @throws IOException      ion IOerror
-//	 */
-//	public long matchFrom(final SpanBuffer target, final SpanBuffer pattern, final long loc) throws NoMatchException, IOException {
-//		// Check for null inputs.
-//		if (target == null) {
-//			throw new IllegalArgumentException("target may not be null");
-//		}
-//		if (pattern == null) {
-//			throw new IllegalArgumentException("pattern may not be null");
-//		}
-//
-//		// check for pattern to long
-//		if (pattern.getLength() > target.getLength()) {
-//			throw new NoMatchException();
-//		}
-//
-//		// Perfect match at the perfect spot! (Includes case of null pattern)
-//		final SpanBuffer subTarget = target.cut(loc);
-//		if (subTarget.startsWith(pattern)) {
-//			return loc;
-//		}
-//		Bitap bitap = new Bitap();
-//		final Bitap.Result result = bitap.execute(target, pattern, loc);
-//		if (result == null) {
-//			throw new NoMatchException();
-//		}
-//		return result.getIndex();
-//	}
+	/**
+	 * Match a pattern starting at the specified relative position.
+	 *
+	 * <p>
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
+	 * </p>
+	 * Absolute version of this method is match()
+	 * 
+	 * @param pattern  The pattern to match.
+	 * @param position The relative position to start matching at
+	 * @return The relative match position.
+	 * @throws NoMatchException if match not found
+	 * @throws IOException      ion IOerror
+	 */
+	public Bitap.Result matchFrom(final SpanBuffer target, final SpanBuffer pattern, final long loc) throws NoMatchException, IOException {
+		// Check for null inputs.
+		if (target == null) {
+			throw new IllegalArgumentException("target may not be null");
+		}
+		return match( target, pattern, target.makeAbsolute(loc) );
+	}
+
+	/**
+	 * Get a match result starting from a relative position.
+	 *
+	 * @param target the target find the pattern in.
+	 * @param pattern the pattern to match
+	 * @param start  the location to start the match from.
+	 * @param config the Bitap.Config to use for the match.
+	 * @return The match result.
+	 * @throws NoMatchException if a match could not be established
+	 * @throws IOException      on IO error.
+	 */
+	public static Bitap.Result matchFrom(final SpanBuffer target, final SpanBuffer pattern, final long start, Bitap.Config config) throws NoMatchException, IOException {
+		return match( target, pattern, target.makeAbsolute(start), config );
+	}
 
 	/**
 	 * Get a match result from an attempted match.
