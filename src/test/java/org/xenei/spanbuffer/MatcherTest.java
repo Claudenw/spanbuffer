@@ -15,7 +15,7 @@ public class MatcherTest {
 		SpanBuffer haystack = Factory.wrap("TGATGCATTCGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = Matcher.match(haystack, needle);
-		assertEquals(6, result.getIndex());
+		assertEquals(6, result.getAbsIndex());
 	}
 
 	@Test
@@ -23,7 +23,7 @@ public class MatcherTest {
 		SpanBuffer haystack = Factory.wrap("ATTCGATGCATCAGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = Matcher.match(haystack, needle);
-		assertEquals(0, result.getIndex());
+		assertEquals(0, result.getAbsIndex());
 
 	}
 
@@ -32,7 +32,7 @@ public class MatcherTest {
 		SpanBuffer haystack = Factory.wrap("GATGCATCAGTAGATGCATTC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = Matcher.match(haystack, needle);
-		assertEquals(17, result.getIndex());
+		assertEquals(17, result.getAbsIndex());
 
 	}
 
@@ -49,9 +49,9 @@ public class MatcherTest {
 		SpanBuffer haystack = Factory.wrap("TGATGCATTATTAGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTA");
 		Bitap.Result result = Matcher.match(haystack, needle);
-		assertEquals(6, result.getIndex());
+		assertEquals(6, result.getAbsIndex());
 		result = Matcher.match(haystack, needle, result);
-		assertEquals(9, result.getIndex());
+		assertEquals(9, result.getAbsIndex());
 	}
 
 //		@Test
@@ -283,7 +283,7 @@ public class MatcherTest {
 		pattern = pattern.head(pattern.relativeUpperLimit(Bitap.MAX_BITAP));
 
 		final Bitap.Result result = Matcher.match( target, pattern);
-		Assert.assertEquals(mid, result.getIndex());
+		Assert.assertEquals(mid, result.getAbsIndex());
 
 	}
 
@@ -297,7 +297,7 @@ public class MatcherTest {
 
 	
 		final Bitap.Result result = Matcher.match( target,pattern);
-		Assert.assertEquals(target.getOffset(), result.getIndex());
+		Assert.assertEquals(target.getOffset(), result.getAbsIndex());
 	}
 	
 	@Test
@@ -314,7 +314,7 @@ public class MatcherTest {
 		mid = target.makeAbsolute(mid);
 		
 		final Bitap.Result result = Matcher.match( target,pattern);
-		Assert.assertEquals(mid, result.getIndex());
+		Assert.assertEquals(mid, result.getAbsIndex());
 	}
 
 	@Test
@@ -327,7 +327,7 @@ public class MatcherTest {
 		target = target.duplicate(5);
 
 		final Bitap.Result result = Matcher.match( target,pattern);
-		Assert.assertEquals(target.getOffset(), result.getIndex());
+		Assert.assertEquals(target.getOffset(), result.getAbsIndex());
 	}
 
 }

@@ -94,7 +94,7 @@ public class Matcher  {
 	 * @throws IOException      on IO error.
 	 */
 	public static Bitap.Result match(final SpanBuffer target, final SpanBuffer pattern, final Bitap.Result prevResult) throws NoMatchException, IOException {
-		return match( target, pattern, prevResult.getIndex()+1, prevResult.getConfig());
+		return match( target, pattern, prevResult.getAbsIndex()+1, prevResult.getConfig());
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class Matcher  {
 		final SpanBuffer subTarget = target.sliceAt(start);
 		Bitap.Result result = null;
 		if (subTarget.startsWith(pattern)) {
-			result = new Bitap.Result(start);
+			result = new Bitap.Result(start, target.makeRelative(start));
 		} else {
 			Bitap bitap = new Bitap();
 			result = bitap.execute(subTarget, pattern, subTarget.getOffset() );
@@ -155,7 +155,7 @@ public class Matcher  {
 		final SpanBuffer subTarget = target.cut(start);
 		Bitap.Result result = null;
 		if (subTarget.startsWith(pattern)) {
-			result = new Bitap.Result(config, start);
+			result = new Bitap.Result(config, start, target.makeRelative(start));
 		} else {
 			Bitap bitap = new Bitap( config );
 			result = bitap.execute(subTarget, pattern, subTarget.getOffset() );

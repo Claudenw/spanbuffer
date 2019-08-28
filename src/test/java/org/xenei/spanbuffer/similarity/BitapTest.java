@@ -18,7 +18,7 @@ public class BitapTest {
 		SpanBuffer haystack = Factory.wrap("TGATGCATTCGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = bitap.execute(haystack, needle);
-		assertEquals(6, result.getIndex());
+		assertEquals(6, result.getAbsIndex());
 	}
 
 	@Test
@@ -26,7 +26,7 @@ public class BitapTest {
 		SpanBuffer haystack = Factory.wrap("ATTCGATGCATCAGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = bitap.execute(haystack, needle);
-		assertEquals(0, result.getIndex());
+		assertEquals(0, result.getAbsIndex());
 
 	}
 
@@ -35,7 +35,7 @@ public class BitapTest {
 		SpanBuffer haystack = Factory.wrap("GATGCATCAGTAGATGCATTC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = bitap.execute(haystack, needle);
-		assertEquals(17, result.getIndex());
+		assertEquals(17, result.getAbsIndex());
 
 	}
 
@@ -52,9 +52,9 @@ public class BitapTest {
 		SpanBuffer haystack = Factory.wrap("TGATGCATTATTAGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTA");
 		Bitap.Result result = bitap.execute(haystack, needle);
-		assertEquals(6, result.getIndex());
-		result = bitap.execute(haystack.cut( result.getIndex()+1), needle);
-		assertEquals(9, result.getIndex());
+		assertEquals(6, result.getAbsIndex());
+		result = bitap.execute(haystack.sliceAt( result.getAbsIndex()+1), needle);
+		assertEquals(9, result.getAbsIndex());
 	}
 
 //		@Test
