@@ -137,11 +137,6 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
-	public Matcher getMatcher() {
-		return sb.getMatcher();
-	}
-
-	@Override
 	public byte read(final long position) throws IOException {
 		return sb.read(position);
 	}

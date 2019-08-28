@@ -424,33 +424,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 		Assert.assertEquals(new String(buffer), spanBuffer.getText());
 	}
 
-	@ContractTest
-	public void testMatch() throws NoMatchException, IOException {
-		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-
-		SpanBuffer span2 = spanBuffer.sliceAt(mid);
-		span2 = span2.head(span2.relativeUpperLimit(Matcher.MAX_BITAP));
-
-		final Matcher matcher = spanBuffer.getMatcher();
-
-		final Matcher.Result result = matcher.bitap(span2);
-		Assert.assertEquals(mid, result.getIndex());
-
-	}
-
-	@ContractTest
-	public void testMatchAtStart() throws NoMatchException, IOException {
-		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-
-		SpanBuffer span2 = spanBuffer.head(mid);
-		span2 = span2.head(span2.relativeUpperLimit(Matcher.MAX_BITAP));
-
-		final Matcher matcher = spanBuffer.getMatcher();
-
-		final Matcher.Result result = matcher.bitap(span2);
-		Assert.assertEquals(spanBuffer.getOffset(), result.getIndex());
-	}
-
+	
 	@ContractTest
 	public void testReadPosition() throws IOException {
 		for (int i = 0; i < spanBuffer.getLength(); i++) {
@@ -744,37 +718,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 		Assert.assertEquals(new String(buffer), spanBuffer.getText());
 	}
 
-	@ContractTest
-	public void testMatchWithOffset() throws NoMatchException, IOException {
-		// absolute mid position
-		long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		// get span buffer from mid with max length of
-		SpanBuffer span2 = spanBuffer.sliceAt(mid);
-		mid = spanBuffer.makeRelative(mid);
-		span2 = span2.head(span2.relativeUpperLimit(Matcher.MAX_BITAP));
-
-		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
-		mid = spanBuffer.makeAbsolute(mid);
-
-		final Matcher matcher = spanBuffer.getMatcher();
-
-		final Matcher.Result result = matcher.bitap(span2);
-		Assert.assertEquals(mid, result.getIndex());
-	}
-
-	@ContractTest
-	public void testMatchAtStartWithOffset() throws NoMatchException, IOException {
-		final long mid = (spanBuffer.getLength() / 2);
-		SpanBuffer span2 = spanBuffer.head(mid);
-		span2 = span2.head(span2.relativeUpperLimit(Matcher.MAX_BITAP));
-
-		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
-
-		final Matcher matcher = spanBuffer.getMatcher();
-
-		final Matcher.Result result = matcher.bitap(span2);
-		Assert.assertEquals(spanBuffer.getOffset(), result.getIndex());
-	}
+	
 
 	@ContractTest
 	public void testReadPositionWithOffset() throws IOException {

@@ -27,18 +27,20 @@ import org.xenei.spanbuffer.streams.SpanBufferInputStream;
  * visible.
  *
  * <p>
- * Span buffer methods that take positional arguments tend to come int 2
+ * Span buffer methods that take positional arguments tend to come in 2
  * flavors. One takes absolute position the other takes relative position.
  * </p>
  *
  * <p>
- * Absolute position is defined as buffer.getOffset()+relativePosition. Absolute
- * position has a range of (getOffset(),getOffset()+getLength())
+ * Absolute position is the position within the buffer as the distance from the 
+ * start of all the buffers that make up this span buffer. it is defined as buffer.getOffset()+relativePosition. Absolute
+ * position has a range of [getOffset(),getOffset()+getLength())
  * </p>
  *
  * <p>
- * Relative position is the position within the buffer when visualized as a byte
- * buffer. Relative position has a range of (0,getLength())
+ * Relative position is the position within the buffer (relative to the start of
+ * the individual buffer) when visualized as a byte
+ * buffer. Relative position has a range of [0,getLength())
  * </p>
  */
 public interface SpanBuffer extends LongSpan {
@@ -145,12 +147,11 @@ public interface SpanBuffer extends LongSpan {
 	SpanBuffer sliceAt(long position);
 
 	/**
-	 * Like sliceAt() except the that byteCount is the number of bytes to cut off
-	 * the front.
+	 * Cut byteCount off the front of this buffer and return the 
+	 * remaining bytes.  This is a relative method.
 	 *
 	 * <p>
 	 * See discussion of Absolute and Relative methods above.
-	 *
 	 * </p>
 	 * <p>
 	 * The absolute version of this method is sliceAt().
@@ -388,13 +389,6 @@ public interface SpanBuffer extends LongSpan {
 	 * @throws IOException on error.
 	 */
 	String getHex(int limit) throws IOException;
-
-	/**
-	 * Get a matcher object on the span buffer.
-	 *
-	 * @return a Matcher
-	 */
-	Matcher getMatcher();
 
 	/**
 	 * Read the byte at the absolute specified position.
