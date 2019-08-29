@@ -55,8 +55,8 @@ public final class Factory {
 	 * exceeds this then off heap memory is used. This is the limit used when
 	 * loading files or data streams.
 	 */
-	/* package private for  testing */
-	/* package private*/ static int MAX_HEAP = NumberUtils.checkIntLimit("MAX_HEAP", 32 * FileUtils.ONE_MB);
+	/* package private for testing */
+	/* package private */ static int MAX_HEAP = NumberUtils.checkIntLimit("MAX_HEAP", 32 * FileUtils.ONE_MB);
 
 	/**
 	 * The default length for the internal buffer of a lazy loaded buffer.
@@ -414,16 +414,16 @@ public final class Factory {
 	public static SpanBuffer wrap(File file, long bufferSize) throws IOException {
 		return wrap(file, bufferSize, false);
 	}
-	
+
 	/**
 	 * Create a span buffer from a file.
 	 * <p>
 	 * If the file is smaller than MAX_HEAP the entire file is read into heap. If
-	 * the file is larger than MAX_HEAP then buffers of DEFAULT_INTERNAL_BUFFER_SIZE will be used by a
-	 * lazy loader..
+	 * the file is larger than MAX_HEAP then buffers of DEFAULT_INTERNAL_BUFFER_SIZE
+	 * will be used by a lazy loader..
 	 * </p>
 	 * 
-	 * @param file       the file to read.
+	 * @param file           the file to read.
 	 * @param deleteAfterUse if true file will be deleted when no longer needed.
 	 * @return a SpanBuffer with an offset of 0.
 	 * @throws IOException           on IO error
@@ -501,16 +501,16 @@ public final class Factory {
 	 * Uses default internal buffer size
 	 * </p>
 	 * 
-	 * @param file       the file to read.
+	 * @param file the file to read.
 	 * @return a SpanBuffer with an offset of 0.
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
 	@SuppressWarnings("resource")
 	public static SpanBuffer asMemMap(File file) throws IOException {
-		return asMemMap( file, DEFAULT_INTERNAL_BUFFER_SIZE );
+		return asMemMap(file, DEFAULT_INTERNAL_BUFFER_SIZE);
 	}
-	
+
 	/**
 	 * Create a span buffer using a memory mapped file from a file.
 	 * 
@@ -704,7 +704,7 @@ public final class Factory {
 	public static SpanBuffer merge(final Stream<SpanBuffer> buffers) {
 		return Factory.merge(0, buffers.iterator());
 	}
-	
+
 	/**
 	 * Merge multiple SpanBuffers into a SpanBuffer and set the offset. The buffers
 	 * are concatenated and the total is used for the result.

@@ -1,8 +1,23 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer.similarity;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 
 import org.junit.Test;
@@ -14,7 +29,7 @@ public class BitapTest {
 	Bitap bitap = new Bitap();
 
 	@Test
-	public void bygFindExactMatchInMiddle() throws  IOException {
+	public void bygFindExactMatchInMiddle() throws IOException {
 		SpanBuffer haystack = Factory.wrap("TGATGCATTCGTAGATGC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = bitap.execute(haystack, needle);
@@ -31,7 +46,7 @@ public class BitapTest {
 	}
 
 	@Test
-	public void bygFindExactMatchAtEnd() throws  IOException {
+	public void bygFindExactMatchAtEnd() throws IOException {
 		SpanBuffer haystack = Factory.wrap("GATGCATCAGTAGATGCATTC");
 		SpanBuffer needle = Factory.wrap("ATTC");
 		Bitap.Result result = bitap.execute(haystack, needle);
@@ -40,7 +55,7 @@ public class BitapTest {
 	}
 
 	@Test
-	public void bygFindOverlappingExactMatches() throws  IOException {
+	public void bygFindOverlappingExactMatches() throws IOException {
 //			String haystack = "TGATGCATTATTAGTAGATGC";
 //			String needle = "ATTA";
 //			Bitap bitap = new Bitap(needle, alphabet);
@@ -53,7 +68,7 @@ public class BitapTest {
 		SpanBuffer needle = Factory.wrap("ATTA");
 		Bitap.Result result = bitap.execute(haystack, needle);
 		assertEquals(6, result.getAbsIndex());
-		result = bitap.execute(haystack.sliceAt( result.getAbsIndex()+1), needle);
+		result = bitap.execute(haystack.sliceAt(result.getAbsIndex() + 1), needle);
 		assertEquals(9, result.getAbsIndex());
 	}
 

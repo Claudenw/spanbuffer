@@ -27,20 +27,21 @@ import org.xenei.spanbuffer.streams.SpanBufferInputStream;
  * visible.
  *
  * <p>
- * Span buffer methods that take positional arguments tend to come in 2
- * flavors. One takes absolute position the other takes relative position.
+ * Span buffer methods that take positional arguments tend to come in 2 flavors.
+ * One takes absolute position the other takes relative position.
  * </p>
  *
  * <p>
- * Absolute position is the position within the buffer as the distance from the 
- * start of all the buffers that make up this span buffer. it is defined as buffer.getOffset()+relativePosition. Absolute
- * position has a range of [getOffset(),getOffset()+getLength())
+ * Absolute position is the position within the buffer as the distance from the
+ * start of all the buffers that make up this span buffer. it is defined as
+ * buffer.getOffset()+relativePosition. Absolute position has a range of
+ * [getOffset(),getOffset()+getLength())
  * </p>
  *
  * <p>
  * Relative position is the position within the buffer (relative to the start of
- * the individual buffer) when visualized as a byte
- * buffer. Relative position has a range of [0,getLength())
+ * the individual buffer) when visualized as a byte buffer. Relative position
+ * has a range of [0,getLength())
  * </p>
  */
 public interface SpanBuffer extends LongSpan {
@@ -147,8 +148,8 @@ public interface SpanBuffer extends LongSpan {
 	SpanBuffer sliceAt(long position);
 
 	/**
-	 * Cut byteCount off the front of this buffer and return the 
-	 * remaining bytes.  This is a relative method.
+	 * Cut byteCount off the front of this buffer and return the remaining bytes.
+	 * This is a relative method.
 	 *
 	 * <p>
 	 * See discussion of Absolute and Relative methods above.

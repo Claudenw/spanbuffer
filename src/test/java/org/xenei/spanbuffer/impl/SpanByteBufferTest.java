@@ -78,7 +78,7 @@ public class SpanByteBufferTest {
 		bb.position(6);
 		SpanBuffer sb = new SpanByteBuffer(bb);
 		SpanBuffer sb2 = sb.cut(2);
-		Assert.assertEquals( "rld", sb2.getText());
+		Assert.assertEquals("rld", sb2.getText());
 		Assert.assertEquals(6, bb.position());
 	}
 

@@ -270,7 +270,7 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 
 		return getEnd() - myWalker.getPos();
 	}
-	
+
 	@Override
 	public final byte readRelative(final long byteOffset) throws IOException {
 		return read(getOffset() + byteOffset);

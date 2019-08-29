@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer.similarity;
 
 import java.io.IOException;
@@ -7,9 +24,18 @@ import org.xenei.spanbuffer.NoMatchException;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.Walker;
 
+/**
+ * Bitap matching implementation.
+ *
+ */
 public class Bitap {
+
+	/**
+	 * Configuration for the bitap match.
+	 *
+	 */
 	public static class Config {
-		
+
 		/**
 		 * The default match distance used by the match function.
 		 */
@@ -18,20 +44,20 @@ public class Bitap {
 		 * The default match threshold used by the match function.
 		 */
 		public static final double DEFAULT_MATCH_THRESHOLD = 0.5d;
-	
-	
-		private final  int distance;
+
+		private final int distance;
 		private final double threshold;
-		
+
 		/**
 		 * Copy constructor
+		 * 
 		 * @param other the config to copy from.
 		 */
-		public Config( Config other ) {
+		public Config(Config other) {
 			distance = other.distance;
 			threshold = other.threshold;
 		}
-		
+
 		/**
 		 * Constructor.
 		 */
@@ -39,43 +65,43 @@ public class Bitap {
 			distance = DEFAULT_MATCH_DISTANCE;
 			threshold = DEFAULT_MATCH_THRESHOLD;
 		}
-		
+
 		/**
 		 * Constructor
-		 * @param distance the maximum distance for the match.
+		 * 
+		 * @param distance  the maximum distance for the match.
 		 * @param threshold the threshold for the match.
 		 */
-		public Config( final int distance, final double threshold)
-		{
+		public Config(final int distance, final double threshold) {
 			this.distance = distance;
 			this.threshold = threshold;
-		}		
-		
+		}
+
 		/**
 		 * Get the threshold for this matcher.
+		 * 
 		 * @return the match threshold.
 		 */
 		public double getThreshold() {
 			return threshold;
 		}
-		
-		
+
 		/**
 		 * Get the current distance for for bitap match.
+		 * 
 		 * @return the match distance.
 		 */
-		public int getDistance()
-		{
+		public int getDistance() {
 			return distance;
 		}
-		
+
 	}
 
 	/**
-	 * The result of a match call.
+	 * The result of a bitap execution.
 	 */
-	public static class Result  {
-	
+	public static class Result {
+
 		/**
 		 * The absolute position in the buffer of the match.
 		 */
@@ -94,101 +120,103 @@ public class Bitap {
 		 * The score for the match.
 		 */
 		private double score;
-		
+
 		/**
 		 * The configuration used for the match.
 		 */
 		private final Bitap.Config config;
-		
+
 		/**
 		 * Create a default result.
 		 */
-		public Result()
-		{
-			this( new Config() );
+		public Result() {
+			this(new Config());
 		}
-		
+
 		/**
 		 * Create a result with the specified match positions.
 		 * <p>
 		 * See discussion of Absolute and Relative methods in SpanBuffer.
 		 * </p>
+		 * 
 		 * @See SpanBuffer
 		 * 
 		 * @param absStart the Absolute location
 		 * @param relStart the Relative location.
 		 */
-		public Result(long absStart, long relStart )
-		{
-			this( new Config(), absStart, relStart );
+		public Result(long absStart, long relStart) {
+			this(new Config(), absStart, relStart);
 		}
-		
+
 		/**
 		 * Create a result with the specified configuration.
+		 * 
 		 * @param config the bitap configuration.
 		 */
-		public Result( Bitap.Config config )
-		{
-			this(config,0,0);
+		public Result(Bitap.Config config) {
+			this(config, 0, 0);
 		}
-		
+
 		/**
 		 * Create a result with specified configuration and positions.
 		 * <p>
 		 * See discussion of Absolute and Relative methods in SpanBuffer.
 		 * </p>
+		 * 
 		 * @See SpanBuffer
-		 * @param config the bitap config
+		 * @param config   the bitap config
 		 * @param absStart the Absolute location
 		 * @param relStart the Relative location.
 		 */
-		public Result( Bitap.Config config, long absStart, long relStart )
-		{
+		public Result(Bitap.Config config, long absStart, long relStart) {
 			this.config = config;
 			this.absIndex = absStart;
 			this.relIndex = relStart;
 		}
-	
+
 		/**
 		 * The absolute position in the buffer of the match.
 		 *
 		 * <p>
 		 * See discussion of Absolute and Relative methods in SpanBuffer.
 		 * </p>
+		 * 
 		 * @See SpanBuffer
 		 */
 		public final long getAbsIndex() {
 			return absIndex;
 		}
-	
+
 		/**
 		 * The relative position in the buffer of the match.
 		 *
 		 * <p>
 		 * See discussion of Absolute and Relative methods in SpanBuffer.
 		 * </p>
+		 * 
 		 * @See SpanBuffer
 		 */
 		public final long getRelIndex() {
 			return relIndex;
 		}
-		
+
 		/**
 		 * The number of errors in the match.
 		 */
 		public final int getErrors() {
 			return errors;
 		}
-	
+
 		/**
 		 * The score for the match.
 		 */
 		public final double getScore() {
 			return score;
 		}
-	
+
 		/**
 		 * Get the configuration used to generate this result.
+		 * 
 		 * @return the configuration.
 		 */
 		public final Config getConfig() {
@@ -197,39 +225,39 @@ public class Bitap {
 	}
 
 	private Bitap.Config config;
-	
+
 	/**
 	 * The maximum size of a pattern for a BITAP match.
 	 */
 	public static final int MAX_BITAP = Integer.SIZE;
-	
+
 	/**
 	 * Constructor with a default configuration.
 	 */
 	public Bitap() {
-		this( new Config() );
+		this(new Config());
 	}
-	
+
 	/**
 	 * Constructor with the specified configuration.
+	 * 
 	 * @param config the bitap configuration that was used.
 	 */
-	public Bitap(Bitap.Config config)
-	{ 
+	public Bitap(Bitap.Config config) {
 		this.config = config;
 	}
-	
+
 	/**
 	 * Set the configuration.
+	 * 
 	 * @param config The configuration to use.
 	 * @return this for chaining.
 	 */
-	public Bitap setConfig( Bitap.Config config )
-	{
+	public Bitap setConfig(Bitap.Config config) {
 		this.config = config;
 		return this;
 	}
-	
+
 	/**
 	 * Calculate the bitap distance. The tolerance is the number of errors
 	 * acceptable in the matched string.
@@ -238,9 +266,10 @@ public class Bitap {
 	 * The resulting position (in the Result object) is relative.
 	 * </p>
 	 * <p>
- 	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
-	 * @param target the buffer to search in.
+	 * 
+	 * @param target  the buffer to search in.
 	 * @param pattern The pattern to match
 	 * @return The result object representing match or null if no match was found.
 	 * @throws IOException on error
@@ -257,7 +286,7 @@ public class Bitap {
 	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
 	 *
-	 * @param target the buffer to search in.
+	 * @param target  the buffer to search in.
 	 * @param pattern The pattern to match
 	 * @param loc     The absolute location to start the pattern match from.
 	 * @return The result object representing match or null if no match was found.
@@ -277,7 +306,7 @@ public class Bitap {
 
 		// Highest score beyond which we give up.
 		double scoreThreshold = this.config.threshold;
-		final Bitap.Result retval = new Result( this.config);
+		final Bitap.Result retval = new Result(this.config);
 		retval.absIndex = -1;
 		retval.relIndex = target.makeRelative(-1);
 
@@ -286,7 +315,7 @@ public class Bitap {
 
 		try {
 			retval.absIndex = (int) target.positionOf(pattern, loc);
-			retval.relIndex = target.makeRelative( retval.absIndex );
+			retval.relIndex = target.makeRelative(retval.absIndex);
 			retval.score = bitapScore(0, retval.absIndex, loc, pattern);
 			scoreThreshold = Math.min(retval.score, scoreThreshold);
 			// What about in the other direction? (speedup)
@@ -294,7 +323,7 @@ public class Bitap {
 			final double score = bitapScore(0, idx, loc, pattern);
 			if (score < scoreThreshold) {
 				retval.absIndex = idx;
-				retval.relIndex = target.makeRelative( retval.absIndex );
+				retval.relIndex = target.makeRelative(retval.absIndex);
 				retval.score = score;
 				scoreThreshold = score;
 			}
@@ -357,8 +386,8 @@ public class Bitap {
 					if (score <= scoreThreshold) {
 						// Told you so.
 						scoreThreshold = score;
-						retval.relIndex =  j-1 ;
-						retval.absIndex = target.makeAbsolute( retval.relIndex );
+						retval.relIndex = j - 1;
+						retval.absIndex = target.makeAbsolute(retval.relIndex);
 						retval.score = score;
 						retval.errors = errorCount;
 
@@ -424,6 +453,7 @@ public class Bitap {
 
 	/**
 	 * Convert a byte to an int.
+	 * 
 	 * @param b the byte to convert.
 	 * @return the integer value for the byte bit pattern.
 	 */

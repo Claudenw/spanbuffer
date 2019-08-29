@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer.similarity;
 
 import java.io.IOException;
@@ -7,33 +24,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.SpanBuffer;
 
+/**
+ * A Levenshtein distance implementation.
+ * <p>
+ * This is the number of changes needed to change one buffer into another, where
+ * each change is a single byte modification (deletion, insertion or
+ * substitution).
+ * </p>
+ * <p>
+ * This implementations is based on Apache Commons 3.5
+ * StringUtils.getLevenshteinDistance
+ * </p>
+ */
 public class Levenshtein {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Levenshtein.class);
-	
+
 	/**
 	 * Do not instantiate.
 	 */
-	private Levenshtein() {		
+	private Levenshtein() {
 	}
-	
+
 	/**
 	 * <p>
 	 * Find the Levenshtein distance between two SpanBuffers.
 	 * </p>
 	 *
-	 * <p>
-	 * This is the number of changes needed to change one buffer into another, where
-	 * each change is a single byte modification (deletion, insertion or
-	 * substitution).
-	 * </p>
-	 * <p>
-	 * This implementations is based on Apache Commons 3.5
-	 * StringUtils.getLevenshteinDistance
-	 * </p>
-	 *
-	 * @param target the target to get the distance from. Maximum length Integer.MAX_VALUE-1.
-	 * @param pattern the pattern to get the distance to. Maximum length Integer.MAX_VALUE-1.
+	 * @param target  the target to get the distance from. Maximum length
+	 *                Integer.MAX_VALUE-1.
+	 * @param pattern the pattern to get the distance to. Maximum length
+	 *                Integer.MAX_VALUE-1.
 	 * @return result distance
 	 * @throws IllegalArgumentException if either buffer is longer than
 	 *                                  Integer.MAX_VALUE-1 or null
@@ -46,7 +67,7 @@ public class Levenshtein {
 		if (pattern == null) {
 			throw new IllegalArgumentException("pattern may not be null");
 		}
-	
+
 		if ((target.getLength() > (Integer.MAX_VALUE - 1)) || (pattern.getLength() > (Integer.MAX_VALUE - 1))) {
 			throw new IllegalArgumentException("buffers are too long");
 		}
@@ -70,16 +91,16 @@ public class Levenshtein {
 		 * not cause an out of memory condition when calculating the LD over two very
 		 * large strings.
 		 */
-	
+
 		int myTargetLen = (int) myTarget.getLength(); // length of myTarget
 		int myPatternLen = (int) myPattern.getLength(); // length of myPattern
-	
+
 		if (myTargetLen == 0) {
 			return myPatternLen;
 		} else if (myPatternLen == 0) {
 			return myTargetLen;
 		}
-	
+
 		if (myTargetLen > myPatternLen) {
 			// swap the input strings to consume less memory
 			final SpanBuffer tmp = myTarget;
@@ -88,28 +109,28 @@ public class Levenshtein {
 			myTargetLen = myPatternLen;
 			myPatternLen = (int) myPattern.getLength();
 		}
-	
+
 		int[] prevCostAry = new int[myTargetLen + 1]; // 'previous' cost array, horizontally
 		int[] costAry = new int[myTargetLen + 1]; // cost array, horizontally
 		int[] tmp; // placeholder to assist in swapping p and d
-	
+
 		// indexes into strings s and t
 		int myTargetPos; // iterates through myTarget
 		int myPatternPos; // iterates through myPattern
-	
+
 		byte myPatternPrev; // jth byte of t
-	
+
 		int cost; // cost
-	
+
 		for (myTargetPos = 0; myTargetPos <= myTargetLen; myTargetPos++) {
 			prevCostAry[myTargetPos] = myTargetPos;
 		}
-	
+
 		try {
 			for (myPatternPos = 1; myPatternPos <= myPatternLen; myPatternPos++) {
 				myPatternPrev = myPattern.read((myPattern.getOffset() + myPatternPos) - 1);
 				costAry[0] = myPatternPos;
-	
+
 				for (myTargetPos = 1; myTargetPos <= myTargetLen; myTargetPos++) {
 					cost = myTarget.read((myTarget.getOffset() + myTargetPos) - 1) == myPatternPrev ? 0 : 1;
 					// minimum of cell to the left+1, to the top+1, diagonally
@@ -118,14 +139,14 @@ public class Levenshtein {
 							Math.min(costAry[myTargetPos - 1] + 1, prevCostAry[myTargetPos] + 1),
 							prevCostAry[myTargetPos - 1] + cost);
 				}
-	
+
 				// copy current distance counts to 'previous row' distance
 				// counts
 				tmp = prevCostAry;
 				prevCostAry = costAry;
 				costAry = tmp;
 			}
-	
+
 			// our last action in the above loop was to switch d and p, so p now
 			// actually has the most recent cost counts
 			return prevCostAry[myTargetLen];
@@ -139,19 +160,10 @@ public class Levenshtein {
 	 * Find the Levenshtein distance between two buffers if it's less than or equal
 	 * to a given threshold.
 	 *
-	 * <p>
-	 * This is the number of changes needed to change one buffer into another, where
-	 * each change is a single byte modification (deletion, insertion or
-	 * substitution).
-	 * </p>
-	 *
-	 * <p>
-	 * This implementations is based on Apache Commons 3.5
-	 * StringUtils.getLevenshteinDistance
-	 * </p>
-	 *
-	 * @param target the target to get the distance from. Maximum length Integer.MAX_VALUE-1.
-	 * @param pattern the pattern to get the distance to. Maximum length Integer.MAX_VALUE-1.
+	 * @param target    the target to get the distance from. Maximum length
+	 *                  Integer.MAX_VALUE-1.
+	 * @param pattern   the pattern to get the distance to. Maximum length
+	 *                  Integer.MAX_VALUE-1.
 	 * @param threshold the target threshold, must not be negative
 	 * @return result distance, or {@code -1} if the distance would be greater than
 	 *         the threshold
@@ -168,10 +180,10 @@ public class Levenshtein {
 		if (threshold < 0) {
 			throw new IllegalArgumentException("Threshold must not be negative");
 		}
-	
+
 		SpanBuffer myTarget = target;
 		SpanBuffer myPattern = pattern;
-	
+
 		if ((myTarget.getLength() > (Integer.MAX_VALUE - 1)) || (myPattern.getLength() > (Integer.MAX_VALUE - 1))) {
 			throw new IllegalArgumentException("Buffers are too long");
 		}
@@ -213,10 +225,10 @@ public class Levenshtein {
 		 * See Algorithms on Strings, Trees and Sequences by Dan Gusfield for some
 		 * discussion.
 		 */
-	
+
 		int myTargetLen = (int) myTarget.getLength(); // length of myTarget
 		int myPatternLen = (int) myPattern.getLength(); // length of myPattern
-	
+
 		// if one string is empty, the edit distance is necessarily the length
 		// of the other
 		if (myTargetLen == 0) {
@@ -224,7 +236,7 @@ public class Levenshtein {
 		} else if (myPatternLen == 0) {
 			return myTargetLen <= threshold ? myTargetLen : -1;
 		}
-	
+
 		if (myTargetLen > myPatternLen) {
 			// swap the two strings to consume less memory
 			myTarget = pattern;
@@ -232,11 +244,11 @@ public class Levenshtein {
 			myTargetLen = (int) myTarget.getLength(); // length of myTarget
 			myPatternLen = (int) myPattern.getLength(); // length of myPattern
 		}
-	
+
 		int[] prevCostAry = new int[myTargetLen + 1]; // 'previous' cost array, horizontally
 		int[] costAry = new int[myTargetLen + 1]; // cost array, horizontally
 		int[] tmp; // placeholder to assist in swapping p and d
-	
+
 		// fill in starting table values
 		final int boundary = Math.min(myTargetLen, threshold) + 1;
 		for (int i = 0; i < boundary; i++) {
@@ -246,7 +258,7 @@ public class Levenshtein {
 		// stripe will be ignored in following loop iterations
 		Arrays.fill(prevCostAry, boundary, prevCostAry.length, Integer.MAX_VALUE);
 		Arrays.fill(costAry, Integer.MAX_VALUE);
-	
+
 		try {
 			// iterates through t
 			for (int j = 1; j <= myPatternLen; j++) {
@@ -255,23 +267,23 @@ public class Levenshtein {
 				// of
 				// t
 				costAry[0] = j;
-	
+
 				// compute stripe indices, constrain to array size
 				final int min = Math.max(1, j - threshold);
 				final int max = (j > (Integer.MAX_VALUE - threshold)) ? myTargetLen
 						: Math.min(myTargetLen, j + threshold);
-	
+
 				// the stripe may lead off of the table if s and t are of
 				// different sizes
 				if (min > max) {
 					return -1;
 				}
-	
+
 				// ignore entry left of leftmost
 				if (min > 1) {
 					costAry[min - 1] = Integer.MAX_VALUE;
 				}
-	
+
 				// iterates through [min, max] in s
 				for (int i = min; i <= max; i++) {
 					if (myTarget.read((myTarget.getOffset() + i) - 1) == myPatternPrev) {
@@ -283,14 +295,14 @@ public class Levenshtein {
 						costAry[i] = 1 + Math.min(Math.min(costAry[i - 1], prevCostAry[i]), prevCostAry[i - 1]);
 					}
 				}
-	
+
 				// copy current distance counts to 'previous row' distance
 				// counts
 				tmp = prevCostAry;
 				prevCostAry = costAry;
 				costAry = tmp;
 			}
-	
+
 			// if p[n] is greater than the threshold, there's no guarantee on it
 			// being the correct
 			// distance

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -55,7 +72,7 @@ public class WalkerTest {
 			sb = new SpanByteBuffer(bb);
 		}
 	}
-	
+
 	/*
 	 * hasCurrent is test in reads test.
 	 */
@@ -63,7 +80,7 @@ public class WalkerTest {
 	@Test
 	public void testReads() throws IOException {
 		Walker walker = sb.getWalker();
-		assertTrue( walker.hasCurrent() );
+		assertTrue(walker.hasCurrent());
 		assertEquals(b, walker.readByte());
 		assertEquals(i, walker.readInt());
 		assertEquals(l, walker.readLong());
@@ -81,54 +98,51 @@ public class WalkerTest {
 		assertEquals(utf, walker.readUTF());
 		assertEquals(skipLen, walker.skipBytes(skipLen));
 		assertEquals(b, walker.readByte());
-		assertFalse( "Should be at eof", walker.hasCurrent() );
+		assertFalse("Should be at eof", walker.hasCurrent());
 	}
-	
+
 	@Test
 	public void testGetBuffer() {
 		Walker walker = sb.getWalker();
-		assertEquals( sb, walker.getBuffer() );
+		assertEquals(sb, walker.getBuffer());
 	}
 
 	@Test
 	public void testGetByte() throws IOException {
 		Walker walker = sb.getWalker();
-		assertEquals( b, walker.getByte() );
-		assertEquals( "getByte should not move walker", b, walker.getByte() );
-		
+		assertEquals(b, walker.getByte());
+		assertEquals("getByte should not move walker", b, walker.getByte());
+
 	}
-	
+
 	/*
 	 * Also tests increment.
 	 */
 	@Test
 	public void testGetPos() throws IOException {
 		Walker walker = sb.getWalker();
-		assertEquals( 0, walker.getPos() );
+		assertEquals(0, walker.getPos());
 		walker.increment(10);
-		assertEquals( 10, walker.getPos() );
-		walker.increment( -5 );
-		assertEquals( 5, walker.getPos() );
-		walker.setPosition( 7 );
-		assertEquals( 7, walker.getPos() );
+		assertEquals(10, walker.getPos());
+		walker.increment(-5);
+		assertEquals(5, walker.getPos());
+		walker.setPosition(7);
+		assertEquals(7, walker.getPos());
 	}
-	
+
 	@Test
 	public void testReadBytes() throws IOException {
-		sb = Factory.wrap( "Hello World");
+		sb = Factory.wrap("Hello World");
 		byte[] buff = new byte[5];
-		
+
 		Walker walker = sb.getWalker();
-		assertEquals( 0, walker.getPos() );
-		assertEquals( 5, walker.read(buff)) ;
-		assertArrayEquals( "Hello".getBytes(), buff );
-		assertEquals( 5, walker.getPos() );
-		assertEquals( 1, walker.read( buff, 4, 1) );
-		assertArrayEquals( "Hell ".getBytes(), buff );
-		assertEquals( 6, walker.getPos() );
+		assertEquals(0, walker.getPos());
+		assertEquals(5, walker.read(buff));
+		assertArrayEquals("Hello".getBytes(), buff);
+		assertEquals(5, walker.getPos());
+		assertEquals(1, walker.read(buff, 4, 1));
+		assertArrayEquals("Hell ".getBytes(), buff);
+		assertEquals(6, walker.getPos());
 	}
-	
-	
-	
 
 }

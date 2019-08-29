@@ -424,7 +424,6 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 		Assert.assertEquals(new String(buffer), spanBuffer.getText());
 	}
 
-	
 	@ContractTest
 	public void testReadPosition() throws IOException {
 		for (int i = 0; i < spanBuffer.getLength(); i++) {
@@ -717,8 +716,6 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
 		Assert.assertEquals(new String(buffer), spanBuffer.getText());
 	}
-
-	
 
 	@ContractTest
 	public void testReadPositionWithOffset() throws IOException {

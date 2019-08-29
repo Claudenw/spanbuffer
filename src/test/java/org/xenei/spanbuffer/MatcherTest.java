@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer;
 
 import static org.junit.Assert.assertEquals;
@@ -8,7 +25,6 @@ import org.junit.Test;
 import org.xenei.spanbuffer.similarity.Bitap;
 
 public class MatcherTest {
-
 
 	@Test
 	public void bygFindExactMatchInMiddle() throws NoMatchException, IOException {
@@ -276,33 +292,32 @@ public class MatcherTest {
 
 	@Test
 	public void testMatch() throws NoMatchException, IOException {
-		SpanBuffer target = Factory.wrap( "abcdefgh" );
+		SpanBuffer target = Factory.wrap("abcdefgh");
 		final long mid = target.makeAbsolute((target.getLength() / 2));
 
 		SpanBuffer pattern = target.sliceAt(mid);
 		pattern = pattern.head(pattern.relativeUpperLimit(Bitap.MAX_BITAP));
 
-		final Bitap.Result result = Matcher.match( target, pattern);
+		final Bitap.Result result = Matcher.match(target, pattern);
 		Assert.assertEquals(mid, result.getAbsIndex());
 
 	}
 
 	@Test
 	public void testMatchAtStart() throws NoMatchException, IOException {
-		SpanBuffer target = Factory.wrap( "abcdefgh" );
+		SpanBuffer target = Factory.wrap("abcdefgh");
 		final long mid = target.makeAbsolute((target.getLength() / 2));
 
 		SpanBuffer pattern = target.head(mid);
 		pattern = pattern.head(pattern.relativeUpperLimit(Bitap.MAX_BITAP));
 
-	
-		final Bitap.Result result = Matcher.match( target,pattern);
+		final Bitap.Result result = Matcher.match(target, pattern);
 		Assert.assertEquals(target.getOffset(), result.getAbsIndex());
 	}
-	
+
 	@Test
 	public void testMatchWithOffset() throws NoMatchException, IOException {
-		SpanBuffer target = Factory.wrap( "abcdefgh" );
+		SpanBuffer target = Factory.wrap("abcdefgh");
 		// absolute mid position
 		long mid = target.makeAbsolute((target.getLength() / 2));
 		// get span buffer from mid with max length of
@@ -312,21 +327,21 @@ public class MatcherTest {
 
 		target = target.duplicate(5);
 		mid = target.makeAbsolute(mid);
-		
-		final Bitap.Result result = Matcher.match( target,pattern);
+
+		final Bitap.Result result = Matcher.match(target, pattern);
 		Assert.assertEquals(mid, result.getAbsIndex());
 	}
 
 	@Test
 	public void testMatchAtStartWithOffset() throws NoMatchException, IOException {
-		SpanBuffer target = Factory.wrap( "abcdefgh" );
+		SpanBuffer target = Factory.wrap("abcdefgh");
 		final long mid = (target.getLength() / 2);
 		SpanBuffer pattern = target.head(mid);
 		pattern = pattern.head(pattern.relativeUpperLimit(Bitap.MAX_BITAP));
 
 		target = target.duplicate(5);
 
-		final Bitap.Result result = Matcher.match( target,pattern);
+		final Bitap.Result result = Matcher.match(target, pattern);
 		Assert.assertEquals(target.getOffset(), result.getAbsIndex());
 	}
 
