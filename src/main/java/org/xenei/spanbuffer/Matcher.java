@@ -24,10 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.similarity.Bitap;
 
 /**
- * Matcher implementation for SpanBuffers.  Provides some common
- * matching functions.  Some of the code in this module is 
- * based on Apache Commons Lang 3.5
- * StringUtils.getLevenshteinDistance
+ * Matcher provides some convenience functions to perform matching from 
+ * a specific location in a buffer.
  */
 public class Matcher  {
 	private static final Logger LOG = LoggerFactory.getLogger(Matcher.class);
@@ -35,7 +33,9 @@ public class Matcher  {
 
 	/**
 	 * Match a pattern starting at the specified relative position.
-	 *
+	 * <p> 
+	 * Characters before loc will not be considered in the match
+	 * </p>
 	 * <p>
 	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
@@ -57,7 +57,13 @@ public class Matcher  {
 
 	/**
 	 * Get a match result starting from a relative position.
-	 *
+	 * <p> 
+	 * Characters before loc will not be considered in the match
+	 * </p>
+	 * <p>
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
+	 * </p>
+	 * Absolute version of this method is match()
 	 * @param target the target find the pattern in.
 	 * @param pattern the pattern to match
 	 * @param start  the location to start the match from.
@@ -71,7 +77,7 @@ public class Matcher  {
 	}
 
 	/**
-	 * Get a match result from an attempted match.
+	 * Get a match result starting from the absolute beginning of the target.
 	 *
 	 * @param target the target find the pattern in.
 	 * @param pattern the pattern to match
@@ -98,11 +104,16 @@ public class Matcher  {
 	}
 
 	/**
-	 * Get a match result starting from a specific position.
-	 *
+	 * Get a match result starting from a specific absolute position.
+	 * <p> 
+	 * Characters before start will not be considered in the match
+	 * </p>
+	 * <p>
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
+	 * </p>
 	 * @param target the target find the pattern in.
 	 * @param pattern the pattern to match
-	 * @param loc     the location to start the match from.
+	 * @param start     the location to start the match from.
 	 * @return The match result.
 	 * @throws NoMatchException if a match could not be established
 	 * @throws IOException      on IO error.
@@ -132,8 +143,13 @@ public class Matcher  {
 	}
 
 	/**
-	 * Get a match result starting from a specific position.
-	 *
+	 * Get a match result starting from a specific absolute  position.
+	 * <p> 
+	 * Characters before start will not be considered in the match
+	 * </p>
+	 * <p>
+	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
+	 * </p>
 	 * @param target the target find the pattern in.
 	 * @param pattern the pattern to match
 	 * @param start  the location to start the match from.

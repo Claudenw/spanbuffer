@@ -23,11 +23,28 @@ public class Bitap {
 		private final  int distance;
 		private final double threshold;
 		
+		/**
+		 * Copy constructor
+		 * @param other the config to copy from.
+		 */
+		public Config( Config other ) {
+			distance = other.distance;
+			threshold = other.threshold;
+		}
+		
+		/**
+		 * Constructor.
+		 */
 		public Config() {
 			distance = DEFAULT_MATCH_DISTANCE;
 			threshold = DEFAULT_MATCH_THRESHOLD;
 		}
 		
+		/**
+		 * Constructor
+		 * @param distance the maximum distance for the match.
+		 * @param threshold the threshold for the match.
+		 */
 		public Config( final int distance, final double threshold)
 		{
 			this.distance = distance;
@@ -223,7 +240,7 @@ public class Bitap {
 	 * <p>
  	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
-	 *
+	 * @param target the buffer to search in.
 	 * @param pattern The pattern to match
 	 * @return The result object representing match or null if no match was found.
 	 * @throws IOException on error
@@ -235,15 +252,12 @@ public class Bitap {
 	/**
 	 * Calculate the bitap distance. The tolerance is the number of errors
 	 * acceptable in the matched string.
-	 *
-	 * <p>
-	 * The resulting position (in the Result object) is relative.
-	 *
-	 * </p>
+	 * 
 	 * <p>
 	 * See discussion of Absolute and Relative methods in SpanBuffer javadoc.
 	 * </p>
 	 *
+	 * @param target the buffer to search in.
 	 * @param pattern The pattern to match
 	 * @param loc     The absolute location to start the pattern match from.
 	 * @return The result object representing match or null if no match was found.
