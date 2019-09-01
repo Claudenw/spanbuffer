@@ -18,8 +18,10 @@
 package org.xenei.spanbuffer.impl;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,14 +115,13 @@ public class SpanBufferList extends AbstractSpanBuffer {
 	}
 
 	/**
-	 * Locate the index of the SpanBuffer in the list tht contains the position.
+	 * Locate the index of the SpanBuffer in the list that contains the position.
 	 *
 	 * @param position The position to locate.
 	 * @return The index of the SpanBuffer containing the position or -1 if not
 	 *         found.
 	 */
 	private int locateSpanIndex(final long position) {
-
 		for (int i = 0; i < spanList.size(); i++) {
 			if (spanList.get(i).contains(position)) {
 				return i;
@@ -177,6 +178,22 @@ public class SpanBufferList extends AbstractSpanBuffer {
 		return bytesRead;
 	}
 
+	@Override
+	public int read(final long position, final ByteBuffer buff) throws IOException {
+		final SpanBuffer sb = locateSpan(position);
+		if (sb == null) {
+			return 0;
+		}
+		int bytesRead = sb.read(position, buff);
+		if (buff.hasRemaining()) {
+			// recurse to read more			
+			final long newPosition = position + bytesRead;
+			final int nextRead = this.read(newPosition, buff);
+			bytesRead += nextRead;
+		}
+		return bytesRead;
+	}
+	
 	@Override
 	public long getLength() {
 		return length;

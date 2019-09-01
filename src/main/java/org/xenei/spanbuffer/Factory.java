@@ -61,7 +61,7 @@ public final class Factory {
 	/**
 	 * The default length for the internal buffer of a lazy loaded buffer.
 	 */
-	public static final long DEFAULT_INTERNAL_BUFFER_SIZE = 4 * FileUtils.ONE_MB;
+	public static final int DEFAULT_INTERNAL_BUFFER_SIZE = (int)(4 * FileUtils.ONE_MB);
 
 	/**
 	 * The tracker that manages closing objects when final spanbuffer is garbage
@@ -201,7 +201,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile, long bufferSize)
+	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile, int bufferSize)
 			throws FileNotFoundException, IOException {
 		return wrap(randomAccessFile, bufferSize, false);
 	}
@@ -221,7 +221,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile, long bufferSize, boolean closeAfterUse)
+	public static SpanBuffer wrap(final RandomAccessFile randomAccessFile, int bufferSize, boolean closeAfterUse)
 			throws FileNotFoundException, IOException {
 		if (randomAccessFile == null) {
 			throw new IllegalArgumentException("randomAccessFile must not be a null");
@@ -287,7 +287,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(final FileChannel fileChannel, long bufferSize)
+	public static SpanBuffer wrap(final FileChannel fileChannel, int bufferSize)
 			throws FileNotFoundException, IOException {
 		if (fileChannel == null) {
 			throw new IllegalArgumentException("FileChannel must not be a null");
@@ -311,7 +311,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(final FileChannel fileChannel, long bufferSize, boolean closeAfterUse)
+	public static SpanBuffer wrap(final FileChannel fileChannel, int bufferSize, boolean closeAfterUse)
 			throws FileNotFoundException, IOException {
 		if (fileChannel == null) {
 			throw new IllegalArgumentException("FileChannel must not be a null");
@@ -411,7 +411,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrap(File file, long bufferSize) throws IOException {
+	public static SpanBuffer wrap(File file, int bufferSize) throws IOException {
 		return wrap(file, bufferSize, false);
 	}
 
@@ -447,7 +447,7 @@ public final class Factory {
 	 * @return a SpanBuffer with an offset of 0.
 	 * @throws IOException on IO error
 	 */
-	public static SpanBuffer wrap(File file, long bufferSize, boolean deleteAfterUse) throws IOException {
+	public static SpanBuffer wrap(File file, int bufferSize, boolean deleteAfterUse) throws IOException {
 		RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
 		if (deleteAfterUse) {
 			fileTracker.track(file, randomAccessFile);
@@ -473,7 +473,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrapFile(String fileName, long bufferSize) throws IOException {
+	public static SpanBuffer wrapFile(String fileName, int bufferSize) throws IOException {
 		return wrap(new File(fileName), bufferSize, false);
 	}
 
@@ -491,7 +491,7 @@ public final class Factory {
 	 * @throws IOException           on IO error
 	 * @throws FileNotFoundException on file not found.
 	 */
-	public static SpanBuffer wrapFile(String fileName, long bufferSize, boolean deleteAfterUse) throws IOException {
+	public static SpanBuffer wrapFile(String fileName, int bufferSize, boolean deleteAfterUse) throws IOException {
 		return wrap(new File(fileName), bufferSize, deleteAfterUse);
 	}
 
@@ -521,7 +521,7 @@ public final class Factory {
 	 * @throws FileNotFoundException on file not found.
 	 */
 	@SuppressWarnings("resource")
-	public static SpanBuffer asMemMap(File file, long bufferSize) throws IOException {
+	public static SpanBuffer asMemMap(File file, int bufferSize) throws IOException {
 		return wrap(new RandomAccessFile(file, "r").getChannel(), bufferSize, true);
 	}
 

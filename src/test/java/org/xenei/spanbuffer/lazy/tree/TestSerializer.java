@@ -24,9 +24,10 @@ import java.util.List;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 
 public class TestSerializer implements TreeSerializer<TestPosition> {
-
-	List<byte[]> buffers = new ArrayList<byte[]>();
+	
+	List<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 	int maxBufferSize;
+	
 
 	public TestSerializer() {
 		this(10);
@@ -38,11 +39,11 @@ public class TestSerializer implements TreeSerializer<TestPosition> {
 
 	@Override
 	public int getMaxBufferSize() {
-		return 10;
+		return maxBufferSize;
 	}
 
 	@Override
-	public TestPosition serialize(byte[] buffer) {
+	public TestPosition serialize(ByteBuffer buffer) {
 		buffers.add(buffer);
 		return new TestPosition(buffers.size() - 1);
 	}

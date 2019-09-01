@@ -20,6 +20,7 @@ package org.xenei.spanbuffer.lazy.tree;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,26 +30,26 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
 public class TestDeserializer implements TreeDeserializer<TestPosition> {
 
-	private List<byte[]> buffers;
+	private List<ByteBuffer> buffers;
 
-	public TestDeserializer(List<byte[]> buffers) {
+	public TestDeserializer(List<ByteBuffer> buffers) {
 		this.buffers = buffers;
 	}
 
 	@Override
-	public SpanBuffer deserialize(TestPosition position) {
-		return position.isNoData() ? Factory.EMPTY : Factory.wrap(buffers.get(position.idx));
+	public ByteBuffer deserialize(TestPosition position) {
+		return position.isNoData() ? null: buffers.get(position.idx);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TreeLazyLoader<TestPosition, TestDeserializer>> extractLoaders(SpanBuffer buffer) {
-		List<TreeLazyLoader<TestPosition, TestDeserializer>> result = new ArrayList<TreeLazyLoader<TestPosition, TestDeserializer>>();
+	public List<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>> extractLoaders(SpanBuffer buffer) {
+		List<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>> result = new ArrayList<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>>();
 		try (DataInputStream ois = new DataInputStream(buffer.getInputStream())) {
 			while (true) {
 				try {
 					int idx = ois.readInt();
-					TreeLazyLoader<TestPosition, TestDeserializer> tll = new TreeLazyLoader<TestPosition, TestDeserializer>(
+					TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>> tll = new TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>(
 							new TestPosition(idx), TestDeserializer.this);
 					result.add(tll);
 				} catch (EOFException e) {

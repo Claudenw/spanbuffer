@@ -288,6 +288,11 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
+	public final int readRelative(final long byteOffset, final ByteBuffer buff)
+			throws IOException {
+		return read(getOffset() + byteOffset, buff);
+	}
+	@Override
 	public final int read(final long position, final byte[] buff) throws IOException {
 		return read(position, buff, 0, buff.length);
 	}
@@ -537,6 +542,13 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 			return bytesRead;
 		}
 
+		@Override
+		public int read(ByteBuffer buff) throws IOException {
+			int read = sb.read( pos, buff );
+			pos += read;
+			return read;
+ 		}
+		
 		@Override
 		public int readInt() throws IOException {
 			return (((readByte() & 0xff) << 24) | ((readByte() & 0xff) << 16) | ((readByte() & 0xff) << 8)

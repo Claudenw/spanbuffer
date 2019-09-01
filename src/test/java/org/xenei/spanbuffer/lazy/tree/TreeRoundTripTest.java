@@ -23,6 +23,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.xenei.spanbuffer.SpanBuffer;
+import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
+import org.xenei.spanbuffer.lazy.tree.node.HeapBufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
 
 public class TreeRoundTripTest {
@@ -30,7 +32,8 @@ public class TreeRoundTripTest {
 	@Test
 	public void testLong() throws IOException {
 		TestSerializer ts = new TestSerializer();
-		TreeOutputStream tos = new TreeOutputStream(ts);
+		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
+		TreeOutputStream tos = new TreeOutputStream(ts, factory);
 		String text = "Now is the time for all good men to come to the aid of their country";
 		tos.write(text.getBytes());
 		tos.close();
@@ -49,14 +52,15 @@ public class TreeRoundTripTest {
 	@Test
 	public void testShort() throws IOException {
 		TestSerializer ts = new TestSerializer();
-		TreeOutputStream tos = new TreeOutputStream(ts);
+		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
+		TreeOutputStream tos = new TreeOutputStream(ts, factory);
 		String text = "Now";
 		tos.write(text.getBytes());
 		tos.close();
 		TestPosition pos = (TestPosition) tos.getPosition();
 
 		assertEquals(0, pos.idx);
-		assertEquals(InnerNode.OUTER_NODE_FLAG, ts.buffers.get(0)[InnerNode.FLAG_BYTE]);
+		assertEquals(InnerNode.OUTER_NODE_FLAG, ts.buffers.get(0).get(InnerNode.FLAG_BYTE));
 
 		TestDeserializer td = new TestDeserializer(ts.buffers);
 
@@ -71,7 +75,8 @@ public class TreeRoundTripTest {
 	@Test
 	public void testEmpty() throws IOException {
 		TestSerializer ts = new TestSerializer();
-		TreeOutputStream tos = new TreeOutputStream(ts);
+		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
+		TreeOutputStream tos = new TreeOutputStream(ts, factory);
 		String text = "";
 		tos.write(text.getBytes());
 		tos.close();

@@ -18,6 +18,7 @@
 package org.xenei.spanbuffer.lazy.tree;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
@@ -69,6 +70,11 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	@Override
 	public final int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		return getDelegate().read(position, buff, pos, len);
+	}
+	
+	@Override
+	public final int read(final long position, final ByteBuffer buff) throws IOException {
+		return getDelegate().read(position, buff);
 	}
 
 	@Override

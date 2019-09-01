@@ -17,6 +17,8 @@
  */
 package org.xenei.spanbuffer.lazy.tree.serde;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.xenei.spanbuffer.SpanBuffer;
@@ -37,8 +39,9 @@ public interface TreeDeserializer<P extends Position> {
 	 * 
 	 * @param position the position to read the buffer from.
 	 * @return a byte buffer containing data that was serialized at the position.
+	 * @throws IOException on error
 	 */
-	public SpanBuffer deserialize(P position);
+	public ByteBuffer deserialize(P position) throws IOException;
 
 	/**
 	 * process a spanbuffer that contains one or more positions serialized by
@@ -47,6 +50,7 @@ public interface TreeDeserializer<P extends Position> {
 	 * 
 	 * @param buffer the buffer to process.
 	 * @return A list of TreeLazyLoader instances.
+	 * @throws IOException on error
 	 */
-	public <T extends TreeDeserializer<P>> List<TreeLazyLoader<P, T>> extractLoaders(SpanBuffer buffer);
+	public List<TreeLazyLoader<P, TreeDeserializer<P>>> extractLoaders(SpanBuffer buffer) throws IOException;
 }

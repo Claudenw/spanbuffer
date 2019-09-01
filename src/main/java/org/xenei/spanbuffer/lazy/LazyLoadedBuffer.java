@@ -18,6 +18,8 @@
 package org.xenei.spanbuffer.lazy;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import org.xenei.span.NumberUtils;
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
@@ -90,7 +92,7 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 	 *                   starts.
 	 * @param lazyLoader the lazy loader.
 	 */
-	private LazyLoadedBuffer(final long offset, final int inset, final LazyLoader lazyLoader) {
+	public LazyLoadedBuffer(final long offset, final int inset, final LazyLoader lazyLoader) {
 		this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
 	}
 
@@ -104,7 +106,7 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 	 *                     unknown.
 	 * @param lazyLoader   the lazy loader.
 	 */
-	private LazyLoadedBuffer(final long offset, final int inset, final long bufferLength, final LazyLoader lazyLoader) {
+	public LazyLoadedBuffer(final long offset, final int inset, final long bufferLength, final LazyLoader lazyLoader) {
 		super(offset);
 		this.inset = inset;
 		this.bufferLength = bufferLength;
@@ -141,25 +143,33 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 		}
 		return new LazyLoadedBuffer(getOffset(), inset, intLimit + inset, lazyLoader);
 	}
+	
+	private SpanBuffer getBuffer() throws IOException {
+		return lazyLoader.getBuffer(inset);
+	}
 
 	@Override
 	public byte read(final long position) throws IOException {
-		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
-		return lazyLoader.getBuffer().read(intLimit + inset);
+		return getBuffer().read(position);
 	}
 
 	@Override
 	public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
-		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position));
-		Walker walker = lazyLoader.getBuffer().getWalker(inset + intLimit);
+		Walker walker = getBuffer().getWalker(position);
 		return walker.read(buff, pos, len);
 
 	}
 
 	@Override
-	public long getLength() {
+	public int read(final long position, final ByteBuffer buff) throws IOException {
+		Walker walker = getBuffer().getWalker(position);
+		return walker.read(buff);
+	}
+	
+	@Override
+	public synchronized long getLength() {
 		if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
-			bufferLength = lazyLoader.getLength();
+			bufferLength = lazyLoader.getLength() - inset;
 		}
 		return bufferLength - inset;
 	}

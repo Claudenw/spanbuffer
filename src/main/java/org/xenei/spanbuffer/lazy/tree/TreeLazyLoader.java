@@ -17,6 +17,8 @@
  */
 package org.xenei.spanbuffer.lazy.tree;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
@@ -29,8 +31,9 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
  * 
  * @param <P> the Position implementation.
  * @param <T> The TreeDeserializer
- *            <P>
- *            implementation.
+ *            
+ * This class always returns buffers at offset 0.
+ *            
  */
 public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> extends AbstractLazyLoader {
 
@@ -64,8 +67,9 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	 * Apply the deserializer map to the buffer to create a list of TreeLazyLoaders.
 	 * 
 	 * @return a list of TreeLazyLoader<P,T> from the buffer.
+	 * @throws IOException on error
 	 */
-	public final List<TreeLazyLoader<P, T>> applyMap(SpanBuffer buffer) {
+	public final List<TreeLazyLoader<P, TreeDeserializer<P>>> applyMap(SpanBuffer buffer) throws IOException {
 		return deserializer.extractLoaders(buffer);
 	}
 
@@ -79,7 +83,9 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	}
 
 	@Override
-	protected SpanBuffer getBufferInternal() {
-		return position.isNoData() ? Factory.EMPTY : deserializer.deserialize(position);
+	protected SpanBuffer getBufferInternal(int inset) throws IOException {	
+		ByteBuffer bb = deserializer.deserialize(position);
+		SpanBuffer buffer = Factory.wrap( bb );
+		return (inset == 0)? buffer : buffer.cut(inset);
 	}
 }

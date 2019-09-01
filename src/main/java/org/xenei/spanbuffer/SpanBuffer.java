@@ -18,6 +18,7 @@
 package org.xenei.spanbuffer;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
@@ -432,6 +433,27 @@ public interface SpanBuffer extends LongSpan {
 
 	/**
 	 * Read the bytes from the specified absolute position into the provided buffer.
+	 * Equivalent to calling <code>read(
+	 * position, buff, 0, buff.length )</code>.
+	 *
+	 * <p>
+	 * This is an absolute method.
+	 *
+	 * </p>
+	 * <p>
+	 * See discussion of Absolute and Relative methods above.
+	 * </p>
+	 *
+	 * @param position the absolute position to start read from.
+	 * @param buff     the buffer to copy the bytes into.
+	 * @return the number of bytes read. May be less then length
+	 * @throws IOException on error
+	 * @see #readRelative(long, byte[])
+	 */
+	int read(long position, ByteBuffer buff) throws IOException;
+
+	/**
+	 * Read the bytes from the specified absolute position into the provided buffer.
 	 *
 	 * <p>
 	 * This is an absolute method.
@@ -488,6 +510,26 @@ public interface SpanBuffer extends LongSpan {
 	 * @see #read(long, byte[])
 	 */
 	int readRelative(long byteOffset, byte[] buff) throws IOException;
+
+	/**
+	 * Read the bytes from the specified relative position into the provided buffer.
+	 * Equivalent to calling readRelative( position, buff, 0, buff.length );
+	 *
+	 * <p>
+	 * This is an relative method.
+	 *
+	 * </p>
+	 * <p>
+	 * See discussion of Absolute and Relative methods above.
+	 * </p>
+	 *
+	 * @param byteOffset the relative position to begin read from.
+	 * @param buff       the buffer to copy the bytes into.
+	 * @return the number of bytes read. May be less then length
+	 * @throws IOException on error
+	 * @see #read(long, byte[])
+	 */
+	int readRelative(long byteOffset, ByteBuffer buff) throws IOException;
 
 	/**
 	 * Read the bytes from the specified relative position into the provided buffer.

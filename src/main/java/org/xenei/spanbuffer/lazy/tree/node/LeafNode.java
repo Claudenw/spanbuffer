@@ -17,6 +17,7 @@
  */
 package org.xenei.spanbuffer.lazy.tree.node;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -29,9 +30,10 @@ public class LeafNode extends TreeNode {
 	 * Constructor.
 	 *
 	 * @param maxBufferSize max buffer size
+	 * @throws IOException 
 	 */
-	public LeafNode(final int maxBufferSize) {
-		super(maxBufferSize);
+	public LeafNode(BufferFactory factory) throws IOException {
+		super(factory);
 	}
 
 	@Override
@@ -50,8 +52,8 @@ public class LeafNode extends TreeNode {
 	}
 
 	@Override
-	public void clearData() {
-		Arrays.fill(data, (byte) 0);
+	public void clearData() throws IOException {	
+		data = factory.createBuffer();
 		offset = 0;
 	}
 

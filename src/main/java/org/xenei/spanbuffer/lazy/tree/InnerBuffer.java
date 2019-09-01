@@ -106,9 +106,9 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			SpanBuffer buffer = lazyLoader.getBuffer();
+			SpanBuffer buffer =  lazyLoader.getBuffer(0);
 			if (buffer.getLength() == 0) {
-				throw new IllegalStateException("Buffer must contain atleast 1 byte");
+				throw new IllegalStateException("Buffer must contain at least 1 byte");
 			}
 
 			/* Figure out what type of data we have */
@@ -150,8 +150,9 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 *
 	 * @param buffer buffer to be expanded
 	 * @return Expanded SpanBuffer
+	 * @throws IOException on error
 	 */
-	private SpanBuffer extract(final SpanBuffer buffer) {
+	private SpanBuffer extract(final SpanBuffer buffer) throws IOException {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		final List<TreeLazyLoader> configs = lazyLoader.applyMap(buffer);
@@ -172,8 +173,9 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 *
 	 * @param buffer SpanBuffer to use for creating the leaf node.
 	 * @return Leaf Node
+	 * @throws IOException on error
 	 */
-	private SpanBuffer buildLeaves(final SpanBuffer buffer) {
+	private SpanBuffer buildLeaves(final SpanBuffer buffer) throws IOException {
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		final List<TreeLazyLoader> configs = lazyLoader.applyMap(buffer);

@@ -17,6 +17,7 @@
  */
 package org.xenei.spanbuffer.lazy.tree.serde;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -38,16 +39,18 @@ public interface TreeSerializer<P extends Position> {
 	 * 
 	 * @param buffer the buffer to write
 	 * @return The Position the buffer was written to.
+	 * @throws IOException on error
 	 */
-	public P serialize(byte[] buffer);
+	public P serialize(ByteBuffer buffer) throws IOException;
 
 	/**
 	 * Write the Position information to a byte buffer.
 	 * 
 	 * @param position the position to write to the buffer.
 	 * @return a byte buffer containing the position information.
+	 * @throws IOException on error
 	 */
-	public ByteBuffer serialize(P position);
+	public ByteBuffer serialize(P position) throws IOException;
 
 	/**
 	 * Return a position that means no data has been written.

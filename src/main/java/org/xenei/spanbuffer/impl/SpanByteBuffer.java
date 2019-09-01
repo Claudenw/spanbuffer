@@ -27,6 +27,7 @@ import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
+import org.xenei.spanbuffer.Walker;
 
 /**
  * A span that comprises a ByteBuffer. The logical beginning of the SpanBuffer
@@ -129,6 +130,18 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 		}
 	}
 
+	@Override
+	public int read(final long position, final ByteBuffer buff) throws IOException {
+		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position) + span.getOffset());
+//		Walker walker = getWalker(position);
+//		return walker.read( buff );
+		ByteBuffer bb = buffer.duplicate().position( intLimit );
+		int limit = (bb.remaining() > buff.remaining() )?buff.remaining():bb.remaining();
+		bb.limit( limit+intLimit );
+		buff.put( bb );
+		return limit;		
+	}
+	
 	@Override
 	public long getLength() {
 		return span.getLength();

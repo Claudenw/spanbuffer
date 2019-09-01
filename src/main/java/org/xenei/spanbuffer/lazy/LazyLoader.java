@@ -19,6 +19,7 @@ package org.xenei.spanbuffer.lazy;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.xenei.spanbuffer.SpanBuffer;
 
@@ -29,11 +30,12 @@ public interface LazyLoader {
 
 	/**
 	 * return the buffer if it has been loaded already, otherwise load and return.
-	 *
+	 * 
+	 * @param inset the insert into the memory mapped buffer.
 	 * @return fully loaded buffer
 	 * @throws IOException on error
 	 */
-	SpanBuffer getBuffer() throws IOException;
+	SpanBuffer getBuffer(int inset) throws IOException;
 
 	/**
 	 * return the buffer length, load the buffer if unknown.

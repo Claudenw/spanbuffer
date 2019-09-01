@@ -17,6 +17,8 @@
  */
 package org.xenei.spanbuffer.lazy.tree.node;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -56,10 +58,11 @@ public class InnerNode extends TreeNode {
 	 * @param maxBufferSize max buffer size
 	 * @param flag          represents the Node type we are dealing with. This
 	 *                      indicated what types of nodes we point to.
+	 * @throws IOException 
 	 */
-	public InnerNode(final int maxBufferSize, final byte flag) {
-		super(maxBufferSize);
-		data[InnerNode.FLAG_BYTE] = flag;
+	public InnerNode(BufferFactory factory, final byte flag) throws IOException {
+		super(factory);
+		data.put(InnerNode.FLAG_BYTE, flag);
 		offset = 1;
 		length = 0;
 	}
@@ -72,28 +75,33 @@ public class InnerNode extends TreeNode {
 	 * @param ln LeafNode with Data
 	 * @throws IllegalStateException if the LeafNode data is too big for the Inner
 	 *                               node
+	 * @throws IOException 
 	 */
-	public InnerNode(final LeafNode ln) throws IllegalStateException {
+	public InnerNode(BufferFactory factory, final LeafNode ln) throws IllegalStateException, IOException {
 
-		this(ln.data.length, OUTER_NODE_FLAG);
+		this(factory, OUTER_NODE_FLAG);
 
 		/*
 		 * check if the data would fit in the Inner node. The leaf node offset will be
 		 * the number of bytes actually written to the buffer.
 		 */
 		if (hasSpace(ln.getOffset())) {
-			System.arraycopy(ln.data, 0, data, offset, ln.getOffset());
+			data.position( 1 ).put( ln.getData() ).position(0);
 			offset += ln.offset;
 			length += ln.getExpandedLength();
+			factory.free( ln.getData() );
 		} else {
 			throw new IllegalStateException("Leaf node data is too big for Inner the inner node.");
 		}
 	}
 
 	@Override
-	public void clearData() {
+	public void clearData() throws IOException {
+		ByteBuffer newData = factory.createBuffer();
+		newData.put(InnerNode.FLAG_BYTE, data.get(InnerNode.FLAG_BYTE));
+		data = newData;
 		// make sure we do not step on the flag data byte.
-		Arrays.fill(data, 1, data.length - 1, (byte) 0);
+		//Arrays.fill(data, 1, data.length - 1, (byte) 0);
 		offset = 1;
 		length = 0;
 	}

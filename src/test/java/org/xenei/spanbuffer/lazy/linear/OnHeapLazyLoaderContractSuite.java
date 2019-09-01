@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +134,12 @@ public class OnHeapLazyLoaderContractSuite {
 
 		@Override
 		public long getEnd() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int read(long position, ByteBuffer buff) throws IOException {
 			// TODO Auto-generated method stub
 			return 0;
 		}

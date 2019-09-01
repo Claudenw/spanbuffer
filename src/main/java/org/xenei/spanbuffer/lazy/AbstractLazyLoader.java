@@ -19,7 +19,11 @@ package org.xenei.spanbuffer.lazy;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
+import java.nio.ByteBuffer;
 
+import org.xenei.span.IntSpan;
+import org.xenei.span.LongSpan;
+import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 
 /**
@@ -34,10 +38,11 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	/**
 	 * Method to load the internal buffer.
 	 * 
+	 * @param the inset into the lazy loaded buffer
 	 * @return the bytes for the internal buffer.
 	 * @throws IOException on error
 	 */
-	protected abstract SpanBuffer getBufferInternal() throws IOException;
+	protected abstract SpanBuffer getBufferInternal(int inset) throws IOException;
 
 	/**
 	 * allows for creation where the length isn't known upfront.
@@ -57,10 +62,10 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	}
 
 	@Override
-	public synchronized SpanBuffer getBuffer() throws IOException {
+	public synchronized SpanBuffer getBuffer(int inset) throws IOException {
 
 		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
-			loadedBufferReference = new SoftReference<>(getBufferInternal());
+			loadedBufferReference = new SoftReference<>(getBufferInternal(inset));
 		}
 		return loadedBufferReference.get();
 	}
@@ -68,13 +73,11 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	@Override
 	public long getLength() {
 		if (length == null) {
-			SpanBuffer buffer;
 			try {
-				buffer = getBuffer();
+				length = getBuffer(0).getLength();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
-			}
-			length = buffer.getLength();
+			}			
 		}
 		return length;
 	}

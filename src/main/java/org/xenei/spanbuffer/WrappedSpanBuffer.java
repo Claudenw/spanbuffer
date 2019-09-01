@@ -18,6 +18,8 @@
 package org.xenei.spanbuffer;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import org.xenei.spanbuffer.streams.SpanBufferInputStream;
 
 /**
@@ -152,6 +154,10 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
 	}
 
 	@Override
+	public int read(final long position, final ByteBuffer buff) throws IOException {
+		return sb.read(position, buff);
+	}
+	@Override
 	public Walker getWalker(final long position) {
 		return sb.getWalker(position);
 	}
@@ -199,6 +205,11 @@ public abstract class WrappedSpanBuffer implements SpanBuffer {
 	@Override
 	public int readRelative(final long byteOffset, final byte[] buff, final int pos, final int len) throws IOException {
 		return sb.readRelative(byteOffset, buff, pos, len);
+	}
+	
+	@Override
+	public int readRelative(final long byteOffset, final ByteBuffer buff) throws IOException {
+		return sb.readRelative(byteOffset, buff);
 	}
 
 }
