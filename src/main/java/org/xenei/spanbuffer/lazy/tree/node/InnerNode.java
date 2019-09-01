@@ -63,7 +63,7 @@ public class InnerNode extends TreeNode {
 	public InnerNode(BufferFactory factory, final byte flag) throws IOException {
 		super(factory);
 		data.put(InnerNode.FLAG_BYTE, flag);
-		offset = 1;
+		data.position(1);
 		length = 0;
 	}
 
@@ -85,9 +85,8 @@ public class InnerNode extends TreeNode {
 		 * check if the data would fit in the Inner node. The leaf node offset will be
 		 * the number of bytes actually written to the buffer.
 		 */
-		if (hasSpace(ln.getOffset())) {
-			data.position( 1 ).put( ln.getData() ).position(0);
-			offset += ln.offset;
+		if (hasSpace(ln.getData().position())) {
+			data.position( 1 ).put( ln.getData() );
 			length += ln.getExpandedLength();
 			factory.free( ln.getData() );
 		} else {
@@ -102,7 +101,7 @@ public class InnerNode extends TreeNode {
 		data = newData;
 		// make sure we do not step on the flag data byte.
 		//Arrays.fill(data, 1, data.length - 1, (byte) 0);
-		offset = 1;
+		data.position(1);
 		length = 0;
 	}
 
@@ -123,12 +122,12 @@ public class InnerNode extends TreeNode {
 	 */
 	@Override
 	public boolean isDataEmpty() {
-		return offset == 1;
+		return data.position() == 1;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("InnerNode of length: %s and offset: %s", length, offset);
+		return String.format("InnerNode of length: %s and offset: %s", length, data.position());
 	}
 
 }

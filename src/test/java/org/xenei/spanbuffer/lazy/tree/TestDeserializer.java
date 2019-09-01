@@ -50,7 +50,7 @@ public class TestDeserializer implements TreeDeserializer<TestPosition> {
 				try {
 					int idx = ois.readInt();
 					TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>> tll = new TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>(
-							new TestPosition(idx), TestDeserializer.this);
+							new TestPosition(idx), this);
 					result.add(tll);
 				} catch (EOFException e) {
 					return result;

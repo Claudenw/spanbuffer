@@ -40,11 +40,6 @@ public abstract class TreeNode {
 	// Data of the data
 	protected ByteBuffer data;
 
-	/**
-	 * The next location in which to add data in the buffer.
-	 */
-	protected int offset;
-	
 	protected final BufferFactory factory;
 
 	/**
@@ -57,17 +52,6 @@ public abstract class TreeNode {
 		this.factory = factory;
 		span = IntSpan.fromLength(factory.headerSize(), factory.bufferSize());
 		data = factory.createBuffer();
-		offset = 0;
-	}
-
-	/**
-	 * Retrieves the offset into the buffer where the next byte will be written.
-	 * This is also the number of bytes in the buffer.
-	 *
-	 * @return the number of bytes in this buffer.
-	 */
-	public final int getOffset() {
-		return offset;
 	}
 
 	/**
@@ -77,7 +61,7 @@ public abstract class TreeNode {
 	 * @return true = Buffer has the capacity
 	 */
 	public boolean hasSpace(final int bytes) {
-		return span.getLength() >= (offset + bytes);
+		return span.getLength() >= (data.position() + bytes);
 	}
 
 	/**
@@ -95,21 +79,19 @@ public abstract class TreeNode {
 	 * length, for inner nodes the dts is probably an encoded Position and may
 	 * represent many more bytes when the position is expanded.
 	 *
-	 * @param dts            Data to store.
+	 * @param buff            Data to store.
 	 * @param expandedLength length of the actual data represented by the data to
 	 *                       store.
 	 * @throws IllegalStateException if the data to store will not fit in the
 	 *                               buffer.
 	 */
-	public final void write(ByteBuffer dts, final long expandedLength) {
-
-		if (hasSpace(dts.limit())) {
+	public final void write(ByteBuffer buff, final long expandedLength) {
+		if (hasSpace(buff.limit()-buff.position())) {
 			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", offset,
+				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", data.position(),
 						expandedLength));
 			}
-			data.position(getOffset()).put( dts ).position(span.getOffset());
-			offset += dts.limit();
+			data.put( buff );
 			adjustLength(expandedLength);
 
 		} else {
@@ -134,11 +116,10 @@ public abstract class TreeNode {
 
 		if (hasSpace(1)) {
 			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", offset,
+				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", data.position(),
 						expandedLength));
 			}
-			data.put( getOffset(), b ).position(span.getOffset());
-			offset ++;
+			data.put( b );
 			adjustLength(expandedLength);
 
 		} else {
@@ -180,7 +161,7 @@ public abstract class TreeNode {
 	 * @return the filled data buffer.
 	 */
 	public ByteBuffer getData() {
-		return data.duplicate().position(0).limit( getOffset());
+		return data.duplicate().position(0);
 	}
 
 	/**
@@ -204,7 +185,15 @@ public abstract class TreeNode {
 	 * @return space left in the buffer.
 	 */
 	public int getSpace() {
-		return span.getLength() - offset;
+		return data.remaining();
+	}
+	
+	/**
+	 * Get the number of bytes in the buffer
+	 * @return the number of bytes in the buffer.
+	 */
+	public int getUsedSpace() {
+		return data.position();
 	}
 
 }

@@ -119,15 +119,10 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 	public int read(final long position, final byte[] buff, final int pos, final int len) {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position) + span.getOffset());
 		buffer.position(intLimit);
-		try {
-			buffer.get(buff, pos, len);
-			return len;
-		} catch (final BufferUnderflowException ex) {
-			buffer.get(buff, pos, buffer.remaining());
-			return buffer.limit() - intLimit - buffer.remaining();
-		} finally {
-			buffer.position(span.getOffset());
-		}
+		int bytesRead = Integer.min(len,  buffer.remaining());
+		buffer.get( buff, pos, bytesRead);
+		buffer.position( span.getOffset() );
+		return bytesRead;
 	}
 
 	@Override

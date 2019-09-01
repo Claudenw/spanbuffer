@@ -38,7 +38,7 @@ public class LeafNode extends TreeNode {
 
 	@Override
 	public boolean isDataEmpty() {
-		return offset == 0;
+		return data.position() == 0;
 	}
 
 	@Override
@@ -48,13 +48,12 @@ public class LeafNode extends TreeNode {
 
 	@Override
 	public long getExpandedLength() {
-		return offset;
+		return data.limit();
 	}
 
 	@Override
 	public void clearData() throws IOException {	
 		data = factory.createBuffer();
-		offset = 0;
 	}
 
 	@Override

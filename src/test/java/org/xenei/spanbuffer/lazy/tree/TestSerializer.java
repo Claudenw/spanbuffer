@@ -50,9 +50,9 @@ public class TestSerializer implements TreeSerializer<TestPosition> {
 
 	@Override
 	public ByteBuffer serialize(TestPosition position) {
-		ByteBuffer bb = ByteBuffer.allocate(Integer.BYTES);
-		bb.putInt(position.idx);
-		return bb;
+		return ByteBuffer.allocate(Integer.BYTES)
+		.putInt(position.idx)
+		.flip();
 	}
 
 	@Override
