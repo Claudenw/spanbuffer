@@ -185,6 +185,7 @@ public class SpanBufferList extends AbstractSpanBuffer {
 			return 0;
 		}
 		int bytesRead = sb.read(position, buff);
+		
 		if (buff.hasRemaining()) {
 			// recurse to read more			
 			final long newPosition = position + bytesRead;

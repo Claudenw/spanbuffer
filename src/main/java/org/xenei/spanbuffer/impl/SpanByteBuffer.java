@@ -133,8 +133,6 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 	@Override
 	public int read(final long position, final ByteBuffer buff) throws IOException {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position) + span.getOffset());
-//		Walker walker = getWalker(position);
-//		return walker.read( buff );
 		ByteBuffer bb = buffer.duplicate().position( intLimit );
 		int limit = (bb.remaining() > buff.remaining() )?buff.remaining():bb.remaining();
 		bb.limit( limit+intLimit );

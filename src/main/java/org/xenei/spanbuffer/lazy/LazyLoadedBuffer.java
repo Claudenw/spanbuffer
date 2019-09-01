@@ -145,7 +145,9 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 	}
 	
 	private SpanBuffer getBuffer() throws IOException {
-		return lazyLoader.getBuffer(inset);
+		SpanBuffer sb = lazyLoader.getBuffer(0)
+				.cut(inset).duplicate( this.getOffset() );
+		return sb;
 	}
 
 	@Override

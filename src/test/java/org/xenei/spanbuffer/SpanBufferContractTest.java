@@ -86,7 +86,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 	public void testSliceAtPosition() throws IOException {
 
 		SpanBuffer span2 = spanBuffer.sliceAt(spanBuffer.getOffset());
-		Assert.assertEquals("Sliced start value is incorrect", spanBuffer.getOffset(), span2.getOffset());
+		Assert.assertEquals("Sliced offset value is incorrect", spanBuffer.getOffset(), span2.getOffset());
 		Assert.assertEquals("Sliced end value is incorrect", spanBuffer.getEnd(), span2.getEnd());
 		Assert.assertEquals("Sliced length value is incorrect", spanBuffer.getLength(), span2.getLength());
 		byte[] buff = new byte[(int) span2.getLength()];
@@ -98,7 +98,7 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 		final long mid = spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
 
 		span2 = spanBuffer.sliceAt(mid);
-		Assert.assertEquals("Sliced start value is incorrect", mid, span2.getOffset());
+		Assert.assertEquals("Sliced offset value is incorrect", mid, span2.getOffset());
 		Assert.assertEquals("Sliced end value is incorrect", LongSpan.calcEnd(span2), span2.getEnd());
 		Assert.assertEquals("Sliced length value is incorrect", LongSpan.calcLength(span2), span2.getLength());
 		buff = new byte[(int) span2.getLength()];

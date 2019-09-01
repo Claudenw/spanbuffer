@@ -65,7 +65,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	public synchronized SpanBuffer getBuffer(int inset) throws IOException {
 
 		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
-			loadedBufferReference = new SoftReference<>(getBufferInternal(inset));
+			loadedBufferReference = new SoftReference<>(getBufferInternal(0));
 		}
 		return loadedBufferReference.get();
 	}
