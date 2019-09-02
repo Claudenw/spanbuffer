@@ -22,11 +22,12 @@
  * 
  * Tree Serialization is generally used to send large blocks of data over
  * smaller protocols (e.g. sending large data objects over MQTT or Kafka
- * queues). In the tree structure the leaf nodes contain the data while the
- * inner nodes contain pointers to other inner nodes or leaf nodes.
+ * queues). It can also be used to store larger items into block storage systems
+ * In the tree structure the leaf nodes contain the data while the inner nodes
+ * contain pointers to other inner nodes or leaf nodes.
  * 
- * Serialization and Deserialization of buffers is handled by the classes in the
- * org.xenei.spanbuffer.lazy.tree.serde package.
+ * Serialization and Deserialization of buffers is handled by implementations of
+ * the interfaces in the org.xenei.spanbuffer.lazy.tree.serde package.
  * 
  */
 package org.xenei.spanbuffer.lazy.tree;

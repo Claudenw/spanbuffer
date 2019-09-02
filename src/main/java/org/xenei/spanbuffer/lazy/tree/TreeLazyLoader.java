@@ -31,9 +31,9 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
  * 
  * @param <P> the Position implementation.
  * @param <T> The TreeDeserializer
- *            
- * This class always returns buffers at offset 0.
- *            
+ * 
+ *            This class always returns buffers at offset 0.
+ * 
  */
 public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> extends AbstractLazyLoader {
 
@@ -83,9 +83,9 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	}
 
 	@Override
-	protected SpanBuffer getBufferInternal(int inset) throws IOException {	
+	protected SpanBuffer getBufferInternal(int inset) throws IOException {
 		ByteBuffer bb = deserializer.deserialize(position);
-		SpanBuffer buffer = Factory.wrap( bb );
-		return (inset == 0)? buffer : buffer.cut(inset);
+		SpanBuffer buffer = Factory.wrap(bb);
+		return (inset == 0) ? buffer : buffer.cut(inset);
 	}
 }

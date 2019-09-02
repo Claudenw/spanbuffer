@@ -19,8 +19,6 @@ package org.xenei.spanbuffer.lazy;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.xenei.spanbuffer.SpanBuffer;
 
 /**

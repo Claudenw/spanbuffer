@@ -18,7 +18,6 @@
 package org.xenei.spanbuffer.impl;
 
 import java.io.IOException;
-import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.xenei.span.NumberUtils;
@@ -27,7 +26,6 @@ import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.Walker;
 
 /**
  * A span that comprises a ByteBuffer. The logical beginning of the SpanBuffer
@@ -119,22 +117,22 @@ public class SpanByteBuffer extends AbstractSpanBuffer {
 	public int read(final long position, final byte[] buff, final int pos, final int len) {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position) + span.getOffset());
 		buffer.position(intLimit);
-		int bytesRead = Integer.min(len,  buffer.remaining());
-		buffer.get( buff, pos, bytesRead);
-		buffer.position( span.getOffset() );
+		int bytesRead = Integer.min(len, buffer.remaining());
+		buffer.get(buff, pos, bytesRead);
+		buffer.position(span.getOffset());
 		return bytesRead;
 	}
 
 	@Override
 	public int read(final long position, final ByteBuffer buff) throws IOException {
 		final int intLimit = NumberUtils.checkIntLimit("position", localizePosition(position) + span.getOffset());
-		ByteBuffer bb = buffer.duplicate().position( intLimit );
-		int limit = (bb.remaining() > buff.remaining() )?buff.remaining():bb.remaining();
-		bb.limit( limit+intLimit );
-		buff.put( bb );
-		return limit;		
+		ByteBuffer bb = buffer.duplicate().position(intLimit);
+		int limit = (bb.remaining() > buff.remaining()) ? buff.remaining() : bb.remaining();
+		bb.limit(limit + intLimit);
+		buff.put(bb);
+		return limit;
 	}
-	
+
 	@Override
 	public long getLength() {
 		return span.getLength();

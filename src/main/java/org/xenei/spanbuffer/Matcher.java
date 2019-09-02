@@ -19,8 +19,6 @@ package org.xenei.spanbuffer;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.similarity.Bitap;
 
 /**
@@ -28,8 +26,7 @@ import org.xenei.spanbuffer.similarity.Bitap;
  * specific location in a buffer.
  */
 public class Matcher {
-	private static final Logger LOG = LoggerFactory.getLogger(Matcher.class);
-
+	
 	/**
 	 * Match a pattern starting at the specified relative position.
 	 * <p>

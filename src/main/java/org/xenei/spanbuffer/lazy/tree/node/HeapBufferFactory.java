@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public class HeapBufferFactory implements BufferFactory {
 	private int bufferSize;
-	
+
 	public HeapBufferFactory(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}

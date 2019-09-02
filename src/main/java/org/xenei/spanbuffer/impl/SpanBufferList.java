@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -185,16 +184,16 @@ public class SpanBufferList extends AbstractSpanBuffer {
 			return 0;
 		}
 		int bytesRead = sb.read(position, buff);
-		
+
 		if (buff.hasRemaining()) {
-			// recurse to read more			
+			// recurse to read more
 			final long newPosition = position + bytesRead;
 			final int nextRead = this.read(newPosition, buff);
 			bytesRead += nextRead;
 		}
 		return bytesRead;
 	}
-	
+
 	@Override
 	public long getLength() {
 		return length;

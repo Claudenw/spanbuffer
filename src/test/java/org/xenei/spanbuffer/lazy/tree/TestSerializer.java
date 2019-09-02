@@ -59,4 +59,9 @@ public class TestSerializer implements TreeSerializer<TestPosition> {
 	public TestPosition getNoDataPosition() {
 		return TestPosition.NO_DATA;
 	}
+
+	@Override
+	public int getPositionSize() {
+		return Integer.BYTES;
+	}
 }

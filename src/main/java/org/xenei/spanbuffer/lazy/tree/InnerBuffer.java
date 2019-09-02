@@ -91,7 +91,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 * Returns the delegate which in this case is the lazyLoader containing the
 	 * information we need for the SpanBuffer.
 	 *
-	 * @return the delegating spanbuffer
+	 * @return the delegate spanbuffer
 	 * @throws IOException
 	 */
 	@Override
@@ -106,7 +106,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			SpanBuffer buffer =  lazyLoader.getBuffer(0);
+			SpanBuffer buffer = lazyLoader.getBuffer(0);
 			if (buffer.getLength() == 0) {
 				throw new IllegalStateException("Buffer must contain at least 1 byte");
 			}

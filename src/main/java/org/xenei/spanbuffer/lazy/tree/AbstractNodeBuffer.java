@@ -57,7 +57,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	 * Returns the delegate which in this case is the lazyLoader containing the
 	 * information we need for the SpanBuffer.
 	 *
-	 * @return the delegating spanbuffer
+	 * @return the delegate spanbuffer
 	 * @throws IOException
 	 */
 	protected abstract SpanBuffer getDelegate() throws IOException;
@@ -71,7 +71,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	public final int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
 		return getDelegate().read(position, buff, pos, len);
 	}
-	
+
 	@Override
 	public final int read(final long position, final ByteBuffer buff) throws IOException {
 		return getDelegate().read(position, buff);

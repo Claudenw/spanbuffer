@@ -19,11 +19,6 @@ package org.xenei.spanbuffer.lazy;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.nio.ByteBuffer;
-
-import org.xenei.span.IntSpan;
-import org.xenei.span.LongSpan;
-import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 
 /**
@@ -77,7 +72,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 				length = getBuffer(0).getLength();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
-			}			
+			}
 		}
 		return length;
 	}

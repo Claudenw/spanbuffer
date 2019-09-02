@@ -143,10 +143,9 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 		}
 		return new LazyLoadedBuffer(getOffset(), inset, intLimit + inset, lazyLoader);
 	}
-	
+
 	private SpanBuffer getBuffer() throws IOException {
-		SpanBuffer sb = lazyLoader.getBuffer(0)
-				.cut(inset).duplicate( this.getOffset() );
+		SpanBuffer sb = lazyLoader.getBuffer(0).cut(inset).duplicate(this.getOffset());
 		return sb;
 	}
 
@@ -167,7 +166,7 @@ public class LazyLoadedBuffer extends AbstractSpanBuffer {
 		Walker walker = getBuffer().getWalker(position);
 		return walker.read(buff);
 	}
-	
+
 	@Override
 	public synchronized long getLength() {
 		if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {

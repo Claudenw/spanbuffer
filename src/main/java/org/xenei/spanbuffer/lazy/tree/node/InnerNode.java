@@ -19,7 +19,6 @@ package org.xenei.spanbuffer.lazy.tree.node;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * An inner node in the tree buffer structure. This node contains serializer
@@ -58,7 +57,7 @@ public class InnerNode extends TreeNode {
 	 * @param maxBufferSize max buffer size
 	 * @param flag          represents the Node type we are dealing with. This
 	 *                      indicated what types of nodes we point to.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public InnerNode(BufferFactory factory, final byte flag) throws IOException {
 		super(factory);
@@ -75,7 +74,7 @@ public class InnerNode extends TreeNode {
 	 * @param ln LeafNode with Data
 	 * @throws IllegalStateException if the LeafNode data is too big for the Inner
 	 *                               node
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public InnerNode(BufferFactory factory, final LeafNode ln) throws IllegalStateException, IOException {
 
@@ -86,9 +85,9 @@ public class InnerNode extends TreeNode {
 		 * the number of bytes actually written to the buffer.
 		 */
 		if (hasSpace(ln.getData().position())) {
-			data.position( 1 ).put( ln.getData() );
+			data.position(1).put(ln.getData());
 			length += ln.getExpandedLength();
-			factory.free( ln.getData() );
+			factory.free(ln.getData());
 		} else {
 			throw new IllegalStateException("Leaf node data is too big for Inner the inner node.");
 		}
@@ -100,7 +99,7 @@ public class InnerNode extends TreeNode {
 		newData.put(InnerNode.FLAG_BYTE, data.get(InnerNode.FLAG_BYTE));
 		data = newData;
 		// make sure we do not step on the flag data byte.
-		//Arrays.fill(data, 1, data.length - 1, (byte) 0);
+		// Arrays.fill(data, 1, data.length - 1, (byte) 0);
 		data.position(1);
 		length = 0;
 	}

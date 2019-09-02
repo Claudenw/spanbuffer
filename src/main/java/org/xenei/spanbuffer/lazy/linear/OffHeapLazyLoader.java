@@ -21,14 +21,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.xenei.span.LongSpan;
 import org.xenei.span.NumberUtils;
-import org.xenei.span.Span;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
@@ -65,7 +63,7 @@ public class OffHeapLazyLoader implements LazyLoader {
 		long offset = 0;
 		long limit = channel.size();
 		while (offset < limit) {
-			int len = (int)Long.min(limit - offset, bufferSize);
+			int len = (int) Long.min(limit - offset, bufferSize);
 			buffers.add(new LazyLoadedBuffer(offset, new OffHeapLazyLoader(marker, offset, len)));
 			offset += bufferSize;
 		}
@@ -94,51 +92,49 @@ public class OffHeapLazyLoader implements LazyLoader {
 		long offset = 0;
 		long limit = randomAccessFile.length();
 		while (offset < limit) {
-			int len = (int)Long.min(limit - offset, bufferSize);
+			int len = (int) Long.min(limit - offset, bufferSize);
 			buffers.add(new LazyLoadedBuffer(offset, 0, len, new OffHeapLazyLoader(marker, offset, len)));
 			offset += bufferSize;
 		}
 		return Factory.merge(buffers.iterator());
 
 	}
-
 
 	/**
 	 * Load off heap buffers from a channel.
 	 * 
-	 * @param channel the channel to load the data from.
-	 * @param position the position to start the read from.
-	 * @param bufferSize the size of the internal buffers.
-	 * @param closeAfterUse    if true the channel will be closed when it is no
-	 *                         longer needed.
+	 * @param channel       the channel to load the data from.
+	 * @param position      the position to start the read from.
+	 * @param bufferSize    the size of the internal buffers.
+	 * @param closeAfterUse if true the channel will be closed when it is no longer
+	 *                      needed.
 	 * @return A lazy loaded span buffer.
 	 * @throws IOException on error.
 	 */
-	public static SpanBuffer load(FileChannel channel, LongSpan position, int bufferSize, boolean closeAfterUse) throws IOException
-	{
+	public static SpanBuffer load(FileChannel channel, LongSpan position, int bufferSize, boolean closeAfterUse)
+			throws IOException {
 		LazyLoader.Marker<FileChannel> marker = new LazyLoader.Marker<FileChannel>(channel);
 		if (closeAfterUse) {
 			Factory.closableTracker.track(channel, marker);
 		}
-		
+
 		List<SpanBuffer> buffers = new ArrayList<SpanBuffer>();
 		long offset = position.getOffset();
 		long limit = position.getEnd();
 		while (offset < limit) {
-			int len = (int)Long.min(limit - offset, bufferSize);
+			int len = (int) Long.min(limit - offset, bufferSize);
 			buffers.add(new LazyLoadedBuffer(offset, 0, len, new OffHeapLazyLoader(marker, offset, len)));
 			offset += bufferSize;
 		}
 		return Factory.merge(buffers.iterator());
 	}
-	
-	
+
 	/**
 	 * Constructor
 	 * 
-	 * @param marker     the marker with the FileChannel to read.
-	 * @param offset     the offset of the file to read.
-	 * @param length     the length of the buffer.
+	 * @param marker the marker with the FileChannel to read.
+	 * @param offset the offset of the file to read.
+	 * @param length the length of the buffer.
 	 * @throws IOException on read error.
 	 */
 	public OffHeapLazyLoader(LazyLoader.Marker<FileChannel> marker, long offset, int length) throws IOException {
@@ -158,8 +154,8 @@ public class OffHeapLazyLoader implements LazyLoader {
 
 	protected SpanBuffer getBufferInternal(int inset) throws IOException {
 		NumberUtils.checkIntLimit("buffer length", getLength());
-		ByteBuffer buff =  marker.get().map(FileChannel.MapMode.READ_ONLY, span.getOffset(), span.getLength());
-		SpanBuffer sb = Factory.wrap( span.getOffset(), buff );
+		ByteBuffer buff = marker.get().map(FileChannel.MapMode.READ_ONLY, span.getOffset(), span.getLength());
+		SpanBuffer sb = Factory.wrap(span.getOffset(), buff);
 		return (inset != 0) ? sb.cut(inset) : sb;
 	}
 

@@ -61,7 +61,7 @@ public final class Factory {
 	/**
 	 * The default length for the internal buffer of a lazy loaded buffer.
 	 */
-	public static final int DEFAULT_INTERNAL_BUFFER_SIZE = (int)(4 * FileUtils.ONE_MB);
+	public static final int DEFAULT_INTERNAL_BUFFER_SIZE = (int) (4 * FileUtils.ONE_MB);
 
 	/**
 	 * The tracker that manages closing objects when final spanbuffer is garbage

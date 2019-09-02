@@ -20,9 +20,7 @@ package org.xenei.spanbuffer.lazy.linear;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +84,7 @@ public class OnHeapLazyLoader extends AbstractLazyLoader {
 		long offset = 0;
 		long limit = channel.size();
 		while (offset < limit) {
-			int len = (int)Long.min(limit - offset, bufferSize);
+			int len = (int) Long.min(limit - offset, bufferSize);
 			buffers.add(new LazyLoadedBuffer(offset, new OnHeapLazyLoader(marker, offset, len)));
 			offset += bufferSize;
 		}
@@ -111,10 +109,10 @@ public class OnHeapLazyLoader extends AbstractLazyLoader {
 	@Override
 	protected SpanBuffer getBufferInternal(int inset) throws IOException {
 		// length was set in the constructor.
-		ByteBuffer bb = ByteBuffer.allocate((int)getLength()-inset);
-		marker.get().read( bb, offset+inset );
+		ByteBuffer bb = ByteBuffer.allocate((int) getLength() - inset);
+		marker.get().read(bb, offset + inset);
 		bb.position(0);
-		return Factory.wrap( offset+inset, bb );
+		return Factory.wrap(offset + inset, bb);
 	}
 
 }

@@ -19,12 +19,9 @@ package org.xenei.spanbuffer.lazy.tree.node;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.span.IntSpan;
-import org.xenei.span.LongSpan;
 
 /**
  * Abstract node for tracking data in a tree buffer structure.
@@ -79,19 +76,19 @@ public abstract class TreeNode {
 	 * length, for inner nodes the dts is probably an encoded Position and may
 	 * represent many more bytes when the position is expanded.
 	 *
-	 * @param buff            Data to store.
+	 * @param buff           Data to store.
 	 * @param expandedLength length of the actual data represented by the data to
 	 *                       store.
 	 * @throws IllegalStateException if the data to store will not fit in the
 	 *                               buffer.
 	 */
 	public final void write(ByteBuffer buff, final long expandedLength) {
-		if (hasSpace(buff.limit()-buff.position())) {
+		if (hasSpace(buff.limit() - buff.position())) {
 			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", data.position(),
-						expandedLength));
+				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d",
+						data.position(), expandedLength));
 			}
-			data.put( buff );
+			data.put(buff);
 			adjustLength(expandedLength);
 
 		} else {
@@ -106,7 +103,7 @@ public abstract class TreeNode {
 	 * length, for inner nodes the dts is probably an encoded Position and may
 	 * represent many more bytes when the position is expanded.
 	 *
-	 * @param b            the byte to write.
+	 * @param b              the byte to write.
 	 * @param expandedLength length of the actual data represented by the data to
 	 *                       store.
 	 * @throws IllegalStateException if the data to store will not fit in the
@@ -116,10 +113,10 @@ public abstract class TreeNode {
 
 		if (hasSpace(1)) {
 			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d", data.position(),
-						expandedLength));
+				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d",
+						data.position(), expandedLength));
 			}
-			data.put( b );
+			data.put(b);
 			adjustLength(expandedLength);
 
 		} else {
@@ -127,6 +124,7 @@ public abstract class TreeNode {
 		}
 
 	}
+
 	/**
 	 * Get the span for the actual byte buffer we are writing to.
 	 * 
@@ -155,18 +153,20 @@ public abstract class TreeNode {
 //		data.position(0);
 //		return other.position(0);
 //	}
-	
+
 	/**
 	 * Returns only the filled data buffer.
+	 * 
 	 * @return the filled data buffer.
 	 */
 	public ByteBuffer getData() {
-		return data.duplicate().position(0);
+		return data.duplicate().flip();
 	}
 
 	/**
 	 * Set the node back to its initial state.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public abstract void clearData() throws IOException;
 
@@ -187,9 +187,10 @@ public abstract class TreeNode {
 	public int getSpace() {
 		return data.remaining();
 	}
-	
+
 	/**
 	 * Get the number of bytes in the buffer
+	 * 
 	 * @return the number of bytes in the buffer.
 	 */
 	public int getUsedSpace() {

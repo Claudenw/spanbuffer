@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
@@ -41,7 +40,6 @@ public class TestDeserializer implements TreeDeserializer<TestPosition> {
 		return position.isNoData() ? null: buffers.get(position.idx);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>> extractLoaders(SpanBuffer buffer) {
 		List<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>> result = new ArrayList<TreeLazyLoader<TestPosition, TreeDeserializer<TestPosition>>>();

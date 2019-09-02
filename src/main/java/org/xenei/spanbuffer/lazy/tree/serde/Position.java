@@ -31,5 +31,5 @@ public interface Position {
 	 * @return true if there was no data written to the node.
 	 */
 	public boolean isNoData();
-	
+
 }

@@ -18,7 +18,6 @@
 package org.xenei.spanbuffer.lazy.tree.node;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * A leaf node in a tree buffer structure. This node contains raw byte data for
@@ -30,7 +29,7 @@ public class LeafNode extends TreeNode {
 	 * Constructor.
 	 *
 	 * @param maxBufferSize max buffer size
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public LeafNode(BufferFactory factory) throws IOException {
 		super(factory);
@@ -52,7 +51,7 @@ public class LeafNode extends TreeNode {
 	}
 
 	@Override
-	public void clearData() throws IOException {	
+	public void clearData() throws IOException {
 		data = factory.createBuffer();
 	}
 

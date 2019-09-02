@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -30,9 +29,6 @@ import org.xenei.spanbuffer.lazy.tree.serde.Position;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xenei.spanbuffer.Factory;
-import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.Walker;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
 import org.xenei.spanbuffer.lazy.tree.node.LeafNode;
@@ -56,7 +52,6 @@ public class TreeOutputStream extends OutputStream {
 	protected Position position;
 	private final BufferFactory factory;
 
-
 	private static final Logger LOG = LoggerFactory.getLogger(TreeOutputStream.class);
 
 	/*
@@ -67,17 +62,26 @@ public class TreeOutputStream extends OutputStream {
 
 	private static final int LEAF_NODE_INDEX = 0;
 	private static final int FIRST_INNER_INDEX = 1;
-	
+
 	/**
-	 * Constructor.
-	 *
+	 * Constructor. The factory must produce buffers that are 1 + (2*positionSize)
+	 * long. Position size is specified by the serializer.
+	 * 
 	 * @param serializer The TreeSerializer implementation to use for the output.
-	 * @throws IOException 
+	 * @param factory    The Factory to produce new buffers.
+	 * @throws IOException
 	 */
-	public TreeOutputStream(@SuppressWarnings("rawtypes") TreeSerializer serializer, BufferFactory factory) throws IOException {
+	public TreeOutputStream(@SuppressWarnings("rawtypes") TreeSerializer serializer, BufferFactory factory)
+			throws IOException {
 		this.factory = factory;
 		this.serializer = serializer;
 		this.position = serializer.getNoDataPosition();
+
+		int minInnerLeafSize = 1 + (serializer.getPositionSize() * 2);
+		if (factory.bufferSize() < minInnerLeafSize) {
+			throw new IllegalArgumentException(
+					String.format("Factory must produce buffers that are at least %s bytes long", minInnerLeafSize));
+		}
 
 		/* create the stack */
 		stackNodeList = new ArrayList<>();
@@ -91,7 +95,7 @@ public class TreeOutputStream extends OutputStream {
 		if (closed) {
 			throw new IOException("Stream is closed.");
 		}
-		writeLeafNode( ByteBuffer.wrap( new byte[] {(byte) arg0}));
+		writeLeafNode(ByteBuffer.wrap(new byte[] { (byte) arg0 }));
 	}
 
 	@Override
@@ -107,101 +111,43 @@ public class TreeOutputStream extends OutputStream {
 		} else if (len == 0) {
 			return;
 		}
-
-		ByteBuffer data = ByteBuffer.wrap(buffer, off, len);
-	
-		writeLeafNode(data);
+		writeLeafNode(ByteBuffer.wrap(buffer, off, len));
 	}
-	
-	private void writeLeafNode( ByteBuffer data ) throws IOException {
-		
-			final TreeNode leafNode = stackNodeList.get(LEAF_NODE_INDEX);
 
-			while (data.hasRemaining())
-			{
-				// if the leaf node is full write it.
-				if (!leafNode.hasSpace(1)) {
-					ByteBuffer toWrite = serializeNode( leafNode);					
-					writeNode(toWrite, FIRST_INNER_INDEX, leafNode.getSpan().getLength());
-					leafNode.clearData();
-				}
-				
-				
-				if (data.remaining() <= leafNode.getSpace()) {
-					writeNode(data, LEAF_NODE_INDEX, data.remaining());
-				} else {
-	
-					/*
-					 * write part of the data
-					 */				
-					int oldLimit = data.limit();
-					data.limit(data.position()+leafNode.getSpace());
-					writeNode(data, LEAF_NODE_INDEX, leafNode.getSpace());
-					data.limit( oldLimit );
-				}
+	private void writeLeafNode(ByteBuffer data) throws IOException {
+
+		final TreeNode leafNode = stackNodeList.get(LEAF_NODE_INDEX);
+
+		while (data.hasRemaining()) {
+			// if the leaf node is full write it.
+			if (!leafNode.hasSpace(1)) {
+				ByteBuffer toWrite = serializeNode(leafNode);
+				writeNode(toWrite, FIRST_INNER_INDEX, leafNode.getSpan().getLength());
+				leafNode.clearData();
 			}
-//				
-//				
-//				if (leafNode.getOffset() > 0) {
-//					leafNode.getData().
-//					// Create an empty array with the remaining space left
-//					ByteBuffer bytes = ByteBuffer.allocate(leafNode.getSpace());
-//					
-//					node = startWritingToLeaf(node, bytes);
-//				}
-//				// The remaining data may still be bigger than the capacity of the span
-//				if (node.getLength() > leafNode.getSpan().getLength()) {
-//
-//					// create an array equal to the length of the span
-//					ByteBuffer bytes = ByteBuffer.allocate(leafNode.getSpan().getLength());
-//
-//					// write chunks of data (size = capacity)
-//					while (node.getLength() > leafNode.getSpan().getLength()) {
-//						node = startWritingToLeaf(node, bytes);
-//					}
-//				}
-//
-//				// if we have the capacity for the data, then write it
-//
-//				if (node.getLength() > 0) {
-//					ByteBuffer bytes = ByteBuffer.allocate((int)node.getLength());
-//
-//					node.readRelative(0, bytes);
-//
-//					writeNode(bytes, LEAF_NODE_INDEX, bytes.limit());
-//
-//				}
-//
-//			}
-//
-//		} catch (InterruptedException | ExecutionException ex) {
-//			ex.printStackTrace();
-//		}
+
+			/*
+			 * write some or all of the data depending on how much is left.
+			 */
+			int partLimit = Integer.min(data.limit(), data.position() + leafNode.getSpace());
+			ByteBuffer part = data.duplicate().limit(partLimit);
+			writeNode(part, LEAF_NODE_INDEX, part.remaining());
+			data.position(partLimit);
+		}
 
 	}
-
-//	private SpanBuffer startWritingToLeaf(final SpanBuffer node, ByteBuffer bytes)
-//			throws ExecutionException, InterruptedException, IOException {
-//
-//		node.readRelative(0, bytes);
-//
-//		writeNode(bytes, LEAF_NODE_INDEX, bytes.limit());
-//
-//		return node.cut(bytes.limit());
-//
-//	}
 
 	/**
-	 * Writes to node, the buffer must fit in an empty LeafNode.
+	 * Writes to node. The data in the buffer must fit in an empty node, keep in
+	 * mind that inner nodes are 1 byte shorter than a leaf node.
 	 *
 	 * @param buffer         data buffer to be written in the node
 	 * @param nodeIndex      index position in the stackNodeList
 	 * @param expandedLength the length of the actual data
-	 * @throws IOException 
+	 * @throws IOException
 	 *
 	 */
-	private void writeNode(ByteBuffer buffer, final int nodeIndex, final long expandedLength)
-			throws IOException {
+	private void writeNode(ByteBuffer buffer, final int nodeIndex, final long expandedLength) throws IOException {
 
 		// Node number should never be greater than the size
 		if (nodeIndex >= stackNodeList.size()) {
@@ -210,52 +156,28 @@ public class TreeOutputStream extends OutputStream {
 
 		final TreeNode node = stackNodeList.get(nodeIndex);
 
-		if (!node.hasSpace(buffer.limit())) {
+		if (!node.hasSpace(buffer.remaining())) {
 			final ByteBuffer bb = serializeNode(node);
 			writeNode(bb, nodeIndex + 1, node.getExpandedLength());
 			node.clearData();
 		}
-
 		node.write(buffer, expandedLength);
 
 	}
-	
-	/**
-	 * a byte to the leaf node
-	 *
-	 * @param b         the byte to write
-	 * @param nodeIndex      index position in the stackNodeList
-	 * @param expandedLength the length of the actual data
-	 * @throws InterruptedException In case action was interrupted during execution
-	 * @throws ExecutionException   Thrown at execution
-	 * @throws IOException 
-	 *
-	 */
-	private void writeNode(Byte b, final long expandedLength)
-			throws InterruptedException, ExecutionException, IOException {
-		final TreeNode node = stackNodeList.get(LEAF_NODE_INDEX);
-		if (!node.hasSpace(1)) {
-			final ByteBuffer bb = serializeNode(node);
-			writeNode(bb, FIRST_INNER_INDEX, node.getExpandedLength());
-			node.clearData();
-		}
-		node.write(b, expandedLength);
-	}
 
 	/**
-	 * When calling this buffer must fit in an empty LeafNode.
+	 * Create the root node.
 	 *
 	 * @throws InterruptedException In case action was interrupted during execution
 	 * @throws ExecutionException   Thrown at execution
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void createRoot() throws InterruptedException, ExecutionException, IOException {
 		int nodeIndex = LEAF_NODE_INDEX;
 
 		// Can the data be compressed in 1 node e.g. we have only data in the leaf node
-		
-		if ((nodeIndex == LEAF_NODE_INDEX)&& (stackNodeList.size() == 2))
-		{
+
+		if (stackNodeList.size() == 2) {
 			TreeNode leaf = stackNodeList.get(LEAF_NODE_INDEX);
 			TreeNode inner = stackNodeList.get(FIRST_INNER_INDEX);
 			if (inner.isDataEmpty() && inner.hasSpace(leaf.getUsedSpace())) {
@@ -270,24 +192,24 @@ public class TreeOutputStream extends OutputStream {
 
 		TreeNode node = stackNodeList.get(nodeIndex);
 
-		while (nodeIndex<stackNodeList.size()-1)
-		{
-			final int nextPosition = nodeIndex+1;
+		while (nodeIndex < stackNodeList.size() - 1) {
+			final int nextPosition = nodeIndex + 1;
 			final ByteBuffer bb = serializeNode(node);
 			writeNode(bb, nextPosition, node.getExpandedLength());
 			node.clearData();
 			nodeIndex = nextPosition;
 			node = stackNodeList.get(nodeIndex);
 		}
-		// We are at the last node of the stack?
+		// We are at the last node of the stack
 		writeRoot(node);
 	}
 
 	/**
-	 * Once we write the root we can retrieve the Position information about the
-	 * node.
+	 * Once we are closed we write root node. Its position is retrieved with this
+	 * method.
 	 * 
 	 * @return Position object for the root
+	 * @throws IllegalStateException if the output is not closed.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Position> T getPosition() {
@@ -300,11 +222,12 @@ public class TreeOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Writes the node's data and retrieves the position in a buffer for an inner node.
+	 * Writes the node's data and retrieves the position in a buffer for an inner
+	 * node.
 	 *
 	 * @param node The tree node to serialize.
 	 * @return the position encoded into a bytebuffer by the TreeSerializer.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
 	private ByteBuffer serializeNode(final TreeNode node) throws IOException {
@@ -325,7 +248,7 @@ public class TreeOutputStream extends OutputStream {
 	 * @return Position information from TreeSerializer.
 	 * @throws ExecutionException   on error
 	 * @throws InterruptedException on error
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected void writeRoot(final TreeNode rootNode) throws ExecutionException, InterruptedException, IOException {
 

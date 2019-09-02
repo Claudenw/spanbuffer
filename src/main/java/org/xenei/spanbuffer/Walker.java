@@ -137,11 +137,11 @@ public interface Walker extends DataInput {
 	 * @throws IOException on error
 	 */
 	int read(byte[] buff, int offset, int len) throws IOException;
-	
+
 	/**
 	 * Attempt to fill the ByteBuffer.
 	 * 
-	 * @param buff   the buffer to fill.
+	 * @param buff the buffer to fill.
 	 * @return the number of bytes read.
 	 * @throws IOException on error
 	 */

@@ -35,6 +35,13 @@ public interface TreeSerializer<P extends Position> {
 	public int getMaxBufferSize();
 
 	/**
+	 * Return the number of bytes that a Position occupies when it is serialized.
+	 * 
+	 * @return serialized Position size.
+	 */
+	public int getPositionSize();
+
+	/**
 	 * Write the buffer to the data storage and return a Position.
 	 * 
 	 * @param buffer the buffer to write
