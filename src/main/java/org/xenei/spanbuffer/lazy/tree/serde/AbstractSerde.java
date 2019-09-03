@@ -47,7 +47,7 @@ public abstract class AbstractSerde<P extends Position> {
 	 * @return the buffer factory.
 	 */
 	public abstract BufferFactory getFactory();
-	
+
 	/**
 	 * Verify that the serde is valid.
 	 * 
@@ -55,7 +55,8 @@ public abstract class AbstractSerde<P extends Position> {
 	 * <ul>
 	 * <li>the factory must produce buffers that are 1 + (2*positionSize) long.
 	 * Position size is specified by the serializer.</li>
-	 * <li>the deserializer header size must be equal to the factory header size.</li>
+	 * <li>the deserializer header size must be equal to the factory header
+	 * size.</li>
 	 * </ul>
 	 * 
 	 * @throwsIllegalArgumentException if the condition is not met.
@@ -72,8 +73,8 @@ public abstract class AbstractSerde<P extends Position> {
 					getFactory().headerSize(), getDeserializer().headerSize()));
 		}
 	}
-	
-	public TreeLazyLoader<P> getLazyLoader( P pos ) {
+
+	public TreeLazyLoader<P> getLazyLoader(P pos) {
 		return new TreeLazyLoader<P>(pos, getDeserializer());
 	}
 }

@@ -965,13 +965,13 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBuffer() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( mid );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate(mid);
 		final int bytesRead = spanBuffer.read(0, buff);
 		Assert.assertEquals("Should have read " + mid + " bytes", mid, bytesRead);
-		Assert.assertEquals( mid, buff.position());
-		Assert.assertEquals( mid, buff.limit());
-		Assert.assertEquals( mid, buff.capacity());
+		Assert.assertEquals(mid, buff.position());
+		Assert.assertEquals(mid, buff.limit());
+		Assert.assertEquals(mid, buff.capacity());
 		buff.position(0);
 		for (int i = 0; i < mid; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[i], buff.get());
@@ -980,13 +980,13 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferAtOffset() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( mid );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate(mid);
 		final int bytesRead = spanBuffer.read(1, buff);
 		Assert.assertEquals("Should have read " + mid + " bytes", mid, bytesRead);
-		Assert.assertEquals( mid, buff.position());
-		Assert.assertEquals( mid, buff.limit());
-		Assert.assertEquals( mid, buff.capacity());
+		Assert.assertEquals(mid, buff.position());
+		Assert.assertEquals(mid, buff.limit());
+		Assert.assertEquals(mid, buff.capacity());
 		buff.position(0);
 		for (int i = 0; i < mid; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[1 + i], buff.get());
@@ -995,14 +995,14 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferWithPos() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( mid );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate(mid);
 		buff.position(1);
 		final int bytesRead = spanBuffer.read(0, buff);
-		Assert.assertEquals("Should have read " + (mid-1) + " bytes", mid-1, bytesRead);
-		Assert.assertEquals( mid, buff.position());
-		Assert.assertEquals( mid, buff.limit());
-		Assert.assertEquals( mid, buff.capacity());
+		Assert.assertEquals("Should have read " + (mid - 1) + " bytes", mid - 1, bytesRead);
+		Assert.assertEquals(mid, buff.position());
+		Assert.assertEquals(mid, buff.limit());
+		Assert.assertEquals(mid, buff.capacity());
 		buff.position(1);
 		for (int i = 0; i < bytesRead; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[i], buff.get());
@@ -1011,14 +1011,14 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferWithOffsetAndPos() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( mid );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate(mid);
 		buff.position(1);
 		final int bytesRead = spanBuffer.read(1, buff);
-		Assert.assertEquals("Should have read " + (mid-1) + " bytes", mid-1, bytesRead);
-		Assert.assertEquals( mid, buff.position());
-		Assert.assertEquals( mid, buff.limit());
-		Assert.assertEquals( mid, buff.capacity());
+		Assert.assertEquals("Should have read " + (mid - 1) + " bytes", mid - 1, bytesRead);
+		Assert.assertEquals(mid, buff.position());
+		Assert.assertEquals(mid, buff.limit());
+		Assert.assertEquals(mid, buff.capacity());
 		buff.position(1);
 		for (int i = 0; i < bytesRead; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[i + 1], buff.get());
@@ -1027,15 +1027,15 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferAtOffsetWithLimit() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( (int) spanBuffer.getLength() );
-		buff.limit( mid );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate((int) spanBuffer.getLength());
+		buff.limit(mid);
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
 		final int bytesRead = spanBuffer.read(SpanBufferContractTest.TestOffset + 1, buff);
 		Assert.assertEquals("Should have read " + mid + " bytes", mid, bytesRead);
-		Assert.assertEquals( mid, buff.position());
-		Assert.assertEquals( mid, buff.limit());
-		Assert.assertEquals( spanBuffer.getLength(), buff.capacity());
+		Assert.assertEquals(mid, buff.position());
+		Assert.assertEquals(mid, buff.limit());
+		Assert.assertEquals(spanBuffer.getLength(), buff.capacity());
 		buff.position(0);
 		for (int i = 0; i < bytesRead; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[1 + i], buff.get());
@@ -1044,15 +1044,15 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferWithPosAndLimit() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( (int) spanBuffer.getLength() );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate((int) spanBuffer.getLength());
 		buff.position(1);
-		buff.limit( mid+1 );
-		final int bytesRead = spanBuffer.read( 0, buff);
+		buff.limit(mid + 1);
+		final int bytesRead = spanBuffer.read(0, buff);
 		Assert.assertEquals("Should have read " + mid + " bytes", mid, bytesRead);
-		Assert.assertEquals( mid+1, buff.position());
-		Assert.assertEquals( mid+1, buff.limit());
-		Assert.assertEquals( spanBuffer.getLength(), buff.capacity());
+		Assert.assertEquals(mid + 1, buff.position());
+		Assert.assertEquals(mid + 1, buff.limit());
+		Assert.assertEquals(spanBuffer.getLength(), buff.capacity());
 		buff.position(1);
 		for (int i = 0; i < mid; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[i], buff.get());
@@ -1061,16 +1061,16 @@ public class SpanBufferContractTest<T extends SpanBuffer> {
 
 	@ContractTest
 	public void testReadByteBufferWithOffsetAndPosAndLimit() throws IOException {
-		final int mid = (int)spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
-		ByteBuffer buff = ByteBuffer.allocate( (int) spanBuffer.getLength() );
+		final int mid = (int) spanBuffer.makeAbsolute((spanBuffer.getLength() / 2));
+		ByteBuffer buff = ByteBuffer.allocate((int) spanBuffer.getLength());
 		buff.position(1);
-		buff.limit( mid+1 );
+		buff.limit(mid + 1);
 		spanBuffer = spanBuffer.duplicate(SpanBufferContractTest.TestOffset);
 		final int bytesRead = spanBuffer.read(SpanBufferContractTest.TestOffset + 1, buff);
 		Assert.assertEquals("Should have read " + mid + " bytes", mid, bytesRead);
-		Assert.assertEquals( mid+1, buff.position());
-		Assert.assertEquals( mid+1, buff.limit());
-		Assert.assertEquals( spanBuffer.getLength(), buff.capacity());
+		Assert.assertEquals(mid + 1, buff.position());
+		Assert.assertEquals(mid + 1, buff.limit());
+		Assert.assertEquals(spanBuffer.getLength(), buff.capacity());
 		buff.position(1);
 		for (int i = 0; i < mid; i++) {
 			Assert.assertEquals("buffer contents wrong", buffer[i + 1], buff.get());

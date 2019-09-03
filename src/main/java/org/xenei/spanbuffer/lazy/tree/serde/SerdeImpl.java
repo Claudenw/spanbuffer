@@ -25,8 +25,8 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 /**
  * Basic implementation of the Serde.
  * 
- * This is a convenience class to keep the serializer, deserializer and 
- * buffer factory together in one place.
+ * This is a convenience class to keep the serializer, deserializer and buffer
+ * factory together in one place.
  * 
  * @param <P> the Position implementation.
  */
@@ -34,18 +34,17 @@ public class SerdeImpl<P extends Position> extends AbstractSerde<P> {
 	private TreeDeserializer<P> deserializer;
 	private TreeSerializer<P> serializer;
 	private BufferFactory factory;
-	
+
 	/**
-	 * Constructor.
-	 * This constructor calls Serde.verify to verify that the components
-	 * work together correctly.
-	 * @param factory The factory for the serde.
-	 * @param serializer the serializer for the serde
+	 * Constructor. This constructor calls Serde.verify to verify that the
+	 * components work together correctly.
+	 * 
+	 * @param factory      The factory for the serde.
+	 * @param serializer   the serializer for the serde
 	 * @param deserializer the deserializer for the serde.
 	 * @see AbstractSerde#verify()
 	 */
-	public SerdeImpl(BufferFactory factory, TreeSerializer<P> serializer, TreeDeserializer<P> deserializer)
-	{
+	public SerdeImpl(BufferFactory factory, TreeSerializer<P> serializer, TreeDeserializer<P> deserializer) {
 		this.factory = factory;
 		this.serializer = serializer;
 		this.deserializer = deserializer;

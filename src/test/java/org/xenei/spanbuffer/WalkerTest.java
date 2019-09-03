@@ -144,7 +144,7 @@ public class WalkerTest {
 		assertArrayEquals("Hell ".getBytes(), buff);
 		assertEquals(6, walker.getPos());
 	}
-	
+
 	@Test
 	public void testSpanBufferReads() throws IOException {
 		sb = Factory.wrap("Hello World");
@@ -153,7 +153,7 @@ public class WalkerTest {
 		Walker walker = sb.getWalker();
 		assertEquals(0, walker.getPos());
 		assertEquals(5, walker.read(buff));
-		
+
 		assertArrayEquals("Hello".getBytes(), buff.array());
 		assertEquals(5, walker.getPos());
 		buff.position(4);

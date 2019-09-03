@@ -26,7 +26,7 @@ import org.xenei.spanbuffer.similarity.Bitap;
  * specific location in a buffer.
  */
 public class Matcher {
-	
+
 	/**
 	 * Match a pattern starting at the specified relative position.
 	 * <p>

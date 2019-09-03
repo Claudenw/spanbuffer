@@ -19,13 +19,12 @@ package org.xenei.spanbuffer.lazy.tree;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 
 public class TestHeaderBufferFactory implements BufferFactory {
-	
+
 	private int bufferSize;
 
 	public TestHeaderBufferFactory(int bufferSize) {
@@ -34,16 +33,15 @@ public class TestHeaderBufferFactory implements BufferFactory {
 
 	@Override
 	public int bufferSize() {
-		return bufferSize+5;
+		return bufferSize + 5;
 	}
 
 	@Override
 	public ByteBuffer createBuffer() {
 		/* create a buffer with a header that has a known fill */
 		ByteBuffer bb = ByteBuffer.allocate(bufferSize());
-		for (int i=0;i<headerSize();i++)
-		{
-			bb.put((byte)i);
+		for (int i = 0; i < headerSize(); i++) {
+			bb.put((byte) i);
 		}
 		return bb;
 	}
@@ -52,13 +50,12 @@ public class TestHeaderBufferFactory implements BufferFactory {
 	public int headerSize() {
 		return 5;
 	}
-	
+
 	@Override
 	public void free(ByteBuffer buffer) {
 		/* verify the header is intact */
-		for (int i=0;i<headerSize();i++)
-		{
-			assertEquals( String.format("on free() buffer header corrupted at %s",i), (byte)i, buffer.get(i));
+		for (int i = 0; i < headerSize(); i++) {
+			assertEquals(String.format("on free() buffer header corrupted at %s", i), (byte) i, buffer.get(i));
 		}
 	}
 }

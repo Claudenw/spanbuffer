@@ -47,7 +47,7 @@ public class LeafNode extends TreeNode {
 
 	@Override
 	public long getExpandedLength() {
-		return data.limit()-span.getOffset();
+		return data.limit() - span.getOffset();
 	}
 
 	@Override

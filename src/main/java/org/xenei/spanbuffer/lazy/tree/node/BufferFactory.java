@@ -31,6 +31,7 @@ public interface BufferFactory {
 	 * <p>
 	 * Buffer must be positioned just after the header
 	 * </p>
+	 * 
 	 * @return a ByteBuffer to write the data to.
 	 * @throws IOException on error
 	 */
@@ -44,6 +45,5 @@ public interface BufferFactory {
 	 * @throws IOException on error.
 	 */
 	void free(ByteBuffer buffer) throws IOException;
-
 
 }

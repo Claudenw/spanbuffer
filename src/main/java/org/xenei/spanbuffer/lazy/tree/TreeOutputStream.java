@@ -66,14 +66,14 @@ public class TreeOutputStream extends OutputStream {
 
 	/**
 	 * Constructor using a serde.
+	 * 
 	 * @param serde
 	 * @throws IOException
 	 */
-	public TreeOutputStream( AbstractSerde<?> serde ) throws IOException
-	{
-		this( serde.getSerializer(), serde.getFactory());
+	public TreeOutputStream(AbstractSerde<?> serde) throws IOException {
+		this(serde.getSerializer(), serde.getFactory());
 	}
-	
+
 	/**
 	 * Constructor. The factory must produce buffers that are 1 + (2*positionSize)
 	 * long. Position size is specified by the serializer.
@@ -82,8 +82,7 @@ public class TreeOutputStream extends OutputStream {
 	 * @param factory    The Factory to produce new buffers.
 	 * @throws IOException
 	 */
-	public TreeOutputStream(TreeSerializer<?> serializer, BufferFactory factory)
-			throws IOException {
+	public TreeOutputStream(TreeSerializer<?> serializer, BufferFactory factory) throws IOException {
 		this.factory = factory;
 		this.serializer = serializer;
 		this.position = serializer.getNoDataPosition();
@@ -126,20 +125,19 @@ public class TreeOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Write  the data buffer to the leaf nodes.  The buffer may be 
-	 * larger than the leaf node so this code will split larger buffers
-	 * across multiple leaf nodes and ensure that the proper inner nodes
-	 * are constructed.
+	 * Write the data buffer to the leaf nodes. The buffer may be larger than the
+	 * leaf node so this code will split larger buffers across multiple leaf nodes
+	 * and ensure that the proper inner nodes are constructed.
+	 * 
 	 * @param data the data to write.
 	 * @throws IOException on error.
 	 */
 	private void writeLeafNode(ByteBuffer data) throws IOException {
 
 		/*
-		 * The strategy here is to only create an inner node when there
-		 * is actually data to write to it.  Thus when we get to the close()
-		 * processing it is much simpler and there are fewer allocated nodes
-		 * that we may have to free.
+		 * The strategy here is to only create an inner node when there is actually data
+		 * to write to it. Thus when we get to the close() processing it is much simpler
+		 * and there are fewer allocated nodes that we may have to free.
 		 */
 		final TreeNode leafNode = stackNodeList.get(LEAF_NODE_INDEX);
 		while (data.hasRemaining()) {
@@ -190,8 +188,8 @@ public class TreeOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Create the root node.  This method is called after close and ensures
-	 * that all the data are preserved.
+	 * Create the root node. This method is called after close and ensures that all
+	 * the data are preserved.
 	 *
 	 * @throws InterruptedException In case action was interrupted during execution
 	 * @throws ExecutionException   Thrown at execution
@@ -200,9 +198,10 @@ public class TreeOutputStream extends OutputStream {
 	private void createRoot() throws InterruptedException, ExecutionException, IOException {
 		int nodeIndex = LEAF_NODE_INDEX;
 
-		/* Handle the special case where all of the data in the leaf node
-		 * will fit in the inner node.  This creates an "OUTER_NODE" type 
-		 * that means we only have one node to track.
+		/*
+		 * Handle the special case where all of the data in the leaf node will fit in
+		 * the inner node. This creates an "OUTER_NODE" type that means we only have one
+		 * node to track.
 		 */
 
 		if (stackNodeList.size() == 2) {
@@ -293,7 +292,7 @@ public class TreeOutputStream extends OutputStream {
 		super.close();
 		closed = true;
 		if (stackNodeList.get(LEAF_NODE_INDEX).isDataEmpty()) {
-			factory.free( stackNodeList.get(LEAF_NODE_INDEX).getData() );
+			factory.free(stackNodeList.get(LEAF_NODE_INDEX).getData());
 			position = serializer.getNoDataPosition();
 		} else {
 			try {

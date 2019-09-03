@@ -113,7 +113,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 
 			/* Figure out what type of data we have */
 			final byte typeFlag = buffer.read(InnerNode.FLAG_BYTE);
-			
+
 			final boolean innerNodePtrs = (typeFlag & InnerNode.INNER_NODE_FLAG) != 0;
 
 			// cut the flag_byte from the front

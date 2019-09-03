@@ -32,7 +32,7 @@ public abstract class TreeNode {
 	private static final Logger LOG = LoggerFactory.getLogger(TreeNode.class);
 
 	/**
-	 * the span for this node.  The offset is the position in the buffer where the 
+	 * the span for this node. The offset is the position in the buffer where the
 	 * dataspace starts. length is the length of the dataspace, and end is the end
 	 * of the dataspace.
 	 */
@@ -42,7 +42,7 @@ public abstract class TreeNode {
 	protected ByteBuffer data;
 
 	protected final BufferFactory factory;
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -54,7 +54,7 @@ public abstract class TreeNode {
 		span = IntSpan.fromLength(factory.headerSize(), factory.bufferSize());
 		data = factory.createBuffer();
 	}
-	
+
 	/**
 	 * Checks if it can write to the data buffer.
 	 *
@@ -154,19 +154,20 @@ public abstract class TreeNode {
 	public ByteBuffer getData() {
 		return data.duplicate().flip();
 	}
-	
+
 	/**
-	 * Get the raw byte buffer 
-	 * @return the raw data  buffer.
+	 * Get the raw byte buffer
+	 * 
+	 * @return the raw data buffer.
 	 */
 	public ByteBuffer getRawBuffer() {
 		return data;
 	}
 
 	/**
-	 * Set the data buffer back to its initial state.  The number
-	 * of free bytes should be the same as when the constructor 
-	 * was called.  This method should allocate a new buffer
+	 * Set the data buffer back to its initial state. The number of free bytes
+	 * should be the same as when the constructor was called. This method should
+	 * allocate a new buffer
 	 * 
 	 * @throws IOException
 	 */
@@ -196,8 +197,7 @@ public abstract class TreeNode {
 	 * @return the number of bytes in the buffer.
 	 */
 	public int getUsedSpace() {
-		return data.position()-span.getOffset();
+		return data.position() - span.getOffset();
 	}
-	
 
 }

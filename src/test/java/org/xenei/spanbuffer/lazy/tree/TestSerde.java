@@ -25,30 +25,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xenei.spanbuffer.SpanBuffer;
-import org.xenei.spanbuffer.lazy.tree.TestSerde.TestSerializer;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
-import org.xenei.spanbuffer.lazy.tree.node.HeapBufferFactory;
 import org.xenei.spanbuffer.lazy.tree.serde.SerdeImpl;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 
 public class TestSerde extends SerdeImpl<TestPosition> {
-	
-	public TestSerde(BufferFactory factory)
-	{
-		this( factory, new TestSerializer(factory.bufferSize()));
+
+	public TestSerde(BufferFactory factory) {
+		this(factory, new TestSerializer(factory.bufferSize()));
 	}
-	
+
 	private TestSerde(BufferFactory factory, TestSerializer ts) {
-		super( factory, ts,
-				new TestDeserializer(factory.headerSize(), ts.buffers));
+		super(factory, ts, new TestDeserializer(factory.headerSize(), ts.buffers));
 	}
 
 	public static class TestSerializer implements TreeSerializer<TestPosition> {
-		
+
 		List<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 		int maxBufferSize;
-		
 
 		public TestSerializer() {
 			this(10);
@@ -71,9 +66,7 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 
 		@Override
 		public ByteBuffer serialize(TestPosition position) {
-			return ByteBuffer.allocate(Integer.BYTES)
-			.putInt(position.idx)
-			.flip();
+			return ByteBuffer.allocate(Integer.BYTES).putInt(position.idx).flip();
 		}
 
 		@Override
@@ -102,10 +95,10 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 		public int headerSize() {
 			return headerSize;
 		}
-		
+
 		@Override
 		public ByteBuffer deserialize(TestPosition position) {
-			return position.isNoData() ? null: buffers.get(position.idx).position( headerSize );
+			return position.isNoData() ? null : buffers.get(position.idx).position(headerSize);
 		}
 
 		@Override
@@ -115,8 +108,8 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 				while (true) {
 					try {
 						int idx = ois.readInt();
-						TreeLazyLoader<TestPosition> tll = new TreeLazyLoader<TestPosition>(
-								new TestPosition(idx), this);
+						TreeLazyLoader<TestPosition> tll = new TreeLazyLoader<TestPosition>(new TestPosition(idx),
+								this);
 						result.add(tll);
 					} catch (EOFException e) {
 						return result;
@@ -126,8 +119,6 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 				throw new RuntimeException(e);
 			}
 		}
-
-		
 
 	}
 
