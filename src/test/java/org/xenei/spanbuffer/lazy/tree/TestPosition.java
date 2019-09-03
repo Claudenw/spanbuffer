@@ -34,4 +34,8 @@ public class TestPosition implements Position {
 		return idx < 0;
 	}
 
+	@Override
+	public String toString() {
+		return Integer.toString(idx);
+	}
 }

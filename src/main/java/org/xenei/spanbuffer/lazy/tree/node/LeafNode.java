@@ -37,7 +37,7 @@ public class LeafNode extends TreeNode {
 
 	@Override
 	public boolean isDataEmpty() {
-		return data.position() == 0;
+		return data.position() == span.getOffset();
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class LeafNode extends TreeNode {
 
 	@Override
 	public long getExpandedLength() {
-		return data.limit();
+		return data.limit()-span.getOffset();
 	}
 
 	@Override

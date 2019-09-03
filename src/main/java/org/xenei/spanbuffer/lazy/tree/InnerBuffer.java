@@ -106,14 +106,15 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			return delegate;
 
 		} else {
-			SpanBuffer buffer = lazyLoader.getBuffer(0);
+			SpanBuffer buffer = lazyLoader.getBuffer(inset);
 			if (buffer.getLength() == 0) {
 				throw new IllegalStateException("Buffer must contain at least 1 byte");
 			}
 
 			/* Figure out what type of data we have */
-			final boolean innerNodePtrs = (buffer.read(org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE)
-					& InnerNode.INNER_NODE_FLAG) != 0;
+			final byte typeFlag = buffer.read(InnerNode.FLAG_BYTE);
+			
+			final boolean innerNodePtrs = (typeFlag & InnerNode.INNER_NODE_FLAG) != 0;
 
 			// cut the flag_byte from the front
 			final SpanBuffer spanBuffer = buffer.cut(1);
@@ -126,8 +127,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 				delegate = extract(spanBuffer);
 			} else {
 
-				final boolean outerNodeType = (buffer.read(org.xenei.spanbuffer.lazy.tree.node.InnerNode.FLAG_BYTE)
-						& InnerNode.OUTER_NODE_FLAG) != 0;
+				final boolean outerNodeType = (typeFlag & InnerNode.OUTER_NODE_FLAG) != 0;
 
 				if (!outerNodeType) {
 					delegate = buildLeaves(spanBuffer);

@@ -31,14 +31,18 @@ public abstract class TreeNode {
 	// Logger
 	private static final Logger LOG = LoggerFactory.getLogger(TreeNode.class);
 
-	// The span for this node.
-	private final IntSpan span;
+	/**
+	 * the span for this node.  The offset is the position in the buffer where the 
+	 * dataspace starts. length is the length of the dataspace, and end is the end
+	 * of the dataspace.
+	 */
+	protected final IntSpan span;
 
 	// Data of the data
 	protected ByteBuffer data;
 
 	protected final BufferFactory factory;
-
+	
 	/**
 	 * Constructor.
 	 *
@@ -50,7 +54,7 @@ public abstract class TreeNode {
 		span = IntSpan.fromLength(factory.headerSize(), factory.bufferSize());
 		data = factory.createBuffer();
 	}
-
+	
 	/**
 	 * Checks if it can write to the data buffer.
 	 *
@@ -142,18 +146,6 @@ public abstract class TreeNode {
 	 */
 	protected abstract void adjustLength(long addedLength);
 
-//	/**
-//	 * Clone the data from this node. This ensures that the byte array will not be
-//	 * modified by later operations on this node.
-//	 *
-//	 * @return the clone of the internal buffer trimmed to the used size.
-//	 */
-//	public ByteBuffer cloneData() {
-//		ByteBuffer other = data.position(getOffset()).slice();
-//		data.position(0);
-//		return other.position(0);
-//	}
-
 	/**
 	 * Returns only the filled data buffer.
 	 * 
@@ -162,9 +154,19 @@ public abstract class TreeNode {
 	public ByteBuffer getData() {
 		return data.duplicate().flip();
 	}
+	
+	/**
+	 * Get the raw byte buffer 
+	 * @return the raw data  buffer.
+	 */
+	public ByteBuffer getRawBuffer() {
+		return data;
+	}
 
 	/**
-	 * Set the node back to its initial state.
+	 * Set the data buffer back to its initial state.  The number
+	 * of free bytes should be the same as when the constructor 
+	 * was called.  This method should allocate a new buffer
 	 * 
 	 * @throws IOException
 	 */
@@ -194,7 +196,8 @@ public abstract class TreeNode {
 	 * @return the number of bytes in the buffer.
 	 */
 	public int getUsedSpace() {
-		return data.position();
+		return data.position()-span.getOffset();
 	}
+	
 
 }

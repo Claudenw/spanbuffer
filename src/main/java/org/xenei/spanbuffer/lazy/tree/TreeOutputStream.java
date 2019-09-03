@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.xenei.spanbuffer.lazy.tree.node.TreeNode;
 import org.xenei.spanbuffer.lazy.tree.serde.Position;
+import org.xenei.spanbuffer.lazy.tree.serde.AbstractSerde;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class TreeOutputStream extends OutputStream {
 	@SuppressWarnings("rawtypes")
 	protected final TreeSerializer serializer;
 	protected Position position;
-	private final BufferFactory factory;
+	protected final BufferFactory factory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(TreeOutputStream.class);
 
@@ -58,11 +59,21 @@ public class TreeOutputStream extends OutputStream {
 	 * the stack of nodes we are writing to. Leaf is node 0, the rest are inner
 	 * nodes leading back to the root node.
 	 */
-	private final List<TreeNode> stackNodeList;
+	protected final List<TreeNode> stackNodeList;
 
 	private static final int LEAF_NODE_INDEX = 0;
 	private static final int FIRST_INNER_INDEX = 1;
 
+	/**
+	 * Constructor using a serde.
+	 * @param serde
+	 * @throws IOException
+	 */
+	public TreeOutputStream( AbstractSerde<?> serde ) throws IOException
+	{
+		this( serde.getSerializer(), serde.getFactory());
+	}
+	
 	/**
 	 * Constructor. The factory must produce buffers that are 1 + (2*positionSize)
 	 * long. Position size is specified by the serializer.
@@ -71,7 +82,7 @@ public class TreeOutputStream extends OutputStream {
 	 * @param factory    The Factory to produce new buffers.
 	 * @throws IOException
 	 */
-	public TreeOutputStream(@SuppressWarnings("rawtypes") TreeSerializer serializer, BufferFactory factory)
+	public TreeOutputStream(TreeSerializer<?> serializer, BufferFactory factory)
 			throws IOException {
 		this.factory = factory;
 		this.serializer = serializer;
@@ -114,10 +125,23 @@ public class TreeOutputStream extends OutputStream {
 		writeLeafNode(ByteBuffer.wrap(buffer, off, len));
 	}
 
+	/**
+	 * Write  the data buffer to the leaf nodes.  The buffer may be 
+	 * larger than the leaf node so this code will split larger buffers
+	 * across multiple leaf nodes and ensure that the proper inner nodes
+	 * are constructed.
+	 * @param data the data to write.
+	 * @throws IOException on error.
+	 */
 	private void writeLeafNode(ByteBuffer data) throws IOException {
 
+		/*
+		 * The strategy here is to only create an inner node when there
+		 * is actually data to write to it.  Thus when we get to the close()
+		 * processing it is much simpler and there are fewer allocated nodes
+		 * that we may have to free.
+		 */
 		final TreeNode leafNode = stackNodeList.get(LEAF_NODE_INDEX);
-
 		while (data.hasRemaining()) {
 			// if the leaf node is full write it.
 			if (!leafNode.hasSpace(1)) {
@@ -166,7 +190,8 @@ public class TreeOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Create the root node.
+	 * Create the root node.  This method is called after close and ensures
+	 * that all the data are preserved.
 	 *
 	 * @throws InterruptedException In case action was interrupted during execution
 	 * @throws ExecutionException   Thrown at execution
@@ -175,16 +200,22 @@ public class TreeOutputStream extends OutputStream {
 	private void createRoot() throws InterruptedException, ExecutionException, IOException {
 		int nodeIndex = LEAF_NODE_INDEX;
 
-		// Can the data be compressed in 1 node e.g. we have only data in the leaf node
+		/* Handle the special case where all of the data in the leaf node
+		 * will fit in the inner node.  This creates an "OUTER_NODE" type 
+		 * that means we only have one node to track.
+		 */
 
 		if (stackNodeList.size() == 2) {
-			TreeNode leaf = stackNodeList.get(LEAF_NODE_INDEX);
+			LeafNode leaf = (LeafNode) stackNodeList.get(LEAF_NODE_INDEX);
 			TreeNode inner = stackNodeList.get(FIRST_INNER_INDEX);
 			if (inner.isDataEmpty() && inner.hasSpace(leaf.getUsedSpace())) {
 				// create a reference to the root node
-				final LeafNode leafNode = (LeafNode) stackNodeList.get(LEAF_NODE_INDEX);
 				// Let's create our root node
-				final TreeNode rootNode = new InnerNode(factory, leafNode);
+				final TreeNode rootNode = new InnerNode(factory, leaf);
+				// ensure that the leaf data is freed and cleared.
+				factory.free(leaf.getRawBuffer());
+				// ensure that the leaf data is freed and cleared.
+				factory.free(inner.getRawBuffer());
 				writeRoot(rootNode);
 				return;
 			}
@@ -196,7 +227,6 @@ public class TreeOutputStream extends OutputStream {
 			final int nextPosition = nodeIndex + 1;
 			final ByteBuffer bb = serializeNode(node);
 			writeNode(bb, nextPosition, node.getExpandedLength());
-			node.clearData();
 			nodeIndex = nextPosition;
 			node = stackNodeList.get(nodeIndex);
 		}
@@ -256,7 +286,6 @@ public class TreeOutputStream extends OutputStream {
 			TreeOutputStream.LOG.debug("Obtained data for the Root Node, writing it");
 		}
 		position = serializer.serialize(rootNode.getData());
-		rootNode.clearData();
 	}
 
 	@Override
@@ -264,6 +293,7 @@ public class TreeOutputStream extends OutputStream {
 		super.close();
 		closed = true;
 		if (stackNodeList.get(LEAF_NODE_INDEX).isDataEmpty()) {
+			factory.free( stackNodeList.get(LEAF_NODE_INDEX).getData() );
 			position = serializer.getNoDataPosition();
 		} else {
 			try {

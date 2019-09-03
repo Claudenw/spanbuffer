@@ -30,6 +30,12 @@ import org.xenei.spanbuffer.lazy.tree.TreeLazyLoader;
  * @param <P> The Position implementation used by this deserializer.
  */
 public interface TreeDeserializer<P extends Position> {
+	
+	/**
+	 * Get the header size for this deserializer.
+	 * @return The header size.
+	 */
+	public int headerSize();
 
 	/**
 	 * Read from the Position and return the associated byte buffer.
@@ -52,5 +58,5 @@ public interface TreeDeserializer<P extends Position> {
 	 * @return A list of TreeLazyLoader instances.
 	 * @throws IOException on error
 	 */
-	public List<TreeLazyLoader<P, TreeDeserializer<P>>> extractLoaders(SpanBuffer buffer) throws IOException;
+	public List<TreeLazyLoader<P>> extractLoaders(SpanBuffer buffer) throws IOException;
 }

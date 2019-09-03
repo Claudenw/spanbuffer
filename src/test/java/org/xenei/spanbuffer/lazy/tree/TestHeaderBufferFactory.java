@@ -17,51 +17,48 @@
  */
 package org.xenei.spanbuffer.lazy.tree;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
+import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 
-public class TestSerializer implements TreeSerializer<TestPosition> {
+public class TestHeaderBufferFactory implements BufferFactory {
 	
-	List<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
-	int maxBufferSize;
+	private int bufferSize;
+
+	public TestHeaderBufferFactory(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
+	@Override
+	public int bufferSize() {
+		return bufferSize+5;
+	}
+
+	@Override
+	public ByteBuffer createBuffer() {
+		/* create a buffer with a header that has a known fill */
+		ByteBuffer bb = ByteBuffer.allocate(bufferSize());
+		for (int i=0;i<headerSize();i++)
+		{
+			bb.put((byte)i);
+		}
+		return bb;
+	}
+
+	@Override
+	public int headerSize() {
+		return 5;
+	}
 	
-
-	public TestSerializer() {
-		this(10);
-	}
-
-	public TestSerializer(int maxBufferSize) {
-		this.maxBufferSize = maxBufferSize;
-	}
-
 	@Override
-	public int getMaxBufferSize() {
-		return maxBufferSize;
-	}
-
-	@Override
-	public TestPosition serialize(ByteBuffer buffer) {
-		buffers.add(buffer);
-		return new TestPosition(buffers.size() - 1);
-	}
-
-	@Override
-	public ByteBuffer serialize(TestPosition position) {
-		return ByteBuffer.allocate(Integer.BYTES)
-		.putInt(position.idx)
-		.flip();
-	}
-
-	@Override
-	public TestPosition getNoDataPosition() {
-		return TestPosition.NO_DATA;
-	}
-
-	@Override
-	public int getPositionSize() {
-		return Integer.BYTES;
+	public void free(ByteBuffer buffer) {
+		/* verify the header is intact */
+		for (int i=0;i<headerSize();i++)
+		{
+			assertEquals( String.format("on free() buffer header corrupted at %s",i), (byte)i, buffer.get(i));
+		}
 	}
 }

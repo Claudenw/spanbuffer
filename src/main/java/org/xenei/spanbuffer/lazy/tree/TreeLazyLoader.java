@@ -30,14 +30,13 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
  * Class that manages the loading of tree data.
  * 
  * @param <P> the Position implementation.
- * @param <T> The TreeDeserializer
  * 
  *            This class always returns buffers at offset 0.
  * 
  */
-public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> extends AbstractLazyLoader {
+public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 
-	private T deserializer;
+	private TreeDeserializer<P> deserializer;
 	private P position;
 
 	/**
@@ -46,7 +45,7 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	 * @param position     The position in the deserializer to read the data from.
 	 * @param deserializer the deserializer to read from.
 	 */
-	public TreeLazyLoader(P position, T deserializer) {
+	public TreeLazyLoader(P position, TreeDeserializer<P> deserializer) {
 		this.deserializer = deserializer;
 		this.position = position;
 	}
@@ -60,7 +59,7 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 		if (position.isNoData()) {
 			return Factory.EMPTY;
 		}
-		return new InnerBuffer(this);
+		return new InnerBuffer(0, this);
 	}
 
 	/**
@@ -69,7 +68,7 @@ public class TreeLazyLoader<P extends Position, T extends TreeDeserializer<P>> e
 	 * @return a list of TreeLazyLoader<P,T> from the buffer.
 	 * @throws IOException on error
 	 */
-	public final List<TreeLazyLoader<P, TreeDeserializer<P>>> applyMap(SpanBuffer buffer) throws IOException {
+	public final List<TreeLazyLoader<P>> applyMap(SpanBuffer buffer) throws IOException {
 		return deserializer.extractLoaders(buffer);
 	}
 

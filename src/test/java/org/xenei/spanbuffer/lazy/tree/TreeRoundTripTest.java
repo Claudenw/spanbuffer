@@ -20,29 +20,55 @@ package org.xenei.spanbuffer.lazy.tree;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.xenei.spanbuffer.SpanBuffer;
+import org.xenei.spanbuffer.lazy.tree.TestSerde.TestDeserializer;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.HeapBufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
+import org.xenei.spanbuffer.lazy.tree.serde.AbstractSerde;
 
+@RunWith(Parameterized.class)
 public class TreeRoundTripTest {
+	
+	@Parameters(name = "{0}")  
+	public static Collection<Object[]> parameters() {
+		TestSerde ts = new TestSerde( new HeapBufferFactory(10) );
+		TestSerde bts = new TestSerde( new TestHeaderBufferFactory(10));
+		return Arrays.asList( new Object[][] {
+			{"No Offset", ts },
+			{"Offset", bts }
+		});
+	}
+	
+	private AbstractSerde<TestPosition> serde;
+	/**
+	 * Constructor
+	 * @param serde the Serde.
+	 */
+	
+	public TreeRoundTripTest(String name, AbstractSerde<TestPosition> serde)
+	{
+		this.serde = serde;
+	}
 
 	@Test
 	public void testLong() throws IOException {
-		TestSerializer ts = new TestSerializer();
-		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
-		TreeOutputStream tos = new TreeOutputStream(ts, factory);
+		TreeOutputStream tos = new TreeOutputStream( serde );
 		String text = "Now is the time for all good men to come to the aid of their country";
 		tos.write(text.getBytes());
 		tos.close();
 		TestPosition pos = (TestPosition) tos.getPosition();
 
-		TestDeserializer td = new TestDeserializer(ts.buffers);
-
-		TreeLazyLoader<TestPosition, TestDeserializer> tll = new TreeLazyLoader<TestPosition, TestDeserializer>(pos,
-				td);
+		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos); 
 
 		SpanBuffer treeBuffer = tll.asSpanBuffer();
 
@@ -51,21 +77,17 @@ public class TreeRoundTripTest {
 
 	@Test
 	public void testShort() throws IOException {
-		TestSerializer ts = new TestSerializer();
-		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
-		TreeOutputStream tos = new TreeOutputStream(ts, factory);
+		TreeOutputStream tos = new TreeOutputStream( serde );
 		String text = "Now";
 		tos.write(text.getBytes());
 		tos.close();
 		TestPosition pos = (TestPosition) tos.getPosition();
-
+		List<ByteBuffer> lst =((TestDeserializer) serde.getDeserializer()).buffers;
+		
 		assertEquals(0, pos.idx);
-		assertEquals(InnerNode.OUTER_NODE_FLAG, ts.buffers.get(0).get(InnerNode.FLAG_BYTE));
-
-		TestDeserializer td = new TestDeserializer(ts.buffers);
-
-		TreeLazyLoader<TestPosition, TestDeserializer> tll = new TreeLazyLoader<TestPosition, TestDeserializer>(pos,
-				td);
+		assertEquals(InnerNode.OUTER_NODE_FLAG, lst.get(0).get(serde.getFactory().headerSize()+InnerNode.FLAG_BYTE));
+		
+		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos);
 
 		SpanBuffer treeBuffer = tll.asSpanBuffer();
 
@@ -74,9 +96,7 @@ public class TreeRoundTripTest {
 
 	@Test
 	public void testEmpty() throws IOException {
-		TestSerializer ts = new TestSerializer();
-		BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
-		TreeOutputStream tos = new TreeOutputStream(ts, factory);
+		TreeOutputStream tos = new TreeOutputStream( serde );
 		String text = "";
 		tos.write(text.getBytes());
 		tos.close();
@@ -84,10 +104,7 @@ public class TreeRoundTripTest {
 
 		assertEquals(TestPosition.NO_DATA, pos);
 
-		TestDeserializer td = new TestDeserializer(ts.buffers);
-
-		TreeLazyLoader<TestPosition, TestDeserializer> tll = new TreeLazyLoader<TestPosition, TestDeserializer>(pos,
-				td);
+		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos);
 
 		SpanBuffer treeBuffer = tll.asSpanBuffer();
 

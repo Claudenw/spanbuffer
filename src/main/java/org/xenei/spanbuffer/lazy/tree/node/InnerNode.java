@@ -61,8 +61,8 @@ public class InnerNode extends TreeNode {
 	 */
 	public InnerNode(BufferFactory factory, final byte flag) throws IOException {
 		super(factory);
-		data.put(InnerNode.FLAG_BYTE, flag);
-		data.position(1);
+		data.put(typePosition(), flag);
+		data.position(typePosition()+1);
 		length = 0;
 	}
 
@@ -84,23 +84,28 @@ public class InnerNode extends TreeNode {
 		 * check if the data would fit in the Inner node. The leaf node offset will be
 		 * the number of bytes actually written to the buffer.
 		 */
-		if (hasSpace(ln.getData().position())) {
-			data.position(1).put(ln.getData());
+		if (hasSpace(ln.getUsedSpace())) {
+			data.position(typePosition()+1).put(ln.getData().position(span.getOffset()));
 			length += ln.getExpandedLength();
-			factory.free(ln.getData());
+			factory.free(ln.getRawBuffer());
 		} else {
 			throw new IllegalStateException("Leaf node data is too big for Inner the inner node.");
 		}
+	}
+	
+	private int typePosition() {
+		return span.getOffset()+InnerNode.FLAG_BYTE;
 	}
 
 	@Override
 	public void clearData() throws IOException {
 		ByteBuffer newData = factory.createBuffer();
-		newData.put(InnerNode.FLAG_BYTE, data.get(InnerNode.FLAG_BYTE));
+		int typePos = typePosition();
+		newData.put(typePos, data.get(typePos));
 		data = newData;
 		// make sure we do not step on the flag data byte.
 		// Arrays.fill(data, 1, data.length - 1, (byte) 0);
-		data.position(1);
+		data.position(typePos+1);
 		length = 0;
 	}
 
@@ -121,12 +126,12 @@ public class InnerNode extends TreeNode {
 	 */
 	@Override
 	public boolean isDataEmpty() {
-		return data.position() == 1;
+		return data.position() == span.getOffset()+1;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("InnerNode of length: %s and offset: %s", length, data.position());
+		return String.format("InnerNode of length: %s and offset: %s", length, data.position()-span.getOffset());
 	}
 
 }

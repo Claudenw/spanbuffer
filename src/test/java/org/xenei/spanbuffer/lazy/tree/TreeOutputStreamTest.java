@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.xenei.spanbuffer.lazy.tree;
 
 import static org.junit.Assert.assertEquals;
@@ -6,26 +23,51 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.xenei.spanbuffer.lazy.tree.TestSerde.TestSerializer;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.HeapBufferFactory;
 
+@RunWith(Parameterized.class)
 public class TreeOutputStreamTest {
 
-	private TestSerializer ts = new TestSerializer();
-	private BufferFactory factory = new HeapBufferFactory( ts.getMaxBufferSize());
-
+	private TestSerde serde;
+	private List<ByteBuffer> buffers;
+	
+	
+	@Parameters(name = "{0}")  
+	public static Collection<Object[]> parameters() {
+		TestSerde ts = new TestSerde( new HeapBufferFactory(10) );
+		TestSerde bts = new TestSerde( new TestHeaderBufferFactory(10));
+		return Arrays.asList( new Object[][] {
+			{"No Offset", ts },
+			{"Offset", bts }
+		});
+	}
+	
+	public TreeOutputStreamTest(String name, TestSerde serde)
+	{
+		this.serde = serde;
+		this.buffers = ((TestSerializer)serde.getSerializer()).buffers;
+	}
+	
 	@Test
 	public void writeTest() throws IOException {
-		TreeOutputStream tos = new TreeOutputStream(ts, factory);
+		TreeOutputStream tos = new TreeOutputStream( serde );
 		String text = "Now is the time for all good men to come to the aid of their country";
 		tos.write(text.getBytes());
 		tos.close();
 		TestPosition pos = (TestPosition) tos.getPosition();
 		assertEquals( 13, pos.idx );
 		
-		assertEquals( 14, ts.buffers.size());
+		assertEquals( 14, buffers.size());
 		assertText( 0, "Now is the");
 		assertText( 1, " time for ");
 		assertText( 2, "all good m");
@@ -45,25 +87,45 @@ public class TreeOutputStreamTest {
 	
 	private void assertText( int idx, String txt)
 	{
-		ByteBuffer actual = ts.buffers.get(idx);
+		ByteBuffer actual = buffers.get(idx);
+		ByteBuffer trimmed = verifyHeader( idx, actual );
 		ByteBuffer expected = ByteBuffer.wrap( txt.getBytes() );
-		assertEquals( txt, expected, actual );
+		assertEquals( String.format( "[%s]", txt), expected, trimmed );
+	}
+	
+	/**
+	 * Verify the header is correct and then position the 
+	 * buffer after the header.
+	 * Used for testing to verify header not damaged.
+	 * @param idx the buffer number
+	 * @param buffer the buffer.
+	 * @return the buffer positioned after header.
+	 */
+	private ByteBuffer verifyHeader(int idx, ByteBuffer buffer)
+	{
+		
+		for (int i=0;i<serde.getFactory().headerSize();i++)
+		{
+			assertEquals( String.format("buffer (%s) header corrupted at %s",idx,i), (byte)i, buffer.get(i));
+		}
+		return buffer.position( serde.getFactory().headerSize() );
 	}
 	
 	private void assertPtr( int idx, int type, int...ptrs)
 	{
-		ByteBuffer actual = ts.buffers.get(idx);
-		assertEquals( "wrong type", type, actual.get(0));
-		IntBuffer ints = actual.position(1).asIntBuffer();
+		ByteBuffer actual = buffers.get(idx);
+		ByteBuffer trimmed = verifyHeader( idx, actual );
+		assertEquals( "wrong type", type, trimmed.get());
+		IntBuffer ints = trimmed.asIntBuffer();
 		if (ptrs.length == 1)
 		{
 			assertEquals( ptrs[0], ints.get(0));
-			assertEquals( 5, actual.limit() );
+			assertEquals( 4, trimmed.remaining() );
 		}
 		else if (ptrs.length==2) {
 			assertEquals( ptrs[0], ints.get(0));
 			assertEquals( ptrs[1], ints.get(1));
-			assertEquals( 9, actual.limit() );
+			assertEquals( 8, trimmed.remaining() );
 		}
 		else {
 			fail( "Wrong number of ptrs: "+ptrs.length);
