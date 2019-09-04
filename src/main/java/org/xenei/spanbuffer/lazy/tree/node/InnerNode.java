@@ -131,7 +131,8 @@ public class InnerNode extends TreeNode {
 
 	@Override
 	public String toString() {
-		return String.format("InnerNode of type: %s,  expanded length: %s, and data length %s", data.get(typePosition()), length, data.position() - span.getOffset());
+		return String.format("InnerNode[ t:%s ex:%s l:%s ]", data.get(typePosition()), length,
+				data.position() - span.getOffset());
 	}
 
 }

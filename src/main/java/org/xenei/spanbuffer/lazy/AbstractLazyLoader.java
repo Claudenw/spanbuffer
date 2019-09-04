@@ -31,11 +31,14 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	private Long length = null;
 
 	/**
-	 * Method to load the internal buffer.
+	 * Method to load the internal buffer. This is the data as retrieved from
+	 * storage before any subsequent processing that may be needed to decode it into
+	 * the Spanbuffer that getBuffer() returns.
 	 * 
 	 * @param the inset into the lazy loaded buffer
 	 * @return the bytes for the internal buffer.
 	 * @throws IOException on error
+	 * @See {@link #getRawBuffer(int)}
 	 */
 	protected abstract SpanBuffer getBufferInternal(int inset) throws IOException;
 
@@ -56,13 +59,25 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 		this.length = length;
 	}
 
-	@Override
-	public synchronized SpanBuffer getBuffer(int inset) throws IOException {
+	/**
+	 * Return the internal buffer while handling the caching / soft reference to the
+	 * getBufferInternal() call;
+	 * 
+	 * @param inset the inset into the result buffer.
+	 * @return the internal span buffer.
+	 * @throws IOException
+	 */
+	public synchronized SpanBuffer getRawBuffer(int inset) throws IOException {
 
 		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
 			loadedBufferReference = new SoftReference<>(getBufferInternal(0));
 		}
 		return loadedBufferReference.get();
+	}
+
+	@Override
+	public SpanBuffer getBuffer(int inset) throws IOException {
+		return getRawBuffer(inset);
 	}
 
 	@Override

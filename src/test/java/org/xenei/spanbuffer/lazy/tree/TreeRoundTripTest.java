@@ -54,6 +54,7 @@ public class TreeRoundTripTest {
 	 */
 
 	public TreeRoundTripTest(String name, AbstractSerde<TestPosition> serde) {
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 		this.serde = serde;
 	}
 
@@ -67,7 +68,7 @@ public class TreeRoundTripTest {
 
 		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos);
 
-		SpanBuffer treeBuffer = tll.asSpanBuffer();
+		SpanBuffer treeBuffer = tll.getBuffer(0);
 
 		assertEquals(text, treeBuffer.getText());
 	}
@@ -86,7 +87,7 @@ public class TreeRoundTripTest {
 
 		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos);
 
-		SpanBuffer treeBuffer = tll.asSpanBuffer();
+		SpanBuffer treeBuffer = tll.getBuffer(0);
 
 		assertEquals(text, treeBuffer.getText());
 	}
@@ -103,7 +104,7 @@ public class TreeRoundTripTest {
 
 		TreeLazyLoader<TestPosition> tll = serde.getLazyLoader(pos);
 
-		SpanBuffer treeBuffer = tll.asSpanBuffer();
+		SpanBuffer treeBuffer = tll.getBuffer(0);
 
 		assertEquals(text, treeBuffer.getText());
 

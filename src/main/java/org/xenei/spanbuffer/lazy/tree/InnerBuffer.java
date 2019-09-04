@@ -19,13 +19,13 @@ package org.xenei.spanbuffer.lazy.tree;
 
 import java.io.IOException;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.spanbuffer.Factory;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
+import org.xenei.spanbuffer.lazy.tree.serde.Position;
 
 /**
  * The implementation of the inner node buffer.
@@ -33,7 +33,7 @@ import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
  * This is a buffer that wraps an lazily loaded inner node.
  *
  */
-public class InnerBuffer extends AbstractNodeBuffer {
+public class InnerBuffer<P extends Position> extends AbstractNodeBuffer<P> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InnerBuffer.class);
 	private SpanBuffer delegate;
@@ -43,8 +43,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 *
 	 * @param lazyLoader the lazy loader for the data.
 	 */
-	@SuppressWarnings("rawtypes")
-	public InnerBuffer(final TreeLazyLoader lazyLoader) {
+	public InnerBuffer(final TreeLazyLoader<P> lazyLoader) {
 		this(0L, lazyLoader);
 	}
 
@@ -54,7 +53,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 * @param offset     the offset.
 	 * @param lazyLoader the lazy loader for the data.
 	 */
-	public InnerBuffer(final long offset, @SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+	public InnerBuffer(final long offset, final TreeLazyLoader<P> lazyLoader) {
 		this(offset, 0, lazyLoader);
 	}
 
@@ -66,8 +65,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 *                   starts.
 	 * @param lazyLoader the lazy loader for the data
 	 */
-	private InnerBuffer(final long offset, final int inset,
-			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+	InnerBuffer(final long offset, final int inset, final TreeLazyLoader<P> lazyLoader) {
 		this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
 	}
 
@@ -82,7 +80,7 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 * @param lazyLoader   the lazy loader for the data
 	 */
 	private InnerBuffer(final long offset, final int inset, final long bufferLength,
-			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+			final TreeLazyLoader<P> lazyLoader) {
 		super(offset, inset, bufferLength, lazyLoader);
 
 	}
@@ -99,14 +97,10 @@ public class InnerBuffer extends AbstractNodeBuffer {
 
 		// Check if we need to create the delegate
 		if (delegate != null) {
-			if (InnerBuffer.LOG.isDebugEnabled()) {
-				InnerBuffer.LOG.debug("Returning delegate.");
-			}
-
 			return delegate;
-
 		} else {
-			SpanBuffer buffer = lazyLoader.getBuffer(inset);
+			LOG.debug("{} Generating delegate", this);
+			SpanBuffer buffer = lazyLoader.getRawBuffer(inset);
 			if (buffer.getLength() == 0) {
 				throw new IllegalStateException("Buffer must contain at least 1 byte");
 			}
@@ -114,14 +108,12 @@ public class InnerBuffer extends AbstractNodeBuffer {
 			/* Figure out what type of data we have */
 			final byte typeFlag = buffer.read(InnerNode.FLAG_BYTE);
 
+			LOG.debug("{} delegate type {}", this, typeFlag);
+
 			final boolean innerNodePtrs = (typeFlag & InnerNode.INNER_NODE_FLAG) != 0;
 
 			// cut the flag_byte from the front
 			final SpanBuffer spanBuffer = buffer.cut(1);
-
-			if (InnerBuffer.LOG.isDebugEnabled()) {
-				InnerBuffer.LOG.debug("Generating Delegate, inner Nodes:[" + innerNodePtrs + "] ");
-			}
 
 			if (innerNodePtrs) {
 				delegate = extract(spanBuffer);
@@ -154,12 +146,9 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 */
 	private SpanBuffer extract(final SpanBuffer buffer) throws IOException {
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final List<TreeLazyLoader> configs = lazyLoader.applyMap(buffer);
+		final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
 
-		if (InnerBuffer.LOG.isDebugEnabled()) {
-			InnerBuffer.LOG.debug("Expanding Delegate, configs size:[" + configs.size() + "] ");
-		}
+		LOG.debug("{} extracting {} inner buffers", this, configs.size());
 
 		// to ensure that the offsets of the merged nodes are set correctly use
 		// getOffset()
@@ -177,12 +166,9 @@ public class InnerBuffer extends AbstractNodeBuffer {
 	 */
 	private SpanBuffer buildLeaves(final SpanBuffer buffer) throws IOException {
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		final List<TreeLazyLoader> configs = lazyLoader.applyMap(buffer);
+		final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
 
-		if (InnerBuffer.LOG.isDebugEnabled()) {
-			InnerBuffer.LOG.debug("Expanding Leaf Node, configs size:[" + configs.size() + "] ");
-		}
+		LOG.debug("{} extracting {} leaf buffers", this, configs.size());
 
 		// to ensure that the offsets of the merged nodes are set correctly use
 		// getStart()
@@ -193,7 +179,12 @@ public class InnerBuffer extends AbstractNodeBuffer {
 
 	@Override
 	public SpanBuffer duplicate(final long newOffset) {
-		return new InnerBuffer(newOffset, inset, getLength(), lazyLoader);
+		return new InnerBuffer<P>(newOffset, inset, getLength(), lazyLoader);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("InnerBuffer[ %s d:%s ]", getNodeBufferString(), delegate);
 	}
 
 }

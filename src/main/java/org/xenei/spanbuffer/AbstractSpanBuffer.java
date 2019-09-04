@@ -533,11 +533,11 @@ public abstract class AbstractSpanBuffer implements SpanBuffer {
 			if (remaining() <= 0) {
 				return -1;
 			}
-
+			int toRead = len;
 			if (remaining() <= Integer.MAX_VALUE) {
-				len = Math.min(len, (int) remaining());
+				toRead = Math.min(len, (int) remaining());
 			}
-			final int bytesRead = getBuffer().read(getPos(), buff, offset, len);
+			final int bytesRead = getBuffer().read(getPos(), buff, offset, toRead);
 			increment(bytesRead);
 			return bytesRead;
 		}

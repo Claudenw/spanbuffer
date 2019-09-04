@@ -98,7 +98,7 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 
 		@Override
 		public ByteBuffer deserialize(TestPosition position) {
-			return position.isNoData() ? null : buffers.get(position.idx).position(headerSize);
+			return position.isNoData() ? null : buffers.get(position.idx).duplicate().flip().position(headerSize);
 		}
 
 		@Override

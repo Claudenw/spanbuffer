@@ -87,11 +87,9 @@ public abstract class TreeNode {
 	 *                               buffer.
 	 */
 	public final void write(ByteBuffer buff, final long expandedLength) {
-		if (hasSpace(buff.limit() - buff.position())) {
-			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d",
-						data.position(), expandedLength));
-			}
+		if (hasSpace(buff.remaining())) {
+			TreeNode.LOG.debug("Writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
+					data.position());
 			data.put(buff);
 			adjustLength(expandedLength);
 
@@ -116,10 +114,7 @@ public abstract class TreeNode {
 	public final void write(byte b, final long expandedLength) {
 
 		if (hasSpace(1)) {
-			if (TreeNode.LOG.isTraceEnabled()) {
-				TreeNode.LOG.trace(String.format("Writing to buffer at offset: %d and expanded length %d",
-						data.position(), expandedLength));
-			}
+			TreeNode.LOG.debug("Writing to 1/{} to {} at offset: {}", expandedLength, this, data.position());
 			data.put(b);
 			adjustLength(expandedLength);
 

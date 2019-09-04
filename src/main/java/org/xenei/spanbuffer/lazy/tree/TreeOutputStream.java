@@ -208,7 +208,7 @@ public class TreeOutputStream extends OutputStream {
 			LeafNode leaf = (LeafNode) stackNodeList.get(LEAF_NODE_INDEX);
 			TreeNode inner = stackNodeList.get(FIRST_INNER_INDEX);
 			if (inner.isDataEmpty() && inner.hasSpace(leaf.getUsedSpace())) {
-				LOG.debug( "Creating OUTER Node");
+				LOG.debug("Creating OUTER Node");
 				// create a reference to the root node
 				// Let's create our root node, constructor frees leaf
 				final TreeNode rootNode = new InnerNode(factory, leaf);
@@ -260,7 +260,7 @@ public class TreeOutputStream extends OutputStream {
 	@SuppressWarnings("unchecked")
 	private ByteBuffer serializeNode(final TreeNode node) throws IOException {
 
-		TreeOutputStream.LOG.debug("Writing {} ", node );
+		TreeOutputStream.LOG.debug("Writing {} ", node);
 		return serializer.serialize(serializer.serialize(node.getRawBuffer()));
 
 	}
@@ -277,10 +277,8 @@ public class TreeOutputStream extends OutputStream {
 	 */
 	protected void writeRoot(final TreeNode rootNode) throws IOException {
 
-		if (TreeOutputStream.LOG.isDebugEnabled()) {
-			TreeOutputStream.LOG.debug("Obtained data for the Root Node, writing it");
-		}
-		position = serializer.serialize(rootNode.getData());
+		TreeOutputStream.LOG.debug("Writing Root Node: {}", rootNode);
+		position = serializer.serialize(rootNode.getRawBuffer());
 	}
 
 	@Override
@@ -294,7 +292,7 @@ public class TreeOutputStream extends OutputStream {
 			factory.free(stackNodeList.get(LEAF_NODE_INDEX).getData());
 			position = serializer.getNoDataPosition();
 		} else {
-			createRoot();			
+			createRoot();
 		}
 	}
 }

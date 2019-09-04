@@ -27,7 +27,7 @@ import org.xenei.spanbuffer.SpanBuffer;
 public interface LazyLoader {
 
 	/**
-	 * return the buffer if it has been loaded already, otherwise load and return.
+	 * Return the lazy loaded buffer.
 	 * 
 	 * @param inset the insert into the memory mapped buffer.
 	 * @return fully loaded buffer

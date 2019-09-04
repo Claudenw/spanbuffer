@@ -48,6 +48,7 @@ public class TreeOutputStreamTest {
 	}
 
 	public TreeOutputStreamTest(String name, TestSerde serde) {
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 		this.serde = serde;
 		this.buffers = ((TestSerializer) serde.getSerializer()).buffers;
 	}
@@ -96,10 +97,13 @@ public class TreeOutputStreamTest {
 	 */
 	private ByteBuffer verifyHeader(int idx, ByteBuffer buffer) {
 
-		for (int i = 0; i < serde.getFactory().headerSize(); i++) {
-			assertEquals(String.format("buffer (%s) header corrupted at %s", idx, i), (byte) i, buffer.get(i));
+		if (serde.getFactory().headerSize() > 0) {
+			for (int i = 0; i < serde.getFactory().headerSize(); i++) {
+				assertEquals(String.format("buffer (%s) header corrupted at %s", idx, i), (byte) i, buffer.get(i));
+			}
+			return buffer.flip().position(serde.getFactory().headerSize());
 		}
-		return buffer.position(serde.getFactory().headerSize());
+		return buffer.flip();
 	}
 
 	private void assertPtr(int idx, int type, int... ptrs) {

@@ -50,16 +50,12 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 		this.position = position;
 	}
 
-	/**
-	 * Return this lazy loader as a span buffer.
-	 * 
-	 * @return this lazy loader as a span buffer.
-	 */
-	public SpanBuffer asSpanBuffer() {
+	@Override
+	public SpanBuffer getBuffer(int inset) {
 		if (position.isNoData()) {
 			return Factory.EMPTY;
 		}
-		return new InnerBuffer(0, this);
+		return new InnerBuffer<P>(0, this).cut(inset);
 	}
 
 	/**
@@ -70,6 +66,15 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 	 */
 	public final List<TreeLazyLoader<P>> applyMap(SpanBuffer buffer) throws IOException {
 		return deserializer.extractLoaders(buffer);
+	}
+
+	/**
+	 * Get the position this lazy loader is using
+	 * 
+	 * @return the position.
+	 */
+	public final P getPosition() {
+		return position;
 	}
 
 	/**
@@ -87,4 +92,5 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 		SpanBuffer buffer = Factory.wrap(bb);
 		return (inset == 0) ? buffer : buffer.cut(inset);
 	}
+
 }

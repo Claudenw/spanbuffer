@@ -24,16 +24,16 @@ import org.xenei.span.LongSpan;
 import org.xenei.spanbuffer.AbstractSpanBuffer;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.LazyLoadedBuffer;
+import org.xenei.spanbuffer.lazy.tree.serde.Position;
 
 /**
  * This is the implementation of the span buffer on the tree structure.
  */
-public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
+public abstract class AbstractNodeBuffer<P extends Position> extends AbstractSpanBuffer {
 
 	protected final int inset;
 	private long bufferLength;
-	@SuppressWarnings("rawtypes")
-	protected final TreeLazyLoader lazyLoader;
+	protected final TreeLazyLoader<P> lazyLoader;
 
 	/**
 	 * Constructor.
@@ -46,7 +46,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 	 * @param lazyLoader   the lazy loader for the data
 	 */
 	protected AbstractNodeBuffer(final long offset, final int inset, final long bufferLength,
-			@SuppressWarnings("rawtypes") final TreeLazyLoader lazyLoader) {
+			final TreeLazyLoader<P> lazyLoader) {
 		super(offset);
 		this.inset = inset;
 		this.bufferLength = lazyLoader.hasNoData() ? 0 : bufferLength;
@@ -112,23 +112,7 @@ public abstract class AbstractNodeBuffer extends AbstractSpanBuffer {
 		}
 	}
 
-	@Override
-	public final String toString() {
-		StringBuilder sb;
-		try {
-			sb = new StringBuilder();
-			sb.append(lazyLoader.toString());
-			sb.append("_");
-			sb.append(getDelegate().getText());
-
-		} catch (final IOException ex) {
-			sb = new StringBuilder();
-			sb.append(lazyLoader.toString());
-			sb.append("_");
-			sb.append(inset);
-			ex.printStackTrace();
-		}
-		return sb.toString();
+	protected final String getNodeBufferString() {
+		return String.format("p:%s l:%s i:%s o:%s", lazyLoader.getPosition(), bufferLength, inset, getOffset());
 	}
-
 }
