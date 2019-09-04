@@ -195,7 +195,7 @@ public class TreeOutputStream extends OutputStream {
 	 * @throws ExecutionException   Thrown at execution
 	 * @throws IOException
 	 */
-	private void createRoot() throws InterruptedException, ExecutionException, IOException {
+	private void createRoot() throws IOException {
 		int nodeIndex = LEAF_NODE_INDEX;
 
 		/*
@@ -208,11 +208,10 @@ public class TreeOutputStream extends OutputStream {
 			LeafNode leaf = (LeafNode) stackNodeList.get(LEAF_NODE_INDEX);
 			TreeNode inner = stackNodeList.get(FIRST_INNER_INDEX);
 			if (inner.isDataEmpty() && inner.hasSpace(leaf.getUsedSpace())) {
+				LOG.debug( "Creating OUTER Node");
 				// create a reference to the root node
-				// Let's create our root node
+				// Let's create our root node, constructor frees leaf
 				final TreeNode rootNode = new InnerNode(factory, leaf);
-				// ensure that the leaf data is freed and cleared.
-				factory.free(leaf.getRawBuffer());
 				// ensure that the leaf data is freed and cleared.
 				factory.free(inner.getRawBuffer());
 				writeRoot(rootNode);
@@ -261,11 +260,8 @@ public class TreeOutputStream extends OutputStream {
 	@SuppressWarnings("unchecked")
 	private ByteBuffer serializeNode(final TreeNode node) throws IOException {
 
-		if (TreeOutputStream.LOG.isDebugEnabled()) {
-			TreeOutputStream.LOG.debug("Writing node with space " + node.getSpace());
-		}
-
-		return serializer.serialize(serializer.serialize(node.getData()));
+		TreeOutputStream.LOG.debug("Writing {} ", node );
+		return serializer.serialize(serializer.serialize(node.getRawBuffer()));
 
 	}
 
@@ -279,7 +275,7 @@ public class TreeOutputStream extends OutputStream {
 	 * @throws InterruptedException on error
 	 * @throws IOException
 	 */
-	protected void writeRoot(final TreeNode rootNode) throws ExecutionException, InterruptedException, IOException {
+	protected void writeRoot(final TreeNode rootNode) throws IOException {
 
 		if (TreeOutputStream.LOG.isDebugEnabled()) {
 			TreeOutputStream.LOG.debug("Obtained data for the Root Node, writing it");
@@ -289,17 +285,16 @@ public class TreeOutputStream extends OutputStream {
 
 	@Override
 	public void close() throws IOException {
+		if (closed) {
+			return;
+		}
 		super.close();
 		closed = true;
 		if (stackNodeList.get(LEAF_NODE_INDEX).isDataEmpty()) {
 			factory.free(stackNodeList.get(LEAF_NODE_INDEX).getData());
 			position = serializer.getNoDataPosition();
 		} else {
-			try {
-				createRoot();
-			} catch (InterruptedException | ExecutionException ex) {
-				throw new IOException("Failed at creating root node ", ex);
-			}
+			createRoot();			
 		}
 	}
 }
