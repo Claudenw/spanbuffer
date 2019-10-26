@@ -27,14 +27,20 @@ import org.xenei.spanbuffer.SpanBuffer;
  */
 public abstract class AbstractLazyLoader implements LazyLoader {
 
+    /**
+     * References to lazy loaded buffers
+     */
 	private SoftReference<SpanBuffer> loadedBufferReference = null;
+	/**
+	 * The lenght of the buffer if known.
+	 */
 	private Long length = null;
 
 	/**
 	 * Method to load the internal buffer. This is the data as retrieved from
 	 * storage before any subsequent processing that may be needed to decode it into
 	 * the Spanbuffer that getBuffer() returns.
-	 * 
+	 *
 	 * @param the inset into the lazy loaded buffer
 	 * @return the bytes for the internal buffer.
 	 * @throws IOException on error
@@ -62,7 +68,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
 	/**
 	 * Return the internal buffer while handling the caching / soft reference to the
 	 * getBufferInternal() call;
-	 * 
+	 *
 	 * @param inset the inset into the result buffer.
 	 * @return the internal span buffer.
 	 * @throws IOException

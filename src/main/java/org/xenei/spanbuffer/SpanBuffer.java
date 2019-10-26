@@ -55,7 +55,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param absolute the position to convert to relative.
 	 * @return the relative equivalent of the absolute value.
 	 */
-	public default long makeRelative(final long absolute) {
+	default long makeRelative(final long absolute) {
 		return absolute - getOffset();
 	}
 
@@ -65,7 +65,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param relative the relative postion to convert to absolute.
 	 * @return the absolute version.
 	 */
-	public default long makeAbsolute(final long relative) {
+	default long makeAbsolute(final long relative) {
 		return relative + getOffset();
 	}
 
@@ -76,7 +76,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param candidate the candidate to check.
 	 * @return the maximum value or the candidate if it is in range.
 	 */
-	public default long relativeUpperLimit(final long candidate) {
+	default long relativeUpperLimit(final long candidate) {
 		return contains(makeAbsolute(candidate)) ? candidate : makeRelative(getEnd());
 	}
 
@@ -87,7 +87,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param candidate the candidate to check.
 	 * @return the maximum value or the candidate if it is in range.
 	 */
-	public default long absoluteUpperLimit(final long candidate) {
+	default long absoluteUpperLimit(final long candidate) {
 		return contains(candidate) ? candidate : getEnd();
 	}
 
@@ -98,7 +98,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param candidate the candidate to check.
 	 * @return max of 0 or candidate.
 	 */
-	public default long relativeLowerLimit(final long candidate) {
+	default long relativeLowerLimit(final long candidate) {
 		return candidate < 0 ? 0 : candidate;
 	}
 
@@ -109,7 +109,7 @@ public interface SpanBuffer extends LongSpan {
 	 * @param candidate the candidate to check.
 	 * @return max of getOffset() or candidate.
 	 */
-	public default long absoluteLowerLimit(final long candidate) {
+	default long absoluteLowerLimit(final long candidate) {
 		return contains(candidate) ? candidate : getOffset();
 	}
 

@@ -30,6 +30,7 @@ import org.xenei.spanbuffer.lazy.tree.serde.AbstractSerde;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xenei.span.IntSpan;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 import org.xenei.spanbuffer.lazy.tree.node.InnerNode;
 import org.xenei.spanbuffer.lazy.tree.node.LeafNode;
@@ -151,9 +152,9 @@ public class TreeOutputStream extends OutputStream {
 			/*
 			 * write some or all of the data depending on how much is left.
 			 */
-			int partLimit = Integer.min(data.limit(), data.position() + leafNode.getSpace());
+			int partLimit = Integer.min(data.remaining(), data.position() + leafNode.getSpace());
 			ByteBuffer part = data.duplicate().limit(partLimit);
-			writeNode(part, LEAF_NODE_INDEX, part.remaining());
+			writeNode(part, LEAF_NODE_INDEX, partLimit);
 			data.position(partLimit);
 		}
 
@@ -178,7 +179,11 @@ public class TreeOutputStream extends OutputStream {
 
 		final TreeNode node = stackNodeList.get(nodeIndex);
 
+		node.write(buffer, expandedLength);
 		if (!node.hasSpace(buffer.remaining())) {
+			// the current node does not have room for the remaining data
+			// write what we can.
+			LOG.info( "Can not write {} into buffer space of {}", buffer.remaining(), node.getSpace());
 			final ByteBuffer bb = serializeNode(node);
 			writeNode(bb, nodeIndex + 1, node.getExpandedLength());
 			node.clearData();

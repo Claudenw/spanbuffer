@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.span.IntSpan;
+import org.xenei.span.LongSpan;
 
 /**
  * Abstract node for tracking data in a tree buffer structure.
@@ -62,7 +63,8 @@ public abstract class TreeNode {
 	 * @return true = Buffer has the capacity
 	 */
 	public boolean hasSpace(final int bytes) {
-		return span.getLength() >= (data.position() + bytes);
+		IntSpan s2 = IntSpan.fromLength(data.position(), bytes);
+		return span.contains( s2 );
 	}
 
 	/**
@@ -94,6 +96,8 @@ public abstract class TreeNode {
 			adjustLength(expandedLength);
 
 		} else {
+			TreeNode.LOG.error("Failed writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
+					data.position());
 			throw new IllegalStateException("Attempted to write to full buffer");
 		}
 
