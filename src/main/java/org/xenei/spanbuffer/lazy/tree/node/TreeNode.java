@@ -63,7 +63,11 @@ public abstract class TreeNode {
 	 * @return true = Buffer has the capacity
 	 */
 	public boolean hasSpace(final int bytes) {
-		IntSpan s2 = IntSpan.fromLength(data.position(), bytes);
+	    if (bytes == 0)
+	    {
+	        return true;
+	    }
+		IntSpan s2 = IntSpan.fromLength(span.getOffset()+data.position(), bytes);
 		return span.contains( s2 );
 	}
 
@@ -130,7 +134,7 @@ public abstract class TreeNode {
 
 	/**
 	 * Get the span for the actual byte buffer we are writing to.
-	 * 
+	 *
 	 * @return the Span for the byte buffer.
 	 */
 	public IntSpan getSpan() {
@@ -147,7 +151,7 @@ public abstract class TreeNode {
 
 	/**
 	 * Returns only the filled data buffer.
-	 * 
+	 *
 	 * @return the filled data buffer.
 	 */
 	public ByteBuffer getData() {
@@ -156,7 +160,7 @@ public abstract class TreeNode {
 
 	/**
 	 * Get the raw byte buffer
-	 * 
+	 *
 	 * @return the raw data buffer.
 	 */
 	public ByteBuffer getRawBuffer() {
@@ -167,7 +171,7 @@ public abstract class TreeNode {
 	 * Set the data buffer back to its initial state. The number of free bytes
 	 * should be the same as when the constructor was called. This method should
 	 * allocate a new buffer
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public abstract void clearData() throws IOException;
@@ -192,7 +196,7 @@ public abstract class TreeNode {
 
 	/**
 	 * Get the number of bytes in the buffer
-	 * 
+	 *
 	 * @return the number of bytes in the buffer.
 	 */
 	public int getUsedSpace() {

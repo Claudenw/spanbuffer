@@ -37,12 +37,12 @@ import org.xenei.spanbuffer.lazy.tree.node.LeafNode;
 
 /**
  * An output stream that writes data using a TreeSerializer implementation.
- * 
+ *
  * Once the output stream is closed the position of the root node may be
  * retrieved. That position can then be used with the Corresponding
  * TreeDeserializer to create a TreeLazyLoader from which a Spanbuffer may be
  * obtained.
- * 
+ *
  * @see TreeRoundTripTest example.
  *
  */
@@ -67,7 +67,7 @@ public class TreeOutputStream extends OutputStream {
 
 	/**
 	 * Constructor using a serde.
-	 * 
+	 *
 	 * @param serde
 	 * @throws IOException
 	 */
@@ -78,7 +78,7 @@ public class TreeOutputStream extends OutputStream {
 	/**
 	 * Constructor. The factory must produce buffers that are 1 + (2*positionSize)
 	 * long. Position size is specified by the serializer.
-	 * 
+	 *
 	 * @param serializer The TreeSerializer implementation to use for the output.
 	 * @param factory    The Factory to produce new buffers.
 	 * @throws IOException
@@ -129,7 +129,7 @@ public class TreeOutputStream extends OutputStream {
 	 * Write the data buffer to the leaf nodes. The buffer may be larger than the
 	 * leaf node so this code will split larger buffers across multiple leaf nodes
 	 * and ensure that the proper inner nodes are constructed.
-	 * 
+	 *
 	 * @param data the data to write.
 	 * @throws IOException on error.
 	 */
@@ -152,10 +152,10 @@ public class TreeOutputStream extends OutputStream {
 			/*
 			 * write some or all of the data depending on how much is left.
 			 */
-			int partLimit = Integer.min(data.remaining(), data.position() + leafNode.getSpace());
-			ByteBuffer part = data.duplicate().limit(partLimit);
+			int partLimit = Integer.min(data.remaining(), leafNode.getSpace());
+			ByteBuffer part = data.duplicate().limit(data.position() + partLimit);
 			writeNode(part, LEAF_NODE_INDEX, partLimit);
-			data.position(partLimit);
+			data.position(part.limit());
 		}
 
 	}
@@ -179,11 +179,10 @@ public class TreeOutputStream extends OutputStream {
 
 		final TreeNode node = stackNodeList.get(nodeIndex);
 
-		node.write(buffer, expandedLength);
 		if (!node.hasSpace(buffer.remaining())) {
 			// the current node does not have room for the remaining data
 			// write what we can.
-			LOG.info( "Can not write {} into buffer space of {}", buffer.remaining(), node.getSpace());
+			LOG.debug( "Can not write {} into buffer space of {}", buffer.remaining(), node.getSpace());
 			final ByteBuffer bb = serializeNode(node);
 			writeNode(bb, nodeIndex + 1, node.getExpandedLength());
 			node.clearData();
@@ -240,7 +239,7 @@ public class TreeOutputStream extends OutputStream {
 	/**
 	 * Once we are closed we write root node. Its position is retrieved with this
 	 * method.
-	 * 
+	 *
 	 * @return Position object for the root
 	 * @throws IllegalStateException if the output is not closed.
 	 */

@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,7 +37,7 @@ import org.xenei.spanbuffer.lazy.tree.node.HeapBufferFactory;
 
 @RunWith(Parameterized.class)
 public class TreeOutputStreamTest {
-
+    private String name;
 	private TestSerde serde;
 	private List<ByteBuffer> buffers;
 
@@ -49,6 +50,7 @@ public class TreeOutputStreamTest {
 
 	public TreeOutputStreamTest(String name, TestSerde serde) {
 		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+		this.name = name;
 		this.serde = serde;
 		this.buffers = ((TestSerializer) serde.getSerializer()).buffers;
 	}
@@ -90,7 +92,7 @@ public class TreeOutputStreamTest {
 	/**
 	 * Verify the header is correct and then position the buffer after the header.
 	 * Used for testing to verify header not damaged.
-	 * 
+	 *
 	 * @param idx    the buffer number
 	 * @param buffer the buffer.
 	 * @return the buffer positioned after header.
