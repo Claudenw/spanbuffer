@@ -22,48 +22,48 @@ import java.nio.ByteBuffer;
 
 /**
  * Serializer to write tree data to storage.
- * 
+ *
  * @param <P> The Position implementation used by this serializer.
  */
 public interface TreeSerializer<P extends Position> {
 
-	/**
-	 * Get the maximum buffer that the serializer can handle in one buffer.
-	 * 
-	 * @return the maximum buffer size.
-	 */
-	public int getMaxBufferSize();
+    /**
+     * Get the maximum buffer that the serializer can handle in one buffer.
+     *
+     * @return the maximum buffer size.
+     */
+    public int getMaxBufferSize();
 
-	/**
-	 * Return the number of bytes that a Position occupies when it is serialized.
-	 * 
-	 * @return serialized Position size.
-	 */
-	public int getPositionSize();
+    /**
+     * Return the number of bytes that a Position occupies when it is serialized.
+     *
+     * @return serialized Position size.
+     */
+    public int getPositionSize();
 
-	/**
-	 * Write the buffer to the data storage and return a Position.
-	 * 
-	 * @param buffer the buffer to write
-	 * @return The Position the buffer was written to.
-	 * @throws IOException on error
-	 */
-	public P serialize(ByteBuffer buffer) throws IOException;
+    /**
+     * Write the buffer to the data storage and return a Position.
+     *
+     * @param buffer the buffer to write
+     * @return The Position the buffer was written to.
+     * @throws IOException on error
+     */
+    public P serialize(ByteBuffer buffer) throws IOException;
 
-	/**
-	 * Write the Position information to a byte buffer.
-	 * 
-	 * @param position the position to write to the buffer.
-	 * @return a byte buffer containing the position information.
-	 * @throws IOException on error
-	 */
-	public ByteBuffer serialize(P position) throws IOException;
+    /**
+     * Write the Position information to a byte buffer.
+     *
+     * @param position the position to write to the buffer.
+     * @return a byte buffer containing the position information.
+     * @throws IOException on error
+     */
+    public ByteBuffer serialize(P position) throws IOException;
 
-	/**
-	 * Return a position that means no data has been written.
-	 * 
-	 * @return the no data position for this serializer.
-	 */
-	public P getNoDataPosition();
+    /**
+     * Return a position that means no data has been written.
+     *
+     * @return the no data position for this serializer.
+     */
+    public P getNoDataPosition();
 
 }

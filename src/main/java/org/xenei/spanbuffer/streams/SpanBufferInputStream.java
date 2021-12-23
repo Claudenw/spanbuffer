@@ -29,63 +29,61 @@ import org.xenei.spanbuffer.Walker;
  */
 public class SpanBufferInputStream extends InputStream {
 
-	private final Walker walker;
+    private final Walker walker;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param buf the span buffer to read from.
-	 */
-	public SpanBufferInputStream(final SpanBuffer buf) {
-		walker = buf.getWalker(buf.getOffset());
-	}
+    /**
+     * Constructor.
+     *
+     * @param buf the span buffer to read from.
+     */
+    public SpanBufferInputStream(final SpanBuffer buf) {
+        walker = buf.getWalker(buf.getOffset());
+    }
 
-	/**
-	 * get the number of bytes read.
-	 * 
-	 * @return the number of bytes read.
-	 */
-	public long getBytesRead() {
-		return walker.getBuffer().makeRelative(walker.getPos());
-	}
+    /**
+     * get the number of bytes read.
+     *
+     * @return the number of bytes read.
+     */
+    public long getBytesRead() {
+        return walker.getBuffer().makeRelative(walker.getPos());
+    }
 
-	/**
-	 * Get the span buffer this input stream is reading from.
-	 * 
-	 * @return the enclosed span buffer.
-	 */
-	public SpanBuffer getSpanBuffer() {
-		return walker.getBuffer();
-	}
+    /**
+     * Get the span buffer this input stream is reading from.
+     *
+     * @return the enclosed span buffer.
+     */
+    public SpanBuffer getSpanBuffer() {
+        return walker.getBuffer();
+    }
 
-	@Override
-	public int available() {
-		return (int) Math.min(walker.remaining(), Integer.MAX_VALUE);
-	}
+    @Override
+    public int available() {
+        return (int) Math.min(walker.remaining(), Integer.MAX_VALUE);
+    }
 
-	@Override
-	public int read() throws IOException {
-		if (!walker.hasCurrent()) {
-			return -1;
-		}
-		try {
-			return walker.getByte() & 0xFF;
-		} finally {
-			walker.next();
-		}
-	}
+    @Override
+    public int read() throws IOException {
+        if (!walker.hasCurrent()) {
+            return -1;
+        }
+        try {
+            return walker.getByte() & 0xFF;
+        } finally {
+            walker.next();
+        }
+    }
 
-	@Override
-	public int read(final byte[] bytes, final int off, int len) throws IOException {
-		try {
-			return walker.read(bytes, off, len);
-		} catch (IllegalStateException e)
-		{
-			if (e.getCause() instanceof IOException)
-			{
-				throw (IOException) e.getCause();
-			}
-			throw e;
-		}
-	}
+    @Override
+    public int read(final byte[] bytes, final int off, int len) throws IOException {
+        try {
+            return walker.read(bytes, off, len);
+        } catch (IllegalStateException e) {
+            if (e.getCause() instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            throw e;
+        }
+    }
 }

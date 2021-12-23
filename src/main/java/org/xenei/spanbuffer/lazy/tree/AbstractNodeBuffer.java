@@ -31,88 +31,88 @@ import org.xenei.spanbuffer.lazy.tree.serde.Position;
  */
 public abstract class AbstractNodeBuffer<P extends Position> extends AbstractSpanBuffer {
 
-	protected final int inset;
-	private long bufferLength;
-	protected final TreeLazyLoader<P> lazyLoader;
+    protected final int inset;
+    private long bufferLength;
+    protected final TreeLazyLoader<P> lazyLoader;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param offset       The external offset for this buffer.
-	 * @param inset        The offset into the internal buffer where this buffer
-	 *                     starts.
-	 * @param bufferLength the length of the internal buffer or UNDEF_LEN if
-	 *                     unknown.
-	 * @param lazyLoader   the lazy loader for the data
-	 */
-	protected AbstractNodeBuffer(final long offset, final int inset, final long bufferLength,
-			final TreeLazyLoader<P> lazyLoader) {
-		super(offset);
-		this.inset = inset;
-		this.bufferLength = lazyLoader.hasNoData() ? 0 : bufferLength;
-		this.lazyLoader = lazyLoader;
-	}
+    /**
+     * Constructor.
+     *
+     * @param offset       The external offset for this buffer.
+     * @param inset        The offset into the internal buffer where this buffer
+     *                     starts.
+     * @param bufferLength the length of the internal buffer or UNDEF_LEN if
+     *                     unknown.
+     * @param lazyLoader   the lazy loader for the data
+     */
+    protected AbstractNodeBuffer(final long offset, final int inset, final long bufferLength,
+            final TreeLazyLoader<P> lazyLoader) {
+        super(offset);
+        this.inset = inset;
+        this.bufferLength = lazyLoader.hasNoData() ? 0 : bufferLength;
+        this.lazyLoader = lazyLoader;
+    }
 
-	/**
-	 * Returns the delegate which in this case is the lazyLoader containing the
-	 * information we need for the SpanBuffer.
-	 *
-	 * @return the delegate spanbuffer
-	 * @throws IOException
-	 */
-	protected abstract SpanBuffer getDelegate() throws IOException;
+    /**
+     * Returns the delegate which in this case is the lazyLoader containing the
+     * information we need for the SpanBuffer.
+     *
+     * @return the delegate spanbuffer
+     * @throws IOException
+     */
+    protected abstract SpanBuffer getDelegate() throws IOException;
 
-	@Override
-	public final byte read(final long position) throws IOException {
-		return getDelegate().read(position);
-	}
+    @Override
+    public final byte read(final long position) throws IOException {
+        return getDelegate().read(position);
+    }
 
-	@Override
-	public final int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
-		return getDelegate().read(position, buff, pos, len);
-	}
+    @Override
+    public final int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
+        return getDelegate().read(position, buff, pos, len);
+    }
 
-	@Override
-	public final int read(final long position, final ByteBuffer buff) throws IOException {
-		return getDelegate().read(position, buff);
-	}
+    @Override
+    public final int read(final long position, final ByteBuffer buff) throws IOException {
+        return getDelegate().read(position, buff);
+    }
 
-	@Override
-	public final SpanBuffer sliceAt(final long position) {
-		try {
-			return getDelegate().sliceAt(position);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    @Override
+    public final SpanBuffer sliceAt(final long position) {
+        try {
+            return getDelegate().sliceAt(position);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	@Override
-	public final long getEnd() {
-		return LongSpan.calcEnd(this);
-	}
+    @Override
+    public final long getEnd() {
+        return LongSpan.calcEnd(this);
+    }
 
-	@Override
-	public final long getLength() {
-		if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
-			try {
-				bufferLength = getDelegate().getLength();
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		return bufferLength - inset;
-	}
+    @Override
+    public final long getLength() {
+        if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
+            try {
+                bufferLength = getDelegate().getLength();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return bufferLength - inset;
+    }
 
-	@Override
-	public final SpanBuffer head(final long byteCount) {
-		try {
-			return getDelegate().head(byteCount);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    @Override
+    public final SpanBuffer head(final long byteCount) {
+        try {
+            return getDelegate().head(byteCount);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	protected final String getNodeBufferString() {
-		return String.format("p:%s l:%s i:%s o:%s", lazyLoader.getPosition(), bufferLength, inset, getOffset());
-	}
+    protected final String getNodeBufferString() {
+        return String.format("p:%s l:%s i:%s o:%s", lazyLoader.getPosition(), bufferLength, inset, getOffset());
+    }
 }

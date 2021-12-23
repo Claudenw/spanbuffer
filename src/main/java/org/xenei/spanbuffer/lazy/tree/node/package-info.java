@@ -17,6 +17,6 @@
  */
 /**
  * Internal tree buffer structure.
- * 
+ *
  */
 package org.xenei.spanbuffer.lazy.tree.node;

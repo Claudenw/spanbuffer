@@ -31,33 +31,33 @@ import org.xenei.spanbuffer.lazy.tree.TreeLazyLoader;
  */
 public interface TreeDeserializer<P extends Position> {
 
-	/**
-	 * Get the header size for this deserializer.
-	 * 
-	 * @return The header size.
-	 */
-	public int headerSize();
+    /**
+     * Get the header size for this deserializer.
+     *
+     * @return The header size.
+     */
+    public int headerSize();
 
-	/**
-	 * Read from the Position and return the associated byte buffer.
-	 * 
-	 * The position parameter was returned from an earlier call to
-	 * TreeSerializer.serialize().
-	 * 
-	 * @param position the position to read the buffer from.
-	 * @return a byte buffer containing data that was serialized at the position.
-	 * @throws IOException on error
-	 */
-	public ByteBuffer deserialize(P position) throws IOException;
+    /**
+     * Read from the Position and return the associated byte buffer.
+     *
+     * The position parameter was returned from an earlier call to
+     * TreeSerializer.serialize().
+     *
+     * @param position the position to read the buffer from.
+     * @return a byte buffer containing data that was serialized at the position.
+     * @throws IOException on error
+     */
+    public ByteBuffer deserialize(P position) throws IOException;
 
-	/**
-	 * process a spanbuffer that contains one or more positions serialized by
-	 * TreeSerializer.serialize(position) and return a list of TreeLazyLoader
-	 * instances.
-	 * 
-	 * @param buffer the buffer to process.
-	 * @return A list of TreeLazyLoader instances.
-	 * @throws IOException on error
-	 */
-	public List<TreeLazyLoader<P>> extractLoaders(SpanBuffer buffer) throws IOException;
+    /**
+     * process a spanbuffer that contains one or more positions serialized by
+     * TreeSerializer.serialize(position) and return a list of TreeLazyLoader
+     * instances.
+     *
+     * @param buffer the buffer to process.
+     * @return A list of TreeLazyLoader instances.
+     * @throws IOException on error
+     */
+    public List<TreeLazyLoader<P>> extractLoaders(SpanBuffer buffer) throws IOException;
 }

@@ -22,187 +22,185 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xenei.span.IntSpan;
-import org.xenei.span.LongSpan;
 
 /**
  * Abstract node for tracking data in a tree buffer structure.
  *
  */
 public abstract class TreeNode {
-	// Logger
-	private static final Logger LOG = LoggerFactory.getLogger(TreeNode.class);
+    // Logger
+    private static final Logger LOG = LoggerFactory.getLogger(TreeNode.class);
 
-	/**
-	 * the span for this node. The offset is the position in the buffer where the
-	 * dataspace starts. length is the length of the dataspace, and end is the end
-	 * of the dataspace.
-	 */
-	protected final IntSpan span;
+    /**
+     * the span for this node. The offset is the position in the buffer where the
+     * dataspace starts. length is the length of the dataspace, and end is the end
+     * of the dataspace.
+     */
+    protected final IntSpan span;
 
-	// Data of the data
-	protected ByteBuffer data;
+    // Data of the data
+    protected ByteBuffer data;
 
-	protected final BufferFactory factory;
+    protected final BufferFactory factory;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param factory the Factory to create buffers with.
-	 * @throws IOException on error
-	 */
-	public TreeNode(BufferFactory factory) throws IOException {
-		this.factory = factory;
-		span = IntSpan.fromLength(factory.headerSize(), factory.bufferSize());
-		data = factory.createBuffer();
-	}
+    /**
+     * Constructor.
+     *
+     * @param factory the Factory to create buffers with.
+     * @throws IOException on error
+     */
+    public TreeNode(BufferFactory factory) throws IOException {
+        this.factory = factory;
+        span = IntSpan.fromLength(factory.headerSize(), factory.bufferSize());
+        data = factory.createBuffer();
+    }
 
-	/**
-	 * Checks if it can write to the data buffer.
-	 *
-	 * @param bytes the number of bytes required in the buffer.
-	 * @return true = Buffer has the capacity
-	 */
-	public boolean hasSpace(final int bytes) {
-	    if (bytes == 0)
-	    {
-	        return true;
-	    }
-		IntSpan s2 = IntSpan.fromLength(span.getOffset()+data.position(), bytes);
-		return span.contains( s2 );
-	}
+    /**
+     * Checks if it can write to the data buffer.
+     *
+     * @param bytes the number of bytes required in the buffer.
+     * @return true = Buffer has the capacity
+     */
+    public boolean hasSpace(final int bytes) {
+        if (bytes == 0) {
+            return true;
+        }
+        IntSpan s2 = IntSpan.fromLength(span.getOffset() + data.position(), bytes);
+        return span.contains(s2);
+    }
 
-	/**
-	 * Is the buffer empty? This varies as inner nodes always have a byte written to
-	 * the buffer even if there is no 'real' data. This will return true if there is
-	 * no 'real' data.
-	 *
-	 * @return true if there is no data in the buffer.
-	 */
-	public abstract boolean isDataEmpty();
+    /**
+     * Is the buffer empty? This varies as inner nodes always have a byte written to
+     * the buffer even if there is no 'real' data. This will return true if there is
+     * no 'real' data.
+     *
+     * @return true if there is no data in the buffer.
+     */
+    public abstract boolean isDataEmpty();
 
-	/**
-	 * Writes data to the buffer. The expanded length is the number of bytes
-	 * represented by the data to store. In leaf nodes this is the same as the dts
-	 * length, for inner nodes the dts is probably an encoded Position and may
-	 * represent many more bytes when the position is expanded.
-	 *
-	 * @param buff           Data to store.
-	 * @param expandedLength length of the actual data represented by the data to
-	 *                       store.
-	 * @throws IllegalStateException if the data to store will not fit in the
-	 *                               buffer.
-	 */
-	public final void write(ByteBuffer buff, final long expandedLength) {
-		if (hasSpace(buff.remaining())) {
-			TreeNode.LOG.debug("Writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
-					data.position());
-			data.put(buff);
-			adjustLength(expandedLength);
+    /**
+     * Writes data to the buffer. The expanded length is the number of bytes
+     * represented by the data to store. In leaf nodes this is the same as the dts
+     * length, for inner nodes the dts is probably an encoded Position and may
+     * represent many more bytes when the position is expanded.
+     *
+     * @param buff           Data to store.
+     * @param expandedLength length of the actual data represented by the data to
+     *                       store.
+     * @throws IllegalStateException if the data to store will not fit in the
+     *                               buffer.
+     */
+    public final void write(ByteBuffer buff, final long expandedLength) {
+        if (hasSpace(buff.remaining())) {
+            TreeNode.LOG.debug("Writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
+                    data.position());
+            data.put(buff);
+            adjustLength(expandedLength);
 
-		} else {
-			TreeNode.LOG.error("Failed writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
-					data.position());
-			throw new IllegalStateException("Attempted to write to full buffer");
-		}
+        } else {
+            TreeNode.LOG.error("Failed writing {}/{} bytes to {} at offset: {}", buff.remaining(), expandedLength, this,
+                    data.position());
+            throw new IllegalStateException("Attempted to write to full buffer");
+        }
 
-	}
+    }
 
-	/**
-	 * Writes data to the buffer. The expanded length is the number of bytes
-	 * represented by the data to store. In leaf nodes this is the same as the dts
-	 * length, for inner nodes the dts is probably an encoded Position and may
-	 * represent many more bytes when the position is expanded.
-	 *
-	 * @param b              the byte to write.
-	 * @param expandedLength length of the actual data represented by the data to
-	 *                       store.
-	 * @throws IllegalStateException if the data to store will not fit in the
-	 *                               buffer.
-	 */
-	public final void write(byte b, final long expandedLength) {
+    /**
+     * Writes data to the buffer. The expanded length is the number of bytes
+     * represented by the data to store. In leaf nodes this is the same as the dts
+     * length, for inner nodes the dts is probably an encoded Position and may
+     * represent many more bytes when the position is expanded.
+     *
+     * @param b              the byte to write.
+     * @param expandedLength length of the actual data represented by the data to
+     *                       store.
+     * @throws IllegalStateException if the data to store will not fit in the
+     *                               buffer.
+     */
+    public final void write(byte b, final long expandedLength) {
 
-		if (hasSpace(1)) {
-			TreeNode.LOG.debug("Writing to 1/{} to {} at offset: {}", expandedLength, this, data.position());
-			data.put(b);
-			adjustLength(expandedLength);
+        if (hasSpace(1)) {
+            TreeNode.LOG.debug("Writing to 1/{} to {} at offset: {}", expandedLength, this, data.position());
+            data.put(b);
+            adjustLength(expandedLength);
 
-		} else {
-			throw new IllegalStateException("Attempted to write to full buffer");
-		}
+        } else {
+            throw new IllegalStateException("Attempted to write to full buffer");
+        }
 
-	}
+    }
 
-	/**
-	 * Get the span for the actual byte buffer we are writing to.
-	 *
-	 * @return the Span for the byte buffer.
-	 */
-	public IntSpan getSpan() {
-		return span;
-	}
+    /**
+     * Get the span for the actual byte buffer we are writing to.
+     *
+     * @return the Span for the byte buffer.
+     */
+    public IntSpan getSpan() {
+        return span;
+    }
 
-	/**
-	 * Adjust the length property node. For leaf nodes this method does nothing. For
-	 * leaf inner nodes it increments the length that the buffer represents.
-	 *
-	 * @param addedLength the number of bytes to add to the length.
-	 */
-	protected abstract void adjustLength(long addedLength);
+    /**
+     * Adjust the length property node. For leaf nodes this method does nothing. For
+     * leaf inner nodes it increments the length that the buffer represents.
+     *
+     * @param addedLength the number of bytes to add to the length.
+     */
+    protected abstract void adjustLength(long addedLength);
 
-	/**
-	 * Returns only the filled data buffer.
-	 *
-	 * @return the filled data buffer.
-	 */
-	public ByteBuffer getData() {
-	    ByteBuffer result = data.duplicate();
-	    result.flip();
-		return result;
-	}
+    /**
+     * Returns only the filled data buffer.
+     *
+     * @return the filled data buffer.
+     */
+    public ByteBuffer getData() {
+        ByteBuffer result = data.duplicate();
+        result.flip();
+        return result;
+    }
 
-	/**
-	 * Get the raw byte buffer
-	 *
-	 * @return the raw data buffer.
-	 */
-	public ByteBuffer getRawBuffer() {
-		return data;
-	}
+    /**
+     * Get the raw byte buffer
+     *
+     * @return the raw data buffer.
+     */
+    public ByteBuffer getRawBuffer() {
+        return data;
+    }
 
-	/**
-	 * Set the data buffer back to its initial state. The number of free bytes
-	 * should be the same as when the constructor was called. This method should
-	 * allocate a new buffer
-	 *
-	 * @throws IOException
-	 */
-	public abstract void clearData() throws IOException;
+    /**
+     * Set the data buffer back to its initial state. The number of free bytes
+     * should be the same as when the constructor was called. This method should
+     * allocate a new buffer
+     *
+     * @throws IOException
+     */
+    public abstract void clearData() throws IOException;
 
-	/**
-	 * Expanded length of the block. For the leaf node this is the length of the
-	 * buffer. For inner nodes this is the number of bytes encompassed by all the
-	 * leaf nodes the inner nodes point to.
-	 *
-	 * @return length of the overall block
-	 */
-	public abstract long getExpandedLength();
+    /**
+     * Expanded length of the block. For the leaf node this is the length of the
+     * buffer. For inner nodes this is the number of bytes encompassed by all the
+     * leaf nodes the inner nodes point to.
+     *
+     * @return length of the overall block
+     */
+    public abstract long getExpandedLength();
 
-	/**
-	 * Retrieves the space left in the buffer.
-	 *
-	 * @return space left in the buffer.
-	 */
-	public int getSpace() {
-		return data.remaining();
-	}
+    /**
+     * Retrieves the space left in the buffer.
+     *
+     * @return space left in the buffer.
+     */
+    public int getSpace() {
+        return data.remaining();
+    }
 
-	/**
-	 * Get the number of bytes in the buffer
-	 *
-	 * @return the number of bytes in the buffer.
-	 */
-	public int getUsedSpace() {
-		return data.position() - span.getOffset();
-	}
+    /**
+     * Get the number of bytes in the buffer
+     *
+     * @return the number of bytes in the buffer.
+     */
+    public int getUsedSpace() {
+        return data.position() - span.getOffset();
+    }
 
 }

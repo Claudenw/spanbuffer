@@ -18,6 +18,6 @@
 /**
  * Classes that lazily load portions of a span buffer. The lazily loaded buffers
  * may be disposed and re-read as needed.
- * 
+ *
  */
 package org.xenei.spanbuffer.lazy;

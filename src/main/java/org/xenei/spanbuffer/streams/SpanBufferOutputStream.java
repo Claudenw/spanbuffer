@@ -33,98 +33,98 @@ import org.xenei.spanbuffer.SpanBuffer;
  * A SpanBufferOutputStream that writes to memory until max mem size is exceeded
  * after which it writes to a temp file. The resulting SpanBuffer will be memory
  * based if small enough or file based otherwise.
- * 
+ *
  * calling getSpanBuffer() after the stream is closed will return the
  * SpanBuffer.
  *
  * @see Factory#getMaxMemBuffer
  */
 public class SpanBufferOutputStream extends OutputStream {
-	private final ByteArrayOutputStream baos;
-	private FileOutputStream fos;
-	private File file;
-	private boolean closed;
-	private static final Logger LOG = LoggerFactory.getLogger(SpanBufferOutputStream.class);
+    private final ByteArrayOutputStream baos;
+    private FileOutputStream fos;
+    private File file;
+    private boolean closed;
+    private static final Logger LOG = LoggerFactory.getLogger(SpanBufferOutputStream.class);
 
-	/**
-	 * Create empty SpanBufferOutputStream.
-	 */
-	public SpanBufferOutputStream() {
-		baos = new ByteArrayOutputStream();
-		fos = null;
-		closed = false;
-		file = null;
-	}
+    /**
+     * Create empty SpanBufferOutputStream.
+     */
+    public SpanBufferOutputStream() {
+        baos = new ByteArrayOutputStream();
+        fos = null;
+        closed = false;
+        file = null;
+    }
 
-	@Override
-	public void write(final int arg0) throws IOException {
-		if (closed) {
-			throw new IOException("SpanBuffer output stream closed");
-		}
-		baos.write(arg0);
-		if (baos.size() >= Factory.getMaxHeap()) {
-			flush();
-		}
-	}
+    @Override
+    public void write(final int arg0) throws IOException {
+        if (closed) {
+            throw new IOException("SpanBuffer output stream closed");
+        }
+        baos.write(arg0);
+        if (baos.size() >= Factory.getMaxHeap()) {
+            flush();
+        }
+    }
 
-	@Override
-	public void close() throws IOException {
-		baos.close();
-		if (fos != null) {
-			fos.close();
-			if (file != null) {
-				if (!file.delete()) {
-					SpanBufferOutputStream.LOG.warn(" Unable to delete: " + file.getAbsolutePath());
-				}
-			}
-		}
-		closed = true;
-	}
+    @Override
+    public void close() throws IOException {
+        baos.close();
+        if (fos != null) {
+            fos.close();
+            if (file != null) {
+                if (!file.delete()) {
+                    SpanBufferOutputStream.LOG.warn(" Unable to delete: " + file.getAbsolutePath());
+                }
+            }
+        }
+        closed = true;
+    }
 
-	@Override
-	public void flush() throws IOException {
+    @Override
+    public void flush() throws IOException {
 
-		if (closed) {
-			throw new IOException("SpanBuffer output stream closed");
-		}
+        if (closed) {
+            throw new IOException("SpanBuffer output stream closed");
+        }
 
-		baos.flush();
+        baos.flush();
 
-		if (baos.size() > 0) {
-			if ((fos == null) && (baos.size() >= Factory.getMaxHeap())) {
-				file = File.createTempFile("sb-", ".tmp");
-				fos = new FileOutputStream(file);
-			}
-			if (fos != null) {
-				fos.write(baos.toByteArray());
-				baos.reset();
-			}
-		}
+        if (baos.size() > 0) {
+            if ((fos == null) && (baos.size() >= Factory.getMaxHeap())) {
+                file = File.createTempFile("sb-", ".tmp");
+                fos = new FileOutputStream(file);
+            }
+            if (fos != null) {
+                fos.write(baos.toByteArray());
+                baos.reset();
+            }
+        }
 
-		if (fos != null) {
-			fos.flush();
-		}
-	}
+        if (fos != null) {
+            fos.flush();
+        }
+    }
 
-	/**
-	 * Get the span buffer from the stream.
-	 *
-	 * @return The span buffer.
-	 * @throws FileNotFoundException on disk error
-	 * @throws IOException           on general IO error.
-	 */
-	public SpanBuffer getSpanBuffer() throws FileNotFoundException, IOException {
+    /**
+     * Get the span buffer from the stream.
+     *
+     * @return The span buffer.
+     * @throws FileNotFoundException on disk error
+     * @throws IOException           on general IO error.
+     */
+    public SpanBuffer getSpanBuffer() throws FileNotFoundException, IOException {
 
-		if (closed) {
-			throw new IOException("SpanBuffer output stream closed");
-		}
+        if (closed) {
+            throw new IOException("SpanBuffer output stream closed");
+        }
 
-		if (file != null) {
-			flush();
-			return Factory.wrap(file);
-		}
+        if (file != null) {
+            flush();
+            return Factory.wrap(file);
+        }
 
-		return Factory.wrap(baos.toByteArray());
-	}
+        return Factory.wrap(baos.toByteArray());
+    }
 
 }

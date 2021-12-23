@@ -25,11 +25,11 @@ package org.xenei.spanbuffer.lazy.tree.serde;
  */
 public interface Position {
 
-	/**
-	 * Returns true if there was no data written to the node.
-	 * 
-	 * @return true if there was no data written to the node.
-	 */
-	public boolean isNoData();
+    /**
+     * Returns true if there was no data written to the node.
+     *
+     * @return true if there was no data written to the node.
+     */
+    public boolean isNoData();
 
 }

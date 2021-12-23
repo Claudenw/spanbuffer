@@ -25,39 +25,39 @@ import java.io.IOException;
  */
 public class LeafNode extends TreeNode {
 
-	/**
-	 * Constructor.
-	 *
-	 * @param maxBufferSize max buffer size
-	 * @throws IOException
-	 */
-	public LeafNode(BufferFactory factory) throws IOException {
-		super(factory);
-	}
+    /**
+     * Constructor.
+     *
+     * @param maxBufferSize max buffer size
+     * @throws IOException
+     */
+    public LeafNode(BufferFactory factory) throws IOException {
+        super(factory);
+    }
 
-	@Override
-	public boolean isDataEmpty() {
-		return data.position() == span.getOffset();
-	}
+    @Override
+    public boolean isDataEmpty() {
+        return data.position() == span.getOffset();
+    }
 
-	@Override
-	protected void adjustLength(final long expandedLength) throws IllegalStateException {
-		// Do nothing
-	}
+    @Override
+    protected void adjustLength(final long expandedLength) throws IllegalStateException {
+        // Do nothing
+    }
 
-	@Override
-	public long getExpandedLength() {
-		return data.limit() - data.remaining() - span.getOffset();
-	}
+    @Override
+    public long getExpandedLength() {
+        return data.limit() - data.remaining() - span.getOffset();
+    }
 
-	@Override
-	public void clearData() throws IOException {
-		data = factory.createBuffer();
-	}
+    @Override
+    public void clearData() throws IOException {
+        data = factory.createBuffer();
+    }
 
-	@Override
-	public String toString() {
-		return String.format("LeafNode[ l:%s(%s) c:%s ]", data.position(), getExpandedLength(), data.capacity());
-	}
+    @Override
+    public String toString() {
+        return String.format("LeafNode[ l:%s(%s) c:%s ]", data.position(), getExpandedLength(), data.capacity());
+    }
 
 }

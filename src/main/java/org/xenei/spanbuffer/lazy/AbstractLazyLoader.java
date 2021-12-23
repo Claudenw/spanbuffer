@@ -30,72 +30,72 @@ public abstract class AbstractLazyLoader implements LazyLoader {
     /**
      * References to lazy loaded buffers
      */
-	private SoftReference<SpanBuffer> loadedBufferReference = null;
-	/**
-	 * The length of the buffer if known.
-	 */
-	private Long length = null;
+    private SoftReference<SpanBuffer> loadedBufferReference = null;
+    /**
+     * The length of the buffer if known.
+     */
+    private Long length = null;
 
-	/**
-	 * Method to load the internal buffer. This is the data as retrieved from
-	 * storage before any subsequent processing that may be needed to decode it into
-	 * the Spanbuffer that getBuffer() returns.
-	 *
-	 * @param the inset into the lazy loaded buffer
-	 * @return the bytes for the internal buffer.
-	 * @throws IOException on error
-	 * @See {@link #getRawBuffer(int)}
-	 */
-	protected abstract SpanBuffer getBufferInternal(int inset) throws IOException;
+    /**
+     * Method to load the internal buffer. This is the data as retrieved from
+     * storage before any subsequent processing that may be needed to decode it into
+     * the Spanbuffer that getBuffer() returns.
+     *
+     * @param the inset into the lazy loaded buffer
+     * @return the bytes for the internal buffer.
+     * @throws IOException on error
+     * @See {@link #getRawBuffer(int)}
+     */
+    protected abstract SpanBuffer getBufferInternal(int inset) throws IOException;
 
-	/**
-	 * allows for creation where the length isn't known upfront.
-	 */
-	public AbstractLazyLoader() {
-	}
+    /**
+     * allows for creation where the length isn't known upfront.
+     */
+    public AbstractLazyLoader() {
+    }
 
-	/**
-	 * Allows length to be specified up-front when known - so that don't need to
-	 * invoke get() method to get it.
-	 *
-	 * @param length to be specified
-	 */
-	public AbstractLazyLoader(final Long length) {
-		this();
-		this.length = length;
-	}
+    /**
+     * Allows length to be specified up-front when known - so that don't need to
+     * invoke get() method to get it.
+     *
+     * @param length to be specified
+     */
+    public AbstractLazyLoader(final Long length) {
+        this();
+        this.length = length;
+    }
 
-	/**
-	 * Return the internal buffer while handling the caching / soft reference to the
-	 * getBufferInternal() call;
-	 *
-	 * @param inset the inset into the result buffer.
-	 * @return the internal span buffer.
-	 * @throws IOException
-	 */
-	public synchronized SpanBuffer getRawBuffer(int inset) throws IOException {
+    /**
+     * Return the internal buffer while handling the caching / soft reference to the
+     * getBufferInternal() call;
+     *
+     * @param inset the inset into the result buffer.
+     * @return the internal span buffer.
+     * @throws IOException
+     */
+    public synchronized SpanBuffer getRawBuffer(int inset) throws IOException {
 
-		if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
-			loadedBufferReference = new SoftReference<>(getBufferInternal(0));
-		}
-		return loadedBufferReference.get();
-	}
+        if ((loadedBufferReference == null) || (loadedBufferReference.get() == null)) {
+            loadedBufferReference = new SoftReference<>(getBufferInternal(0));
+        }
+        return loadedBufferReference.get();
+    }
 
-	@Override
-	public SpanBuffer getBuffer(int inset) throws IOException {
-		return getRawBuffer(inset);
-	}
+    @Override
+    public SpanBuffer getBuffer(int inset) throws IOException {
+        return getRawBuffer(inset);
+    }
 
-	@Override
-	public long getLength() {
-		if (length == null) {
-			try {
-				length = getBuffer(0).getLength();
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		return length;
-	}
+    @Override
+    public long getLength() {
+        if (length == null) {
+            try {
+                length = getBuffer(0).getLength();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return length;
+    }
 
 }

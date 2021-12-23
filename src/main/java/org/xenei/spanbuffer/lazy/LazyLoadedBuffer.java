@@ -43,141 +43,141 @@ import org.xenei.spanbuffer.Walker;
  * </p>
  */
 public class LazyLoadedBuffer extends AbstractSpanBuffer {
-	/**
-	 * The position within the lazy loaded buffer that is our offset in the buffer.
-	 * Compare to offset - the offset of the buffer with respect to an outside
-	 * index.
-	 */
-	private final int inset;
-	/**
-	 * The length of the lazy loaded buffer.
-	 */
-	private long bufferLength;
+    /**
+     * The position within the lazy loaded buffer that is our offset in the buffer.
+     * Compare to offset - the offset of the buffer with respect to an outside
+     * index.
+     */
+    private final int inset;
+    /**
+     * The length of the lazy loaded buffer.
+     */
+    private long bufferLength;
 
-	/**
-	 * The lazy loader this span buffer is using.
-	 */
-	private final LazyLoader lazyLoader;
+    /**
+     * The lazy loader this span buffer is using.
+     */
+    private final LazyLoader lazyLoader;
 
-	/**
-	 * the length of a buffer with the length is undefined or unknown.
-	 */
-	public static final int UNDEF_LEN = -1;
+    /**
+     * the length of a buffer with the length is undefined or unknown.
+     */
+    public static final int UNDEF_LEN = -1;
 
-	/**
-	 * Create a SpanLazyLoadBuffer with default offset.
-	 *
-	 * @param lazyLoader the lazy loader to load from.
-	 */
-	public LazyLoadedBuffer(final LazyLoader lazyLoader) {
-		this(0L, lazyLoader);
-	}
+    /**
+     * Create a SpanLazyLoadBuffer with default offset.
+     *
+     * @param lazyLoader the lazy loader to load from.
+     */
+    public LazyLoadedBuffer(final LazyLoader lazyLoader) {
+        this(0L, lazyLoader);
+    }
 
-	/**
-	 * if lazyLoader doesn't have a prepopulated length, construction of
-	 * SpanLazyLoadBuffer will cause the lazyLoader to load its data.
-	 *
-	 * @param offset     The external offset for this buffer.
-	 * @param lazyLoader the lazy loader.
-	 */
-	public LazyLoadedBuffer(final long offset, final LazyLoader lazyLoader) {
-		this(offset, 0, lazyLoader);
-	}
+    /**
+     * if lazyLoader doesn't have a prepopulated length, construction of
+     * SpanLazyLoadBuffer will cause the lazyLoader to load its data.
+     *
+     * @param offset     The external offset for this buffer.
+     * @param lazyLoader the lazy loader.
+     */
+    public LazyLoadedBuffer(final long offset, final LazyLoader lazyLoader) {
+        this(offset, 0, lazyLoader);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param offset     The external offset for this buffer.
-	 * @param inset      The offset into the internal buffer where this buffer
-	 *                   starts.
-	 * @param lazyLoader the lazy loader.
-	 */
-	public LazyLoadedBuffer(final long offset, final int inset, final LazyLoader lazyLoader) {
-		this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
-	}
+    /**
+     * Constructor.
+     *
+     * @param offset     The external offset for this buffer.
+     * @param inset      The offset into the internal buffer where this buffer
+     *                   starts.
+     * @param lazyLoader the lazy loader.
+     */
+    public LazyLoadedBuffer(final long offset, final int inset, final LazyLoader lazyLoader) {
+        this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param offset       The external offset for this buffer.
-	 * @param inset        The offset into the internal buffer where this buffer
-	 *                     starts.
-	 * @param bufferLength the length of the internal buffer or UNDEF_LEN if
-	 *                     unknown.
-	 * @param lazyLoader   the lazy loader.
-	 */
-	public LazyLoadedBuffer(final long offset, final int inset, final long bufferLength, final LazyLoader lazyLoader) {
-		super(offset);
-		this.inset = inset;
-		this.bufferLength = bufferLength;
-		this.lazyLoader = lazyLoader;
-	}
+    /**
+     * Constructor.
+     *
+     * @param offset       The external offset for this buffer.
+     * @param inset        The offset into the internal buffer where this buffer
+     *                     starts.
+     * @param bufferLength the length of the internal buffer or UNDEF_LEN if
+     *                     unknown.
+     * @param lazyLoader   the lazy loader.
+     */
+    public LazyLoadedBuffer(final long offset, final int inset, final long bufferLength, final LazyLoader lazyLoader) {
+        super(offset);
+        this.inset = inset;
+        this.bufferLength = bufferLength;
+        this.lazyLoader = lazyLoader;
+    }
 
-	@Override
-	public SpanBuffer duplicate(final long newOffset) {
-		if (newOffset == getOffset()) {
-			return this;
-		}
-		return new LazyLoadedBuffer(newOffset, inset, bufferLength, lazyLoader);
-	}
+    @Override
+    public SpanBuffer duplicate(final long newOffset) {
+        if (newOffset == getOffset()) {
+            return this;
+        }
+        return new LazyLoadedBuffer(newOffset, inset, bufferLength, lazyLoader);
+    }
 
-	@Override
-	public SpanBuffer sliceAt(final long position) {
-		if (position == getOffset()) {
-			return this;
-		}
-		if (position == (getOffset() + getLength())) {
-			return Factory.EMPTY.duplicate(getOffset() + getLength());
-		}
-		final int newInset = NumberUtils.checkIntLimit("position", localizePosition(position)) + inset;
+    @Override
+    public SpanBuffer sliceAt(final long position) {
+        if (position == getOffset()) {
+            return this;
+        }
+        if (position == (getOffset() + getLength())) {
+            return Factory.EMPTY.duplicate(getOffset() + getLength());
+        }
+        final int newInset = NumberUtils.checkIntLimit("position", localizePosition(position)) + inset;
 
-		return new LazyLoadedBuffer(position, newInset, bufferLength, lazyLoader);
-	}
+        return new LazyLoadedBuffer(position, newInset, bufferLength, lazyLoader);
+    }
 
-	@Override
-	public SpanBuffer head(final long byteCount) {
-		final int intLimit = NumberUtils.checkIntLimit("byteCount", byteCount);
-		if ((intLimit < 0) || (intLimit > getLength())) {
-			throw new IllegalArgumentException(
-					String.format("byte count %s is not in the range [0,%s]", byteCount, getLength()));
-		}
-		return new LazyLoadedBuffer(getOffset(), inset, intLimit + inset, lazyLoader);
-	}
+    @Override
+    public SpanBuffer head(final long byteCount) {
+        final int intLimit = NumberUtils.checkIntLimit("byteCount", byteCount);
+        if ((intLimit < 0) || (intLimit > getLength())) {
+            throw new IllegalArgumentException(
+                    String.format("byte count %s is not in the range [0,%s]", byteCount, getLength()));
+        }
+        return new LazyLoadedBuffer(getOffset(), inset, intLimit + inset, lazyLoader);
+    }
 
-	private SpanBuffer getBuffer() throws IOException {
-		SpanBuffer sb = lazyLoader.getBuffer(0).cut(inset).duplicate(this.getOffset());
-		return sb;
-	}
+    private SpanBuffer getBuffer() throws IOException {
+        SpanBuffer sb = lazyLoader.getBuffer(0).cut(inset).duplicate(this.getOffset());
+        return sb;
+    }
 
-	@Override
-	public byte read(final long position) throws IOException {
-		return getBuffer().read(position);
-	}
+    @Override
+    public byte read(final long position) throws IOException {
+        return getBuffer().read(position);
+    }
 
-	@Override
-	public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
-		Walker walker = getBuffer().getWalker(position);
-		return walker.read(buff, pos, len);
+    @Override
+    public int read(final long position, final byte[] buff, final int pos, final int len) throws IOException {
+        Walker walker = getBuffer().getWalker(position);
+        return walker.read(buff, pos, len);
 
-	}
+    }
 
-	@Override
-	public int read(final long position, final ByteBuffer buff) throws IOException {
-		Walker walker = getBuffer().getWalker(position);
-		return walker.read(buff);
-	}
+    @Override
+    public int read(final long position, final ByteBuffer buff) throws IOException {
+        Walker walker = getBuffer().getWalker(position);
+        return walker.read(buff);
+    }
 
-	@Override
-	public synchronized long getLength() {
-		if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
-			bufferLength = lazyLoader.getLength() - inset;
-		}
-		return bufferLength - inset;
-	}
+    @Override
+    public synchronized long getLength() {
+        if (bufferLength == LazyLoadedBuffer.UNDEF_LEN) {
+            bufferLength = lazyLoader.getLength() - inset;
+        }
+        return bufferLength - inset;
+    }
 
-	@Override
-	public long getEnd() {
-		return LongSpan.calcEnd(this);
-	}
+    @Override
+    public long getEnd() {
+        return LongSpan.calcEnd(this);
+    }
 
 }

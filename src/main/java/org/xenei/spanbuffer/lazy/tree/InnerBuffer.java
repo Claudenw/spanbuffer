@@ -35,156 +35,156 @@ import org.xenei.spanbuffer.lazy.tree.serde.Position;
  */
 public class InnerBuffer<P extends Position> extends AbstractNodeBuffer<P> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(InnerBuffer.class);
-	private SpanBuffer delegate;
+    private static final Logger LOG = LoggerFactory.getLogger(InnerBuffer.class);
+    private SpanBuffer delegate;
 
-	/**
-	 * Creates TreeNode with offset to 0.
-	 *
-	 * @param lazyLoader the lazy loader for the data.
-	 */
-	public InnerBuffer(final TreeLazyLoader<P> lazyLoader) {
-		this(0L, lazyLoader);
-	}
+    /**
+     * Creates TreeNode with offset to 0.
+     *
+     * @param lazyLoader the lazy loader for the data.
+     */
+    public InnerBuffer(final TreeLazyLoader<P> lazyLoader) {
+        this(0L, lazyLoader);
+    }
 
-	/**
-	 * Creates a tree node with specified offset.
-	 * 
-	 * @param offset     the offset.
-	 * @param lazyLoader the lazy loader for the data.
-	 */
-	public InnerBuffer(final long offset, final TreeLazyLoader<P> lazyLoader) {
-		this(offset, 0, lazyLoader);
-	}
+    /**
+     * Creates a tree node with specified offset.
+     *
+     * @param offset     the offset.
+     * @param lazyLoader the lazy loader for the data.
+     */
+    public InnerBuffer(final long offset, final TreeLazyLoader<P> lazyLoader) {
+        this(offset, 0, lazyLoader);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param offset     The external offset for this buffer.
-	 * @param inset      The offset into the internal buffer where this buffer
-	 *                   starts.
-	 * @param lazyLoader the lazy loader for the data
-	 */
-	InnerBuffer(final long offset, final int inset, final TreeLazyLoader<P> lazyLoader) {
-		this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
-	}
+    /**
+     * Constructor.
+     *
+     * @param offset     The external offset for this buffer.
+     * @param inset      The offset into the internal buffer where this buffer
+     *                   starts.
+     * @param lazyLoader the lazy loader for the data
+     */
+    InnerBuffer(final long offset, final int inset, final TreeLazyLoader<P> lazyLoader) {
+        this(offset, inset, LazyLoadedBuffer.UNDEF_LEN, lazyLoader);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param offset       The external offset for this buffer.
-	 * @param inset        The offset into the internal buffer where this buffer
-	 *                     starts.
-	 * @param bufferLength the length of the internal buffer or UNDEF_LEN if
-	 *                     unknown.
-	 * @param lazyLoader   the lazy loader for the data
-	 */
-	private InnerBuffer(final long offset, final int inset, final long bufferLength,
-			final TreeLazyLoader<P> lazyLoader) {
-		super(offset, inset, bufferLength, lazyLoader);
+    /**
+     * Constructor.
+     *
+     * @param offset       The external offset for this buffer.
+     * @param inset        The offset into the internal buffer where this buffer
+     *                     starts.
+     * @param bufferLength the length of the internal buffer or UNDEF_LEN if
+     *                     unknown.
+     * @param lazyLoader   the lazy loader for the data
+     */
+    private InnerBuffer(final long offset, final int inset, final long bufferLength,
+            final TreeLazyLoader<P> lazyLoader) {
+        super(offset, inset, bufferLength, lazyLoader);
 
-	}
+    }
 
-	/**
-	 * Returns the delegate which in this case is the lazyLoader containing the
-	 * information we need for the SpanBuffer.
-	 *
-	 * @return the delegate spanbuffer
-	 * @throws IOException
-	 */
-	@Override
-	protected SpanBuffer getDelegate() throws IOException {
+    /**
+     * Returns the delegate which in this case is the lazyLoader containing the
+     * information we need for the SpanBuffer.
+     *
+     * @return the delegate spanbuffer
+     * @throws IOException
+     */
+    @Override
+    protected SpanBuffer getDelegate() throws IOException {
 
-		// Check if we need to create the delegate
-		if (delegate != null) {
-			return delegate;
-		} else {
-			LOG.debug("{} Generating delegate", this);
-			SpanBuffer buffer = lazyLoader.getRawBuffer(inset);
-			if (buffer.getLength() == 0) {
-				throw new IllegalStateException("Buffer must contain at least 1 byte");
-			}
+        // Check if we need to create the delegate
+        if (delegate != null) {
+            return delegate;
+        } else {
+            LOG.debug("{} Generating delegate", this);
+            SpanBuffer buffer = lazyLoader.getRawBuffer(inset);
+            if (buffer.getLength() == 0) {
+                throw new IllegalStateException("Buffer must contain at least 1 byte");
+            }
 
-			/* Figure out what type of data we have */
-			final byte typeFlag = buffer.read(InnerNode.FLAG_BYTE);
+            /* Figure out what type of data we have */
+            final byte typeFlag = buffer.read(InnerNode.FLAG_BYTE);
 
-			LOG.debug("{} delegate type {}", this, typeFlag);
+            LOG.debug("{} delegate type {}", this, typeFlag);
 
-			final boolean innerNodePtrs = (typeFlag & InnerNode.INNER_NODE_FLAG) != 0;
+            final boolean innerNodePtrs = (typeFlag & InnerNode.INNER_NODE_FLAG) != 0;
 
-			// cut the flag_byte from the front
-			final SpanBuffer spanBuffer = buffer.cut(1);
+            // cut the flag_byte from the front
+            final SpanBuffer spanBuffer = buffer.cut(1);
 
-			if (innerNodePtrs) {
-				delegate = extract(spanBuffer);
-			} else {
+            if (innerNodePtrs) {
+                delegate = extract(spanBuffer);
+            } else {
 
-				final boolean outerNodeType = (typeFlag & InnerNode.OUTER_NODE_FLAG) != 0;
+                final boolean outerNodeType = (typeFlag & InnerNode.OUTER_NODE_FLAG) != 0;
 
-				if (!outerNodeType) {
-					delegate = buildLeaves(spanBuffer);
-				} else {
-					// duplicating spanbuffer with new offset
-					delegate = spanBuffer.duplicate(0);
-				}
+                if (!outerNodeType) {
+                    delegate = buildLeaves(spanBuffer);
+                } else {
+                    // duplicating spanbuffer with new offset
+                    delegate = spanBuffer.duplicate(0);
+                }
 
-			}
+            }
 
-		}
+        }
 
-		return delegate;
+        return delegate;
 
-	}
+    }
 
-	/**
-	 * Expand the SpanBuffer into multiple SpanBuffers by defeferencing the pointers
-	 * into lazy loaders.
-	 *
-	 * @param buffer buffer to be expanded
-	 * @return Expanded SpanBuffer
-	 * @throws IOException on error
-	 */
-	private SpanBuffer extract(final SpanBuffer buffer) throws IOException {
+    /**
+     * Expand the SpanBuffer into multiple SpanBuffers by defeferencing the pointers
+     * into lazy loaders.
+     *
+     * @param buffer buffer to be expanded
+     * @return Expanded SpanBuffer
+     * @throws IOException on error
+     */
+    private SpanBuffer extract(final SpanBuffer buffer) throws IOException {
 
-		final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
+        final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
 
-		LOG.debug("{} extracting {} inner buffers", this, configs.size());
+        LOG.debug("{} extracting {} inner buffers", this, configs.size());
 
-		// to ensure that the offsets of the merged nodes are set correctly use
-		// getOffset()
-		return Factory.merge(getOffset(), configs.stream().map(InnerBuffer::new));
+        // to ensure that the offsets of the merged nodes are set correctly use
+        // getOffset()
+        return Factory.merge(getOffset(), configs.stream().map(InnerBuffer::new));
 
-	}
+    }
 
-	/**
-	 * Builds a leaf node - at this stage the recursion will have found the
-	 * end-node.
-	 *
-	 * @param buffer SpanBuffer to use for creating the leaf node.
-	 * @return Leaf Node
-	 * @throws IOException on error
-	 */
-	private SpanBuffer buildLeaves(final SpanBuffer buffer) throws IOException {
+    /**
+     * Builds a leaf node - at this stage the recursion will have found the
+     * end-node.
+     *
+     * @param buffer SpanBuffer to use for creating the leaf node.
+     * @return Leaf Node
+     * @throws IOException on error
+     */
+    private SpanBuffer buildLeaves(final SpanBuffer buffer) throws IOException {
 
-		final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
+        final List<TreeLazyLoader<P>> configs = lazyLoader.applyMap(buffer);
 
-		LOG.debug("{} extracting {} leaf buffers", this, configs.size());
+        LOG.debug("{} extracting {} leaf buffers", this, configs.size());
 
-		// to ensure that the offsets of the merged nodes are set correctly use
-		// getStart()
-		final SpanBuffer sb = Factory.merge(getOffset(), configs.stream().map(LeafBuffer::new));
+        // to ensure that the offsets of the merged nodes are set correctly use
+        // getStart()
+        final SpanBuffer sb = Factory.merge(getOffset(), configs.stream().map(LeafBuffer::new));
 
-		return sb;
-	}
+        return sb;
+    }
 
-	@Override
-	public SpanBuffer duplicate(final long newOffset) {
-		return new InnerBuffer<P>(newOffset, inset, getLength(), lazyLoader);
-	}
+    @Override
+    public SpanBuffer duplicate(final long newOffset) {
+        return new InnerBuffer<P>(newOffset, inset, getLength(), lazyLoader);
+    }
 
-	@Override
-	public String toString() {
-		return String.format("InnerBuffer[ %s d:%s ]", getNodeBufferString(), delegate);
-	}
+    @Override
+    public String toString() {
+        return String.format("InnerBuffer[ %s d:%s ]", getNodeBufferString(), delegate);
+    }
 
 }

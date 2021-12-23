@@ -13,23 +13,18 @@ public class KafkaPosition implements Position {
     private long length;
     private String topic;
 
-    public static KafkaPosition NO_POSITION = new KafkaPosition( "", 0, 0, 0 );
-    public static int BYTES = (2*Long.BYTES)+Integer.BYTES;
+    public static KafkaPosition NO_POSITION = new KafkaPosition("", 0, 0, 0);
+    public static int BYTES = (2 * Long.BYTES) + Integer.BYTES;
 
-
-    private KafkaPosition(String topic, int partition, long offset, long length)
-    {
-        if (partition < 0)
-        {
-            throw new IllegalArgumentException( "Partition may not be less than zero (0)" );
+    private KafkaPosition(String topic, int partition, long offset, long length) {
+        if (partition < 0) {
+            throw new IllegalArgumentException("Partition may not be less than zero (0)");
         }
-        if (offset < 0)
-        {
-            throw new IllegalArgumentException( "Offset may not be less than zero (0)" );
+        if (offset < 0) {
+            throw new IllegalArgumentException("Offset may not be less than zero (0)");
         }
-        if (length < 0)
-        {
-            throw new IllegalArgumentException( "Length may not be less than zero (0)" );
+        if (length < 0) {
+            throw new IllegalArgumentException("Length may not be less than zero (0)");
         }
         this.topic = topic.trim();
         this.offset = offset;
@@ -37,11 +32,9 @@ public class KafkaPosition implements Position {
         this.length = length;
     }
 
-    KafkaPosition(RecordMetadata metadata, long length)
-    {
-        if (length < 0)
-        {
-            throw new IllegalArgumentException( "Length may not be less than zero (0)" );
+    KafkaPosition(RecordMetadata metadata, long length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length may not be less than zero (0)");
         }
 
         this.topic = metadata.topic();
@@ -50,20 +43,19 @@ public class KafkaPosition implements Position {
         this.length = length;
     }
 
-    public ByteBuffer serialize()
-    {
-        ByteBuffer buff = ByteBuffer.allocate( BYTES );
-        buff.asIntBuffer().put( partition );
-        buff.asLongBuffer().put( offset ).put(length);
+    public ByteBuffer serialize() {
+        ByteBuffer buff = ByteBuffer.allocate(BYTES);
+        buff.asIntBuffer().put(partition);
+        buff.asLongBuffer().put(offset).put(length);
         buff.flip();
         return buff;
     }
 
-    public static KafkaPosition deserialize( String topic, DataInputStream inputStream ) throws IOException {
+    public static KafkaPosition deserialize(String topic, DataInputStream inputStream) throws IOException {
         int partition = inputStream.readInt();
         long offset = inputStream.readLong();
         long length = inputStream.readLong();
-        return new KafkaPosition( topic, partition, offset, length);
+        return new KafkaPosition(topic, partition, offset, length);
 
     }
 
@@ -73,7 +65,7 @@ public class KafkaPosition implements Position {
 
     @Override
     public boolean isNoData() {
-        return length<=0;
+        return length <= 0;
     }
 
     public long getOffset() {

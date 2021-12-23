@@ -26,37 +26,37 @@ import org.xenei.spanbuffer.SpanBuffer;
  */
 public interface LazyLoader {
 
-	/**
-	 * Return the lazy loaded buffer.
-	 * 
-	 * @param inset the insert into the memory mapped buffer.
-	 * @return fully loaded buffer
-	 * @throws IOException on error
-	 */
-	SpanBuffer getBuffer(int inset) throws IOException;
+    /**
+     * Return the lazy loaded buffer.
+     *
+     * @param inset the insert into the memory mapped buffer.
+     * @return fully loaded buffer
+     * @throws IOException on error
+     */
+    SpanBuffer getBuffer(int inset) throws IOException;
 
-	/**
-	 * return the buffer length, load the buffer if unknown.
-	 *
-	 * @return length of buffer
-	 */
-	long getLength();
+    /**
+     * return the buffer length, load the buffer if unknown.
+     *
+     * @return length of buffer
+     */
+    long getLength();
 
-	/**
-	 * A marker to determine when a closable object can be closed.
-	 * 
-	 * @param <T> A Closable type
-	 */
-	public class Marker<T extends Closeable> {
-		private T closable;
+    /**
+     * A marker to determine when a closable object can be closed.
+     *
+     * @param <T> A Closable type
+     */
+    public class Marker<T extends Closeable> {
+        private T closable;
 
-		public Marker(T closable) {
-			this.closable = closable;
-		}
+        public Marker(T closable) {
+            this.closable = closable;
+        }
 
-		public T get() {
-			return closable;
-		}
-	}
+        public T get() {
+            return closable;
+        }
+    }
 
 }

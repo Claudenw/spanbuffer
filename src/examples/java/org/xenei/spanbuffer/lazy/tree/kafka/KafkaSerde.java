@@ -28,10 +28,11 @@ import org.xenei.spanbuffer.lazy.tree.serde.SerdeImpl;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 import org.xenei.spanbuffer.lazy.tree.serde.TreeSerializer;
 
-public class KafkaSerde extends SerdeImpl<KafkaPosition>{
+public class KafkaSerde extends SerdeImpl<KafkaPosition> {
 
     public KafkaSerde(String topic, Properties producerProperties, Properties consumerProperties) {
-        super(new KafkaBufferFactory(), new KafkaSerializer(topic, producerProperties), new KafkaDeserializer(topic, consumerProperties));
+        super(new KafkaBufferFactory(), new KafkaSerializer(topic, producerProperties),
+                new KafkaDeserializer(topic, consumerProperties));
     }
 
     public static class KafkaBufferFactory implements BufferFactory {
@@ -48,7 +49,7 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
 
         @Override
         public ByteBuffer createBuffer() throws IOException {
-            return ByteBuffer.allocate( bufferSize() );
+            return ByteBuffer.allocate(bufferSize());
 
         }
 
@@ -61,13 +62,13 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
 
     public static class KafkaSerializer implements TreeSerializer<KafkaPosition> {
 
-        private KafkaProducer<UUID,ByteBuffer> producer;
+        private KafkaProducer<UUID, ByteBuffer> producer;
         private String topic;
 
-        public KafkaSerializer( String topic, Properties producerProperties )
-        {
+        public KafkaSerializer(String topic, Properties producerProperties) {
             this.topic = topic;
-            this.producer = new KafkaProducer<UUID,ByteBuffer>( producerProperties, new UUIDSerializer(), new ByteBufferSerializer() );
+            this.producer = new KafkaProducer<UUID, ByteBuffer>(producerProperties, new UUIDSerializer(),
+                    new ByteBufferSerializer());
         }
 
         @Override
@@ -83,14 +84,15 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
         @Override
         public KafkaPosition serialize(ByteBuffer buffer) throws IOException {
             long length = buffer.remaining();
-            ProducerRecord<UUID,ByteBuffer> record = new ProducerRecord<UUID,ByteBuffer>(topic, UUID.randomUUID(), buffer);
+            ProducerRecord<UUID, ByteBuffer> record = new ProducerRecord<UUID, ByteBuffer>(topic, UUID.randomUUID(),
+                    buffer);
             producer.beginTransaction();
             Future<RecordMetadata> future = producer.send(record);
             producer.commitTransaction();
             try {
                 return new KafkaPosition(future.get(), length);
             } catch (InterruptedException | ExecutionException e) {
-                throw new IOException( e );
+                throw new IOException(e);
             }
         }
 
@@ -106,12 +108,11 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
 
     }
 
-
     public static class KafkaDeserializer implements TreeDeserializer<KafkaPosition> {
         private String topic;
         private Properties consumerProperties;
 
-        KafkaDeserializer( String topic, Properties consumerProperties) {
+        KafkaDeserializer(String topic, Properties consumerProperties) {
             this.topic = topic;
             this.consumerProperties = consumerProperties;
             this.consumerProperties.put("enable.auto.commit", Boolean.FALSE);
@@ -127,12 +128,12 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
             if (position.isNoData()) {
                 return ByteBuffer.allocate(0);
             }
-            try (KafkaConsumer<UUID,ByteBuffer> consumer = new KafkaConsumer<UUID,ByteBuffer>(consumerProperties, new UUIDDeserializer(), new ByteBufferDeserializer()))
-            {
-                consumer.seek( position.getPartition(), position.getOffset() );
-                ConsumerRecords<UUID,ByteBuffer> recs = consumer.poll( Duration.ZERO );
+            try (KafkaConsumer<UUID, ByteBuffer> consumer = new KafkaConsumer<UUID, ByteBuffer>(consumerProperties,
+                    new UUIDDeserializer(), new ByteBufferDeserializer())) {
+                consumer.seek(position.getPartition(), position.getOffset());
+                ConsumerRecords<UUID, ByteBuffer> recs = consumer.poll(Duration.ZERO);
                 if (recs.isEmpty()) {
-                    throw new IOException( "Record not found" );
+                    throw new IOException("Record not found");
                 }
                 return recs.iterator().next().value();
             }
@@ -141,11 +142,12 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
         @Override
         public List<TreeLazyLoader<KafkaPosition>> extractLoaders(SpanBuffer buffer) throws IOException {
             List<TreeLazyLoader<KafkaPosition>> result = new ArrayList<TreeLazyLoader<KafkaPosition>>();
-            try (DataInputStream dis = new DataInputStream( buffer.getInputStream())) {
+            try (DataInputStream dis = new DataInputStream(buffer.getInputStream())) {
                 while (true) {
                     try {
                         KafkaPosition position = KafkaPosition.deserialize(topic, dis);
-                        TreeLazyLoader<KafkaPosition> tll = new TreeLazyLoader<KafkaPosition>(position.getLength(),  position, this);
+                        TreeLazyLoader<KafkaPosition> tll = new TreeLazyLoader<KafkaPosition>(position.getLength(),
+                                position, this);
                         result.add(tll);
                     } catch (EOFException e) {
                         return result;
@@ -157,6 +159,5 @@ public class KafkaSerde extends SerdeImpl<KafkaPosition>{
         }
 
     }
-
 
 }

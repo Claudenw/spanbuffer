@@ -25,37 +25,37 @@ import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 
 public class TestHeaderBufferFactory implements BufferFactory {
 
-	private int bufferSize;
+    private int bufferSize;
 
-	public TestHeaderBufferFactory(int bufferSize) {
-		this.bufferSize = bufferSize;
-	}
+    public TestHeaderBufferFactory(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
-	@Override
-	public int bufferSize() {
-		return bufferSize + 5;
-	}
+    @Override
+    public int bufferSize() {
+        return bufferSize + 5;
+    }
 
-	@Override
-	public ByteBuffer createBuffer() {
-		/* create a buffer with a header that has a known fill */
-		ByteBuffer bb = ByteBuffer.allocate(bufferSize());
-		for (int i = 0; i < headerSize(); i++) {
-			bb.put((byte) i);
-		}
-		return bb;
-	}
+    @Override
+    public ByteBuffer createBuffer() {
+        /* create a buffer with a header that has a known fill */
+        ByteBuffer bb = ByteBuffer.allocate(bufferSize());
+        for (int i = 0; i < headerSize(); i++) {
+            bb.put((byte) i);
+        }
+        return bb;
+    }
 
-	@Override
-	public int headerSize() {
-		return 5;
-	}
+    @Override
+    public int headerSize() {
+        return 5;
+    }
 
-	@Override
-	public void free(ByteBuffer buffer) {
-		/* verify the header is intact */
-		for (int i = 0; i < headerSize(); i++) {
-			assertEquals(String.format("on free() buffer header corrupted at %s", i), (byte) i, buffer.get(i));
-		}
-	}
+    @Override
+    public void free(ByteBuffer buffer) {
+        /* verify the header is intact */
+        for (int i = 0; i < headerSize(); i++) {
+            assertEquals(String.format("on free() buffer header corrupted at %s", i), (byte) i, buffer.get(i));
+        }
+    }
 }

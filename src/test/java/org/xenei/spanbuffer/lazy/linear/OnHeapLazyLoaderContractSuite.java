@@ -42,107 +42,107 @@ import org.xenei.spanbuffer.SpanBufferContractTest.SpanBufferProducer;
 @ContractImpl(OnHeapLazyLoaderContractSuite.TestingSpanBuffer.class)
 public class OnHeapLazyLoaderContractSuite {
 
-	private File file;
-	private byte[] contents;
-	private List<RandomAccessFile> lst;
+    private File file;
+    private byte[] contents;
+    private List<RandomAccessFile> lst;
 
-	public OnHeapLazyLoaderContractSuite() throws FileNotFoundException, IOException {
-		URL url = this.getClass().getClassLoader().getResource("small.txt");
-		file = new File(url.getFile());
-		lst = new ArrayList<RandomAccessFile>();
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				FileInputStream fis = new FileInputStream(file)) {
-			IOUtils.copyLarge(fis, baos);
-			contents = baos.toByteArray();
-		}
-	}
+    public OnHeapLazyLoaderContractSuite() throws FileNotFoundException, IOException {
+        URL url = this.getClass().getClassLoader().getResource("small.txt");
+        file = new File(url.getFile());
+        lst = new ArrayList<RandomAccessFile>();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                FileInputStream fis = new FileInputStream(file)) {
+            IOUtils.copyLarge(fis, baos);
+            contents = baos.toByteArray();
+        }
+    }
 
-	@Contract.Inject
-	public SpanBufferProducer<SpanBuffer> getProducer() {
-		return new SpanBufferProducer<SpanBuffer>() {
+    @Contract.Inject
+    public SpanBufferProducer<SpanBuffer> getProducer() {
+        return new SpanBufferProducer<SpanBuffer>() {
 
-			@Override
-			public SpanBuffer newInstance() {
-				try {
-					RandomAccessFile raf = new RandomAccessFile(file, "r");
-					lst.add(raf);
-					return OnHeapLazyLoader.load(raf, Factory.DEFAULT_INTERNAL_BUFFER_SIZE, false);
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
-			}
+            @Override
+            public SpanBuffer newInstance() {
+                try {
+                    RandomAccessFile raf = new RandomAccessFile(file, "r");
+                    lst.add(raf);
+                    return OnHeapLazyLoader.load(raf, Factory.DEFAULT_INTERNAL_BUFFER_SIZE, false);
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
 
-			@Override
-			public void cleanUp() {
-				for (RandomAccessFile raf : lst) {
-					try {
-						raf.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+            @Override
+            public void cleanUp() {
+                for (RandomAccessFile raf : lst) {
+                    try {
+                        raf.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-			@Override
-			public byte[] getBufferContents() {
-				return contents;
-			}
-		};
-	}
+            @Override
+            public byte[] getBufferContents() {
+                return contents;
+            }
+        };
+    }
 
-	private static class TestingSpanBuffer extends AbstractSpanBuffer {
+    private static class TestingSpanBuffer extends AbstractSpanBuffer {
 
-		protected TestingSpanBuffer(long offset) {
-			super(offset);
-		}
+        protected TestingSpanBuffer(long offset) {
+            super(offset);
+        }
 
-		@Override
-		public SpanBuffer duplicate(long newOffset) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public SpanBuffer duplicate(long newOffset) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public SpanBuffer sliceAt(long position) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public SpanBuffer sliceAt(long position) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public SpanBuffer head(long byteCount) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public SpanBuffer head(long byteCount) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public byte read(long position) throws IOException {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        @Override
+        public byte read(long position) throws IOException {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
-		@Override
-		public int read(long position, byte[] buff, int pos, int len) throws IOException {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        @Override
+        public int read(long position, byte[] buff, int pos, int len) throws IOException {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
-		@Override
-		public long getLength() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        @Override
+        public long getLength() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
-		@Override
-		public long getEnd() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        @Override
+        public long getEnd() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
-		@Override
-		public int read(long position, ByteBuffer buff) throws IOException {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        @Override
+        public int read(long position, ByteBuffer buff) throws IOException {
+            // TODO Auto-generated method stub
+            return 0;
+        }
 
-	}
+    }
 }

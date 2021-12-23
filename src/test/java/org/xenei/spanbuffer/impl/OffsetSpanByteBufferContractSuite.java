@@ -24,37 +24,36 @@ import org.xenei.junit.contract.Contract;
 import org.xenei.junit.contract.ContractImpl;
 import org.xenei.junit.contract.ContractSuite;
 import org.xenei.spanbuffer.SpanBufferContractTest.SpanBufferProducer;
-import org.xenei.spanbuffer.impl.SpanByteBuffer;
 
 @RunWith(ContractSuite.class)
 @ContractImpl(SpanByteBuffer.class)
 public class OffsetSpanByteBufferContractSuite {
 
-	ByteBuffer bb;
+    ByteBuffer bb;
 
-	public OffsetSpanByteBufferContractSuite() {
-		bb = ByteBuffer.wrap("xxHello World".getBytes());
-		bb.position(2);
-	}
+    public OffsetSpanByteBufferContractSuite() {
+        bb = ByteBuffer.wrap("xxHello World".getBytes());
+        bb.position(2);
+    }
 
-	@Contract.Inject
-	public SpanBufferProducer<SpanByteBuffer> getProducer() {
-		return new SpanBufferProducer<SpanByteBuffer>() {
+    @Contract.Inject
+    public SpanBufferProducer<SpanByteBuffer> getProducer() {
+        return new SpanBufferProducer<SpanByteBuffer>() {
 
-			@Override
-			public SpanByteBuffer newInstance() {
-				return new SpanByteBuffer(bb);
-			}
+            @Override
+            public SpanByteBuffer newInstance() {
+                return new SpanByteBuffer(bb);
+            }
 
-			@Override
-			public void cleanUp() {
-				// do nothing
-			}
+            @Override
+            public void cleanUp() {
+                // do nothing
+            }
 
-			@Override
-			public byte[] getBufferContents() {
-				return "Hello World".getBytes();
-			}
-		};
-	}
+            @Override
+            public byte[] getBufferContents() {
+                return "Hello World".getBytes();
+            }
+        };
+    }
 }

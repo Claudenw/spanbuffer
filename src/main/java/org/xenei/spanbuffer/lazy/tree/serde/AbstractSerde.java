@@ -27,54 +27,54 @@ import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
  * @param <P> the Position type.
  */
 public abstract class AbstractSerde<P extends Position> {
-	/**
-	 * get the deserializer for this serde.
-	 * 
-	 * @return the deserializer.
-	 */
-	public abstract TreeDeserializer<P> getDeserializer();
+    /**
+     * get the deserializer for this serde.
+     *
+     * @return the deserializer.
+     */
+    public abstract TreeDeserializer<P> getDeserializer();
 
-	/**
-	 * Get the serializer for this serde.
-	 * 
-	 * @return the serializer
-	 */
-	public abstract TreeSerializer<P> getSerializer();
+    /**
+     * Get the serializer for this serde.
+     *
+     * @return the serializer
+     */
+    public abstract TreeSerializer<P> getSerializer();
 
-	/**
-	 * get the buffer factory for this serde.
-	 * 
-	 * @return the buffer factory.
-	 */
-	public abstract BufferFactory getFactory();
+    /**
+     * get the buffer factory for this serde.
+     *
+     * @return the buffer factory.
+     */
+    public abstract BufferFactory getFactory();
 
-	/**
-	 * Verify that the serde is valid.
-	 * 
-	 * To be valid
-	 * <ul>
-	 * <li>the factory must produce buffers that are 1 + (2*positionSize) long.
-	 * Position size is specified by the serializer.</li>
-	 * <li>the deserializer header size must be equal to the factory header
-	 * size.</li>
-	 * </ul>
-	 * 
-	 * @throwsIllegalArgumentException if the condition is not met.
-	 */
-	public void verify() {
-		int minInnerLeafSize = 1 + (getSerializer().getPositionSize() * 2);
-		if (getFactory().bufferSize() < minInnerLeafSize) {
-			throw new IllegalArgumentException(
-					String.format("Factory must produce buffers that are at least %s bytes long", minInnerLeafSize));
-		}
-		if (getFactory().headerSize() != getDeserializer().headerSize()) {
-			throw new IllegalArgumentException(String.format(
-					"Factory and Deserializer must specify the same header size. Factory=%s, Deserializer=%s",
-					getFactory().headerSize(), getDeserializer().headerSize()));
-		}
-	}
+    /**
+     * Verify that the serde is valid.
+     *
+     * To be valid
+     * <ul>
+     * <li>the factory must produce buffers that are 1 + (2*positionSize) long.
+     * Position size is specified by the serializer.</li>
+     * <li>the deserializer header size must be equal to the factory header
+     * size.</li>
+     * </ul>
+     *
+     * @throwsIllegalArgumentException if the condition is not met.
+     */
+    public void verify() {
+        int minInnerLeafSize = 1 + (getSerializer().getPositionSize() * 2);
+        if (getFactory().bufferSize() < minInnerLeafSize) {
+            throw new IllegalArgumentException(
+                    String.format("Factory must produce buffers that are at least %s bytes long", minInnerLeafSize));
+        }
+        if (getFactory().headerSize() != getDeserializer().headerSize()) {
+            throw new IllegalArgumentException(String.format(
+                    "Factory and Deserializer must specify the same header size. Factory=%s, Deserializer=%s",
+                    getFactory().headerSize(), getDeserializer().headerSize()));
+        }
+    }
 
-	public TreeLazyLoader<P> getLazyLoader(P pos) {
-		return new TreeLazyLoader<P>(pos, getDeserializer());
-	}
+    public TreeLazyLoader<P> getLazyLoader(P pos) {
+        return new TreeLazyLoader<P>(pos, getDeserializer());
+    }
 }
