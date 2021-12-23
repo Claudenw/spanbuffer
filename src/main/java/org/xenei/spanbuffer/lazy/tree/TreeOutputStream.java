@@ -153,7 +153,8 @@ public class TreeOutputStream extends OutputStream {
 			 * write some or all of the data depending on how much is left.
 			 */
 			int partLimit = Integer.min(data.remaining(), leafNode.getSpace());
-			ByteBuffer part = data.duplicate().limit(data.position() + partLimit);
+			ByteBuffer part = data.duplicate();
+			part.limit(data.position() + partLimit);
 			writeNode(part, LEAF_NODE_INDEX, partLimit);
 			data.position(part.limit());
 		}

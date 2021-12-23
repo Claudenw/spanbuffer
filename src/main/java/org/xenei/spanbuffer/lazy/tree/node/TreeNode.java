@@ -155,7 +155,9 @@ public abstract class TreeNode {
 	 * @return the filled data buffer.
 	 */
 	public ByteBuffer getData() {
-		return data.duplicate().flip();
+	    ByteBuffer result = data.duplicate();
+	    result.flip();
+		return result;
 	}
 
 	/**

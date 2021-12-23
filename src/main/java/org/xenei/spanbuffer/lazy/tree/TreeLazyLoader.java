@@ -28,27 +28,38 @@ import org.xenei.spanbuffer.lazy.tree.serde.TreeDeserializer;
 
 /**
  * Class that manages the loading of tree data.
- * 
+ *
  * @param <P> the Position implementation.
- * 
+ *
  *            This class always returns buffers at offset 0.
- * 
+ *
  */
 public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 
-	private TreeDeserializer<P> deserializer;
-	private P position;
+	private final TreeDeserializer<P> deserializer;
+	private final P position;
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param position     The position in the deserializer to read the data from.
 	 * @param deserializer the deserializer to read from.
 	 */
-	public TreeLazyLoader(P position, TreeDeserializer<P> deserializer) {
-		this.deserializer = deserializer;
-		this.position = position;
+	public TreeLazyLoader(final P position, final TreeDeserializer<P> deserializer) {
+	    this( null, position, deserializer);
 	}
+
+	/**
+     * Constructor.
+     * @param length       The length of the buffer.
+     * @param position     The position in the deserializer to read the data from.
+     * @param deserializer the deserializer to read from.
+     */
+    public TreeLazyLoader(final Long length, final P position, final TreeDeserializer<P> deserializer) {
+        super( length );
+        this.deserializer = deserializer;
+        this.position = position;
+    }
 
 	@Override
 	public SpanBuffer getBuffer(int inset) {
@@ -60,7 +71,7 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 
 	/**
 	 * Apply the deserializer map to the buffer to create a list of TreeLazyLoaders.
-	 * 
+	 *
 	 * @return a list of TreeLazyLoader<P,T> from the buffer.
 	 * @throws IOException on error
 	 */
@@ -70,7 +81,7 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 
 	/**
 	 * Get the position this lazy loader is using
-	 * 
+	 *
 	 * @return the position.
 	 */
 	public final P getPosition() {
@@ -79,7 +90,7 @@ public class TreeLazyLoader<P extends Position> extends AbstractLazyLoader {
 
 	/**
 	 * Return true if the buffer has no data.
-	 * 
+	 *
 	 * @return true if the buffer has no data.
 	 */
 	public final boolean hasNoData() {

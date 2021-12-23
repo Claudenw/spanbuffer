@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.xpath.XPathResult;
 import org.xenei.spanbuffer.SpanBuffer;
 import org.xenei.spanbuffer.lazy.tree.node.BufferFactory;
 import org.xenei.spanbuffer.lazy.tree.serde.SerdeImpl;
@@ -66,7 +67,9 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 
 		@Override
 		public ByteBuffer serialize(TestPosition position) {
-			return ByteBuffer.allocate(Integer.BYTES).putInt(position.idx).flip();
+			ByteBuffer result = ByteBuffer.allocate(Integer.BYTES).putInt(position.idx);
+			result.flip();
+			return result;
 		}
 
 		@Override
@@ -98,7 +101,13 @@ public class TestSerde extends SerdeImpl<TestPosition> {
 
 		@Override
 		public ByteBuffer deserialize(TestPosition position) {
-			return position.isNoData() ? null : buffers.get(position.idx).duplicate().flip().position(headerSize);
+		    ByteBuffer result = null;
+			if (!position.isNoData()) {
+			    result = buffers.get(position.idx).duplicate();
+			    result.flip();
+			    result.position(headerSize);
+			}
+			return result;
 		}
 
 		@Override

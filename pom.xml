@@ -80,6 +80,14 @@
 			<version>1.7.26</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+<dependency>
+    <groupId>org.apache.kafka</groupId>
+    <artifactId>kafka-clients</artifactId>
+    <version>2.4.0</version>
+    <optional>true</optional>
+</dependency>
+		
 	</dependencies>
 	<distributionManagement>
 	</distributionManagement>

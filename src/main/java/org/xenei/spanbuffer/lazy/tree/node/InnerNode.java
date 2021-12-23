@@ -68,9 +68,9 @@ public class InnerNode extends TreeNode {
 
 	/**
 	 * Create an Outer Node type of inner node from the leaf node.
-	 * 
+	 *
 	 * There must be space in the leaf node for the flag byte.
-	 * 
+	 *
 	 * @param ln LeafNode with Data
 	 * @throws IllegalStateException if the LeafNode data is too big for the Inner
 	 *                               node
@@ -85,7 +85,10 @@ public class InnerNode extends TreeNode {
 		 * the number of bytes actually written to the buffer.
 		 */
 		if (hasSpace(ln.getUsedSpace())) {
-			data.position(typePosition() + 1).put(ln.getData().position(span.getOffset()));
+			data.position(typePosition() + 1);
+			ByteBuffer leafData = ln.getData();
+			leafData.position(span.getOffset());
+			data.put(leafData);
 			length += ln.getExpandedLength();
 			factory.free(ln.getRawBuffer());
 		} else {

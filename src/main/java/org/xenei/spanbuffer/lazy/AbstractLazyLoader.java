@@ -32,7 +32,7 @@ public abstract class AbstractLazyLoader implements LazyLoader {
      */
 	private SoftReference<SpanBuffer> loadedBufferReference = null;
 	/**
-	 * The lenght of the buffer if known.
+	 * The length of the buffer if known.
 	 */
 	private Long length = null;
 
